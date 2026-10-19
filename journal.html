@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>幣圈新手村 PRO v3.2｜交易復盤系統・倉位與加倉計算機・必備工具庫</title>
+  <title>幣圈新手村 PRO v4.0｜交易復盤系統・倉位與加倉計算機・必備工具庫</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
   <style>
@@ -66,28 +66,29 @@
     <header class="sticky top-0 z-40 bg-slate-950/90 backdrop-blur-md border-b border-slate-800">
       <div class="max-w-7xl mx-auto px-3 sm:px-6 h-16 flex items-center justify-between gap-2">
         <div class="flex items-center gap-2.5 min-w-0 shrink">
-          <a href="index.html" class="shrink-0">
+          <a href="index.html" class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-amber-400 to-orange-600 flex items-center justify-center font-black text-slate-950 text-sm shrink-0 overflow-hidden border border-amber-400/60">
             <img src="avatar.png" alt="村長"
-                 onerror="if(!this.dataset.t){this.dataset.t='1';this.src='avatar.jpg';}else{this.style.display='none';}"
-                 class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl object-cover border border-amber-400/60 bg-slate-800" />
+                 onerror="if(!this.dataset.t){this.dataset.t='1';this.src='avatar.jpg';}else{this.style.display='none';this.nextElementSibling.classList.remove('hidden');}"
+                 class="w-full h-full object-cover" />
+            <span class="hidden font-black text-base text-slate-950">村</span>
           </a>
           <div class="min-w-0">
             <div class="flex items-center gap-1 whitespace-nowrap">
               <span class="font-black text-sm sm:text-lg theme-text-main tracking-tight">幣圈新手村 PRO</span>
-              <span class="text-[10px] sm:text-xs font-extrabold px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-400">v3.2</span>
+              <span class="text-[10px] sm:text-xs font-extrabold px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-400">v4.0</span>
             </div>
             <span id="headerUserBadge" class="text-[11px] theme-text-muted block truncate">請先登入通行證帳號</span>
           </div>
         </div>
 
         <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
-          <button type="button" onclick="toggleTheme()" class="px-2.5 py-2 rounded-xl text-xs font-bold theme-sub theme-text-main hover:opacity-80 whitespace-nowrap">
+          <button type="button" onclick="window.toggleTheme()" class="px-2.5 py-2 rounded-xl text-xs font-bold theme-sub theme-text-main hover:opacity-80 whitespace-nowrap">
             ☀️/🌙
           </button>
           <a href="index.html" class="px-2.5 sm:px-3.5 py-2 rounded-xl text-xs font-bold theme-sub theme-text-main whitespace-nowrap">
             ← 首頁
           </a>
-          <button type="button" id="logoutBtn" onclick="handleLogout()" class="hidden px-2.5 sm:px-3.5 py-2 rounded-xl text-xs font-bold bg-rose-500/20 text-rose-500 border border-rose-500/30 whitespace-nowrap">
+          <button type="button" id="logoutBtn" onclick="window.handleLogout()" class="hidden px-2.5 sm:px-3.5 py-2 rounded-xl text-xs font-bold bg-rose-500/20 text-rose-500 border border-rose-500/30 whitespace-nowrap">
             登出
           </button>
         </div>
@@ -98,10 +99,13 @@
     <section id="loginSection" class="max-w-md mx-auto px-4 py-12">
       <div class="theme-card rounded-3xl p-6 sm:p-8 shadow-2xl">
         <div class="text-center mb-6">
-          <img src="avatar.png" alt="村長"
-               onerror="if(!this.dataset.t){this.dataset.t='1';this.src='avatar.jpg';}else{this.style.display='none';}"
-               class="w-16 h-16 rounded-2xl object-cover border-2 border-amber-400 mx-auto mb-3 shadow-lg" />
-          <h1 class="text-xl sm:text-2xl font-black theme-text-main">登入 VIP 交易復盤系統 <span class="text-xs text-emerald-400 font-extrabold">v3.2</span></h1>
+          <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-amber-400 to-orange-600 border-2 border-amber-400 mx-auto mb-3 shadow-lg flex items-center justify-center overflow-hidden">
+            <img src="avatar.png" alt="村長"
+                 onerror="if(!this.dataset.t){this.dataset.t='1';this.src='avatar.jpg';}else{this.style.display='none';this.nextElementSibling.classList.remove('hidden');}"
+                 class="w-full h-full object-cover" />
+            <span class="hidden font-black text-2xl text-slate-950">村</span>
+          </div>
+          <h1 class="text-xl sm:text-2xl font-black theme-text-main">登入 VIP 交易復盤系統 <span class="text-xs text-emerald-400 font-extrabold">v4.0</span></h1>
           <p class="text-xs theme-text-muted mt-1">請輸入村長核發之「專屬帳號（或 UID）」與「專屬密碼」</p>
         </div>
 
@@ -109,19 +113,19 @@
           <div>
             <label class="block text-xs font-bold theme-text-main mb-1.5">專屬帳號 (或審核之 UID)</label>
             <input type="text" id="loginAccount" placeholder="請輸入專屬帳號"
-                   onkeydown="if(event.key==='Enter') doSystemLogin()"
+                   onkeydown="if(event.key==='Enter'){event.preventDefault();window.doSystemLogin();}"
                    class="w-full px-4 py-3 rounded-xl theme-input text-sm" />
           </div>
           <div>
             <label class="block text-xs font-bold theme-text-main mb-1.5">專屬密碼</label>
             <input type="password" id="loginPassword" placeholder="請輸入專屬密碼"
-                   onkeydown="if(event.key==='Enter') doSystemLogin()"
+                   onkeydown="if(event.key==='Enter'){event.preventDefault();window.doSystemLogin();}"
                    class="w-full px-4 py-3 rounded-xl theme-input text-sm" />
           </div>
 
           <div id="loginErrorMsg" class="text-xs font-bold rounded-xl p-3 hidden"></div>
 
-          <button type="button" id="loginSubmitBtn" onclick="doSystemLogin()"
+          <button type="button" id="loginSubmitBtn" onclick="window.doSystemLogin()"
                   class="w-full py-3.5 rounded-xl font-extrabold text-sm bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-slate-950 shadow-lg active:scale-[0.98] transition-all cursor-pointer">
             🚀 登入復盤系統
           </button>
@@ -143,10 +147,10 @@
         <div class="flex flex-wrap items-center gap-2">
           <div class="flex items-center gap-1.5 theme-sub px-3 py-1.5 rounded-xl">
             <span class="text-xs theme-text-muted">初始本金(U):</span>
-            <input type="number" id="stuInitialCapitalInput" oninput="renderStudentTrades()" class="w-20 bg-transparent text-amber-500 amber-badge-text font-extrabold text-sm focus:outline-none" value="1000" />
+            <input type="number" id="stuInitialCapitalInput" oninput="window.renderStudentTrades()" class="w-20 bg-transparent text-amber-500 amber-badge-text font-extrabold text-sm focus:outline-none" value="1000" />
           </div>
-          <button type="button" id="cloudSyncBtn" onclick="syncTradesFromCloud(true)" class="px-3.5 py-2 rounded-xl text-xs font-extrabold bg-cyan-500/20 text-cyan-500 cyan-badge-text border border-cyan-500/30">🔄 雲端同步</button>
-          <button type="button" onclick="exportMyTradesCsv()" class="px-3 py-2 rounded-xl text-xs font-bold theme-sub theme-text-main">📥 匯出 CSV</button>
+          <button type="button" id="cloudSyncBtn" onclick="window.syncTradesFromCloud(true)" class="px-3.5 py-2 rounded-xl text-xs font-extrabold bg-cyan-500/20 text-cyan-500 cyan-badge-text border border-cyan-500/30">🔄 雲端同步</button>
+          <button type="button" onclick="window.exportMyTradesCsv()" class="px-3 py-2 rounded-xl text-xs font-bold theme-sub theme-text-main">📥 匯出 CSV</button>
         </div>
       </div>
 
@@ -180,12 +184,12 @@
 
       <!-- 功能分頁按鈕 -->
       <div class="flex flex-wrap gap-2 mb-6 border-b border-slate-800/50 pb-3">
-        <button type="button" id="stuTabBtn-journal" onclick="switchStudentTab('journal')" class="px-3.5 py-2 rounded-xl font-extrabold text-xs sm:text-sm bg-amber-500 text-slate-950">📝 我的交易復盤日誌</button>
-        <button type="button" id="stuTabBtn-resources" onclick="switchStudentTab('resources')" class="px-3.5 py-2 rounded-xl font-bold text-xs sm:text-sm theme-sub theme-text-main">⚡ 好用工具與講義</button>
-        <button type="button" id="stuTabBtn-calc" onclick="switchStudentTab('calc')" class="px-3.5 py-2 rounded-xl font-bold text-xs sm:text-sm theme-sub theme-text-main">🧮 倉位 & 加倉計算機</button>
-        <button type="button" id="stuTabBtn-leaderboard" onclick="switchStudentTab('leaderboard')" class="px-3.5 py-2 rounded-xl font-bold text-xs sm:text-sm theme-sub theme-text-main">🏆 排行榜</button>
-        <button type="button" id="stuTabBtn-admin" onclick="switchStudentTab('admin')" class="hidden px-3.5 py-2 rounded-xl font-extrabold text-xs sm:text-sm bg-rose-500 text-white">⚙️ 村長管理後台</button>
-        <button type="button" id="stuTabBtn-review" onclick="switchStudentTab('review')" class="hidden px-3.5 py-2 rounded-xl font-extrabold text-xs sm:text-sm bg-purple-500 text-white">✍️ 批改學員倉位</button>
+        <button type="button" id="stuTabBtn-journal" onclick="window.switchStudentTab('journal')" class="px-3.5 py-2 rounded-xl font-extrabold text-xs sm:text-sm bg-amber-500 text-slate-950">📝 我的交易復盤日誌</button>
+        <button type="button" id="stuTabBtn-resources" onclick="window.switchStudentTab('resources')" class="px-3.5 py-2 rounded-xl font-bold text-xs sm:text-sm theme-sub theme-text-main">⚡ 好用工具與講義</button>
+        <button type="button" id="stuTabBtn-calc" onclick="window.switchStudentTab('calc')" class="px-3.5 py-2 rounded-xl font-bold text-xs sm:text-sm theme-sub theme-text-main">🧮 倉位 & 加倉計算機</button>
+        <button type="button" id="stuTabBtn-leaderboard" onclick="window.switchStudentTab('leaderboard')" class="px-3.5 py-2 rounded-xl font-bold text-xs sm:text-sm theme-sub theme-text-main">🏆 排行榜</button>
+        <button type="button" id="stuTabBtn-admin" onclick="window.switchStudentTab('admin')" class="hidden px-3.5 py-2 rounded-xl font-extrabold text-xs sm:text-sm bg-rose-500 text-white">⚙️ 村長管理後台</button>
+        <button type="button" id="stuTabBtn-review" onclick="window.switchStudentTab('review')" class="hidden px-3.5 py-2 rounded-xl font-extrabold text-xs sm:text-sm bg-purple-500 text-white">✍️ 批改學員倉位</button>
       </div>
 
       <!-- 分頁 1：個人交易復盤日誌 -->
@@ -194,12 +198,12 @@
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5 border-b border-slate-800/40 pb-3">
             <h2 id="tradeFormTitle" class="text-base sm:text-lg font-black theme-text-main">➕ 新增我的交易復盤紀錄</h2>
             <div class="grid grid-cols-2 rounded-xl theme-sub p-1 w-full sm:w-auto">
-              <button type="button" id="modeBtnSingle" onclick="setEntryMode('single')" class="px-3 py-1.5 rounded-lg text-xs font-extrabold bg-amber-500 text-slate-950 text-center">單筆模式</button>
-              <button type="button" id="modeBtnBatch" onclick="setEntryMode('batch')" class="px-3 py-1.5 rounded-lg text-xs font-bold theme-text-muted text-center">分批進出場模式</button>
+              <button type="button" id="modeBtnSingle" onclick="window.setEntryMode('single')" class="px-3 py-1.5 rounded-lg text-xs font-extrabold bg-amber-500 text-slate-950 text-center">單筆模式</button>
+              <button type="button" id="modeBtnBatch" onclick="window.setEntryMode('batch')" class="px-3 py-1.5 rounded-lg text-xs font-bold theme-text-muted text-center">分批進出場模式</button>
             </div>
           </div>
 
-          <form id="tradeRecordForm" onsubmit="addOrUpdateTradeRecord(event)" class="space-y-4">
+          <form id="tradeRecordForm" onsubmit="window.addOrUpdateTradeRecord(event)" class="space-y-4">
             <input type="hidden" id="editTradeRowIndex" value="" />
 
             <div class="p-3.5 sm:p-4 rounded-2xl theme-sub space-y-3">
@@ -219,7 +223,7 @@
                 </div>
                 <div>
                   <label class="block text-xs font-bold theme-text-main mb-1">多空方向 *</label>
-                  <select id="trSide" onchange="previewAutoFee()" class="w-full px-3 py-2.5 rounded-xl theme-input text-sm font-bold">
+                  <select id="trSide" onchange="window.previewAutoFee()" class="w-full px-3 py-2.5 rounded-xl theme-input text-sm font-bold">
                     <option value="做多 Long">🟢 做多 Long</option>
                     <option value="做空 Short">🔴 做空 Short</option>
                   </select>
@@ -231,7 +235,7 @@
               <div class="space-y-2.5">
                 <div class="flex items-center justify-between gap-2">
                   <span class="text-xs font-extrabold text-cyan-500 cyan-badge-text">📥 分批進場（自動算開倉均價與總持倉）</span>
-                  <button type="button" onclick="addBatchInRow()" class="px-2.5 py-1 rounded-lg bg-cyan-500/20 text-cyan-500 cyan-badge-text text-xs font-bold shrink-0">+ 新增進場</button>
+                  <button type="button" onclick="window.addBatchInRow()" class="px-2.5 py-1 rounded-lg bg-cyan-500/20 text-cyan-500 cyan-badge-text text-xs font-bold shrink-0">+ 新增進場</button>
                 </div>
                 <div id="batchInRowsContainer" class="space-y-2"></div>
               </div>
@@ -239,7 +243,7 @@
               <div class="space-y-2.5 pt-3 lg:pt-0 border-t lg:border-t-0 border-slate-700/40">
                 <div class="flex items-center justify-between gap-2">
                   <span class="text-xs font-extrabold text-amber-500 amber-badge-text">📤 分批出場（自動算平倉均價）</span>
-                  <button type="button" onclick="addBatchOutRow()" class="px-2.5 py-1 rounded-lg bg-amber-500/20 text-amber-500 amber-badge-text text-xs font-bold shrink-0">+ 新增出場</button>
+                  <button type="button" onclick="window.addBatchOutRow()" class="px-2.5 py-1 rounded-lg bg-amber-500/20 text-amber-500 amber-badge-text text-xs font-bold shrink-0">+ 新增出場</button>
                 </div>
                 <div id="batchOutRowsContainer" class="space-y-2"></div>
               </div>
@@ -247,4 +251,343 @@
 
             <div class="p-3.5 sm:p-4 rounded-2xl theme-sub space-y-3">
               <div class="text-xs font-extrabold text-amber-500 amber-badge-text">② 開平倉價格、持倉量與盈虧比 (RR)</div>
-              <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols
+              <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+                <div>
+                  <label class="block text-xs font-bold theme-text-main mb-1">槓桿倍數</label>
+                  <input type="number" id="trLeverage" value="10" step="any" class="w-full px-3 py-2.5 rounded-xl theme-input text-sm" />
+                </div>
+                <div>
+                  <label class="block text-xs font-bold theme-text-main mb-1">開倉均價 *</label>
+                  <input type="number" id="trEntryPrice" required step="any" placeholder="0.00" oninput="window.previewAutoFee()" class="w-full px-3 py-2.5 rounded-xl theme-input text-sm" />
+                </div>
+                <div>
+                  <label class="block text-xs font-bold theme-text-main mb-1">平倉均價 *</label>
+                  <input type="number" id="trExitPrice" required step="any" placeholder="0.00" oninput="window.previewAutoFee()" class="w-full px-3 py-2.5 rounded-xl theme-input text-sm" />
+                </div>
+                <div>
+                  <label class="block text-xs font-bold theme-text-main mb-1">持倉量 *</label>
+                  <input type="number" id="trQuantity" required step="any" placeholder="顆數/張數" oninput="window.previewAutoFee()" class="w-full px-3 py-2.5 rounded-xl theme-input text-sm" />
+                </div>
+                <div>
+                  <label class="block text-xs font-bold theme-text-main mb-1">預期 RR</label>
+                  <input type="text" id="trExpectedRR" placeholder="如 1:2.5" class="w-full px-3 py-2.5 rounded-xl theme-input text-sm" />
+                </div>
+                <div>
+                  <label class="block text-xs font-bold text-cyan-500 cyan-badge-text mb-1">實際 RR</label>
+                  <input type="text" id="trActualRR" placeholder="如 1:3" class="w-full px-3 py-2.5 rounded-xl theme-input text-sm" />
+                </div>
+              </div>
+            </div>
+
+            <div class="p-3.5 sm:p-4 rounded-2xl theme-sub space-y-3">
+              <div class="text-xs font-extrabold text-amber-500 amber-badge-text">③ 實際淨利與復盤檢討（手續費由系統自動算出）</div>
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div>
+                  <label class="block text-xs font-bold theme-text-main mb-1">實際淨利 (USDT，虧損請加負號) *</label>
+                  <input type="number" id="trNetProfit" required step="any" placeholder="例如 50 或 -25" oninput="window.previewAutoFee()" class="w-full px-3 py-2.5 rounded-xl theme-input font-bold text-sm border-amber-500/60" />
+                </div>
+                <div>
+                  <label class="block text-xs font-bold text-rose-500 mb-1">系統自動算出之手續費磨耗 (免填)</label>
+                  <div id="autoFeePreviewBox" class="w-full px-3 py-2.5 rounded-xl theme-input text-sm font-extrabold text-rose-500 bg-rose-500/5">
+                    自動計算中 ($0.00 U)
+                  </div>
+                </div>
+                <div>
+                  <label class="block text-xs font-bold theme-text-main mb-1">上傳盤面截圖</label>
+                  <input type="file" id="trScreenshotFile" accept="image/*" onchange="window.handleScreenshotSelect(event)" class="w-full text-xs theme-text-muted file:mr-2 file:py-2 file:px-3 file:rounded-xl file:border-0 file:bg-amber-500 file:text-slate-950 file:font-bold" />
+                  <input type="hidden" id="trExistingScreenshotUrl" value="" />
+                </div>
+              </div>
+
+              <div>
+                <label class="block text-xs font-bold theme-text-main mb-1.5">進場策略（可勾選，也可自行輸入自訂策略）</label>
+                <div id="strategyCheckboxGroup" class="flex flex-wrap gap-2 mb-2.5">
+                  <label class="cursor-pointer inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl theme-input text-xs font-medium"><input type="checkbox" value="SMC訂單塊(OB)" class="strat-chk accent-amber-500" /> SMC訂單塊(OB)</label>
+                  <label class="cursor-pointer inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl theme-input text-xs font-medium"><input type="checkbox" value="FVG失衡區" class="strat-chk accent-amber-500" /> FVG失衡區</label>
+                  <label class="cursor-pointer inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl theme-input text-xs font-medium"><input type="checkbox" value="支撐壓力互換" class="strat-chk accent-amber-500" /> 支撐壓力互換</label>
+                  <label class="cursor-pointer inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl theme-input text-xs font-medium"><input type="checkbox" value="流動性獵取" class="strat-chk accent-amber-500" /> 流動性獵取</label>
+                  <label class="cursor-pointer inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl theme-input text-xs font-medium"><input type="checkbox" value="趨勢突破" class="strat-chk accent-amber-500" /> 趨勢突破</label>
+                  <label class="cursor-pointer inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl theme-input text-xs font-medium"><input type="checkbox" value="背離反轉" class="strat-chk accent-amber-500" /> 背離反轉</label>
+                </div>
+                <div class="flex gap-2 max-w-md">
+                  <input type="text" id="customStrategyInput" placeholder="輸入自訂策略名稱..." class="flex-1 px-3 py-2 rounded-xl theme-input text-xs" />
+                  <button type="button" onclick="window.addCustomStrategyTag()" class="px-3.5 py-2 rounded-xl bg-cyan-500/20 text-cyan-500 cyan-badge-text border border-cyan-500/30 text-xs font-bold shrink-0">+ 新增策略</button>
+                </div>
+              </div>
+
+              <div>
+                <label class="block text-xs font-bold theme-text-main mb-1">復盤心得筆記</label>
+                <textarea id="trNote" rows="2" placeholder="記錄這筆交易的進出場理由與檢討..." class="w-full px-3 py-2.5 rounded-xl theme-input text-sm"></textarea>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-3 pt-1">
+              <button type="submit" id="saveTradeBtn" class="w-full sm:w-auto px-8 py-3 rounded-xl font-extrabold text-sm bg-amber-500 hover:bg-amber-400 text-slate-950 shadow-lg">💾 儲存復盤紀錄</button>
+              <button type="button" id="cancelEditBtn" onclick="window.cancelEditMode()" class="hidden px-5 py-3 rounded-xl font-bold text-sm theme-sub theme-text-main">取消修改</button>
+            </div>
+          </form>
+        </div>
+
+        <div class="theme-card rounded-3xl p-4 sm:p-6">
+          <h3 class="text-base sm:text-lg font-black theme-text-main mb-4">📋 我的歷史交易復盤紀錄</h3>
+          <div id="studentTradesContainer" class="space-y-3"></div>
+        </div>
+      </div>
+
+      <!-- 分頁 2：好用工具與核心講義 -->
+      <div id="stuPane-resources" class="hidden space-y-8">
+        <div class="theme-card rounded-3xl p-5 sm:p-6">
+          <h3 class="text-lg sm:text-xl font-black theme-text-main mb-4">📖 村長獨家核心實戰講義</h3>
+          <div id="studentLecturesContainer" class="grid grid-cols-1 md:grid-cols-3 gap-4"></div>
+        </div>
+
+        <div class="theme-card rounded-3xl p-5 sm:p-6">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
+            <div>
+              <h3 class="text-lg sm:text-xl font-black theme-text-main">⚡ 虛擬貨幣必備數據網站與好用工具</h3>
+              <p class="text-xs theme-text-muted mt-0.5">按實戰梯隊分類整理，點擊卡片即可前往</p>
+            </div>
+            <input type="text" id="resSearchInput" oninput="window.renderStudentResources()" placeholder="搜尋工具名稱或用途..." class="px-3.5 py-2 rounded-xl theme-input text-xs w-full sm:w-60" />
+          </div>
+          <div id="studentWebsitesContainer" class="space-y-6"></div>
+        </div>
+      </div>
+
+      <!-- 分頁 3：以損定量倉位計算機 + 加倉倉位計算機 -->
+      <div id="stuPane-calc" class="hidden space-y-6">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div class="theme-card rounded-3xl p-5 sm:p-6">
+            <h2 class="text-lg font-black theme-text-main mb-1">🧮 1. 以損定量・開倉風險計算機</h2>
+            <p class="text-xs theme-text-muted mb-4">根據止損距離與可承受虧損，自動反推應開持倉價值與保證金</p>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
+              <div>
+                <label class="block text-xs font-bold theme-text-main mb-1">總本金 (USDT)</label>
+                <input type="number" id="calcCapital" value="1000" oninput="window.runRiskCalc()" class="w-full px-3 py-2 rounded-xl theme-input text-sm" />
+              </div>
+              <div>
+                <label class="block text-xs font-bold theme-text-main mb-1">單筆允許虧損 (%)</label>
+                <input type="number" id="calcRiskPct" value="2" step="0.5" oninput="window.runRiskCalc()" class="w-full px-3 py-2 rounded-xl theme-input text-sm" />
+              </div>
+              <div>
+                <label class="block text-xs font-bold theme-text-main mb-1">預計進場價</label>
+                <input type="number" id="calcEntry" step="any" oninput="window.runRiskCalc()" class="w-full px-3 py-2 rounded-xl theme-input text-sm" />
+              </div>
+              <div>
+                <label class="block text-xs font-bold theme-text-main mb-1">預計止損價 (SL)</label>
+                <input type="number" id="calcSl" step="any" oninput="window.runRiskCalc()" class="w-full px-3 py-2 rounded-xl theme-input text-sm" />
+              </div>
+              <div>
+                <label class="block text-xs font-bold theme-text-main mb-1">預計止盈價 (TP)</label>
+                <input type="number" id="calcTp" step="any" oninput="window.runRiskCalc()" class="w-full px-3 py-2 rounded-xl theme-input text-sm" />
+              </div>
+              <div>
+                <label class="block text-xs font-bold theme-text-main mb-1">槓桿倍數 (X)</label>
+                <input type="number" id="calcLev" value="10" oninput="window.runRiskCalc()" class="w-full px-3 py-2 rounded-xl theme-input text-sm" />
+              </div>
+            </div>
+            <div class="grid grid-cols-2 gap-3 p-4 rounded-2xl theme-sub text-center">
+              <div><div class="text-[11px] theme-text-muted">最大虧損金額</div><div id="resRiskUsd" class="text-base font-black text-rose-500 mt-1">$20.00 U</div></div>
+              <div><div class="text-[11px] theme-text-muted">建議開倉總價值</div><div id="resPosValue" class="text-base font-black theme-text-main mt-1">$0.00 U</div></div>
+              <div><div class="text-[11px] theme-text-muted">應投入保證金</div><div id="resMarginNeed" class="text-base font-black text-amber-500 amber-badge-text mt-1">$0.00 U</div></div>
+              <div><div class="text-[11px] theme-text-muted">預估盈虧比 (RR)</div><div id="resRR" class="text-base font-black text-emerald-500 mt-1">--</div></div>
+            </div>
+          </div>
+
+          <div class="theme-card rounded-3xl p-5 sm:p-6">
+            <div class="flex items-center justify-between mb-1">
+              <h2 class="text-lg font-black theme-text-main">📈 2. 加倉倉位計算機</h2>
+              <button type="button" onclick="window.addPyramidRow()" class="px-3 py-1 rounded-lg bg-cyan-500/20 text-cyan-500 cyan-badge-text text-xs font-bold">+ 新增一筆加倉</button>
+            </div>
+            <p class="text-xs theme-text-muted mb-4">輸入原持倉與各次加倉的價格與持倉量，自動算出加倉後的最新均價與總持倉量</p>
+            <div id="pyramidRowsContainer" class="space-y-2.5 mb-4"></div>
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 p-4 rounded-2xl theme-sub text-center">
+              <div><div class="text-[11px] theme-text-muted">加倉後最新均價</div><div id="pyrAvgPrice" class="text-base font-black text-amber-500 amber-badge-text mt-1">0.00</div></div>
+              <div><div class="text-[11px] theme-text-muted">累積總持倉量</div><div id="pyrTotalQty" class="text-base font-black text-cyan-500 cyan-badge-text mt-1">0.00</div></div>
+              <div class="col-span-2 sm:col-span-1"><div class="text-[11px] theme-text-muted">累積總倉位價值</div><div id="pyrTotalVal" class="text-base font-black theme-text-main mt-1">$0.00 U</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 分頁 4：匿名排行榜 -->
+      <div id="stuPane-leaderboard" class="hidden">
+        <div class="theme-card rounded-3xl p-5 sm:p-6 max-w-3xl mx-auto">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
+            <div>
+              <h3 class="text-xl font-black theme-text-main">🏆 新手村實戰匿名排行榜</h3>
+              <p class="text-xs theme-text-muted mt-0.5">全程匿名顯示 UID (***** 遮罩)，點擊切換「盈利排行榜」或「交易量排行榜」</p>
+            </div>
+            <div class="inline-flex rounded-xl theme-sub p-1">
+              <button type="button" id="lbBtnProfit" onclick="window.switchLeaderboardMode('profit')" class="px-3.5 py-1.5 rounded-lg text-xs font-extrabold bg-amber-500 text-slate-950">💰 盈利排行榜</button>
+              <button type="button" id="lbBtnVolume" onclick="window.switchLeaderboardMode('volume')" class="px-3.5 py-1.5 rounded-lg text-xs font-bold theme-text-muted">📊 交易量排行榜</button>
+            </div>
+          </div>
+          <div id="leaderboardContainer" class="space-y-2.5"></div>
+        </div>
+      </div>
+
+      <!-- 分頁 5：村長管理後台 -->
+      <div id="stuPane-admin" class="hidden space-y-6">
+        <div class="theme-card rounded-3xl p-5 sm:p-6">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
+            <div>
+              <h3 class="text-lg font-black theme-text-main">👥 VIP 學員帳密管理・交易量監控・訂閱/UID轉換</h3>
+              <p class="text-xs theme-text-muted">可直接修改學員的專屬帳號、密碼與到期日（儲存後會自動同步更新私訊發送文案！）</p>
+            </div>
+          </div>
+          <div id="adminStudentsContainer" class="space-y-3.5"></div>
+        </div>
+      </div>
+
+      <!-- 分頁 6：批改學員倉位 -->
+      <div id="stuPane-review" class="hidden space-y-6">
+        <div class="theme-card rounded-3xl p-5 sm:p-6">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
+            <div>
+              <h3 class="text-lg font-black theme-text-main">✍️ 批改學員實戰倉位紀錄</h3>
+              <p class="text-xs theme-text-muted">此區專門顯示所有學員的交易復盤紀錄，村長可直接輸入評語點評</p>
+            </div>
+            <input type="text" id="reviewFilterInput" oninput="window.renderAdminReviewTrades()" placeholder="篩選學員帳號、UID 或幣種..." class="px-3.5 py-2 rounded-xl theme-input text-xs w-full sm:w-64" />
+          </div>
+          <div id="adminReviewTradesContainer" class="space-y-3.5"></div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <footer class="border-t border-slate-800/80 bg-slate-950 py-8 mt-12 text-center px-4">
+    <div class="max-w-4xl mx-auto space-y-2">
+      <div class="font-extrabold text-amber-500 amber-badge-text text-xs sm:text-sm">⚠️ 投資理財風險自負聲明</div>
+      <p class="text-xs theme-text-muted leading-relaxed">
+        加密貨幣與衍生品合約交易屬於高波動、高槓桿風險之投資行為，可能導致本金部分或全部損失。本系統提供之復盤紀錄、倉位計算機、核心講義與數據網站導覽僅供教育學習與個人交易管理使用，絕不構成任何投資建議或獲利保證。投資理財風險自負，請務必做好嚴格止損與資金控管。
+      </p>
+      <div class="text-[11px] theme-text-muted pt-1">© 2026 幣圈新手村 PRO v4.0. All Rights Reserved.</div>
+    </div>
+  </footer>
+
+  <script>
+    const SCRIPT_API_URL = "https://script.google.com/macros/s/AKfycby-oIzel0yPK_zLna564GdTHE_EFICkWT5UEghHkh_9kciPpWzhLzycZG-stPyhK8IR/exec";
+
+    // 安全存取 localStorage（徹底防止 macOS 預覽視窗或無痕環境丟出 SecurityError 導致腳本崩潰）
+    function safeGetStorage(key) {
+      try {
+        return window.localStorage.getItem(key);
+      } catch (e) {
+        return null;
+      }
+    }
+
+    function safeSetStorage(key, val) {
+      try {
+        window.localStorage.setItem(key, val);
+      } catch (e) {}
+    }
+
+    function safeRemoveStorage(key) {
+      try {
+        window.localStorage.removeItem(key);
+      } catch (e) {}
+    }
+
+    function escapeHtmlAttr(str) {
+      return String(str || "")
+        .replace(/&/g, "&amp;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
+    }
+
+    function applySavedTheme() {
+      const saved = safeGetStorage("village_theme") || "dark";
+      document.documentElement.classList.toggle("light", saved === "light");
+      document.documentElement.classList.toggle("dark", saved !== "light");
+    }
+
+    function toggleTheme() {
+      const isLight = document.documentElement.classList.contains("light");
+      safeSetStorage("village_theme", isLight ? "dark" : "light");
+      applySavedTheme();
+    }
+    window.toggleTheme = toggleTheme;
+    applySavedTheme();
+
+    const DEFAULT_51_RESOURCES = [
+      { type: "講義", tier: "核心講義", title: "K棒型態基礎與買賣力道", url: "https://drive.google.com/", note: "新手必讀基礎 K 線結構與多空力道判讀" },
+      { type: "講義", tier: "核心講義", title: "SMC 聰明錢概念：訂單塊 (OB) 與失衡區 (FVG)", url: "https://drive.google.com/", note: "主力機構進出場邏輯與高勝率狙擊點位" },
+      { type: "講義", tier: "核心講義", title: "合約倉位管理與風控鐵律", url: "https://drive.google.com/", note: "以損定量計算方式與避免扛單爆倉的核心法則" },
+      { type: "合約數據", tier: "🏆 第一梯隊：即時看盤、爆倉清算與多空籌碼", title: "CoinGlass 爆倉與資金費率監控", url: "https://www.coinglass.com/zh-TW", note: "合約數據神器，監控全網爆倉、費率與清算熱力圖" },
+      { type: "合約數據", tier: "🏆 第一梯隊：即時看盤、爆倉清算與多空籌碼", title: "CoinAnk 專業衍生品與爆倉熱圖", url: "https://coinank.com/zh", note: "訂單流、清算熱圖與未平倉量追蹤" },
+      { type: "實用工具", tier: "🏆 第一梯隊：即時看盤、爆倉清算與多空籌碼", title: "TradingView 專業看盤圖表", url: "https://tw.tradingview.com/", note: "價格走勢、SMC 畫線與指標看盤必備" },
+      { type: "期權數據", tier: "🏆 第一梯隊：即時看盤、爆倉清算與多空籌碼", title: "Deribit 全球最大加密期權與期貨所", url: "https://www.deribit.com/", note: "最大痛點、隱含波動率與選擇權大單" },
+      { type: "多空數據", tier: "🏆 第一梯隊：即時看盤、爆倉清算與多空籌碼", title: "CryptoMeter 即時買賣力道與資金流向", url: "https://www.cryptometer.io/", note: "市場多空情緒與資金流動可視化" },
+      { type: "多空比數據", tier: "🔥 第二梯隊：多空籌碼、鏈上大戶與流動性監控", title: "Coinalyze 衍生品與未平倉合約分析", url: "https://coinalyze.net/", note: "深入分析多空比與主力開倉動向" },
+      { type: "鏈上數據", tier: "🔥 第二梯隊：多空籌碼、鏈上大戶與流動性監控", title: "CryptoQuant 機構級鏈上與礦工指標", url: "https://cryptoquant.com/", note: "追蹤交易所大額充提與礦工拋壓" },
+      { type: "流動性監控", tier: "🔥 第二梯隊：多空籌碼、鏈上大戶與流動性監控", title: "Dexscreener 各鏈 DEX 實時行情", url: "https://dexscreener.com/", note: "山寨幣合約標的之鏈上即時成交追蹤" },
+      { type: "鏈上標記", tier: "🔥 第二梯隊：多空籌碼、鏈上大戶與流動性監控", title: "Arkham 巨鯨錢包與地址追蹤", url: "https://platform.arkhamintelligence.com/", note: "追蹤市場大戶與機構錢包即時動向" },
+      { type: "技術指標", tier: "🔥 第二梯隊：多空籌碼、鏈上大戶與流動性監控", title: "TradingLite 專業訂單簿與成交量圖表", url: "https://www.tradinglite.com/", note: "訂單流、成交熱圖與掛單牆分析" },
+      { type: "總經快訊", tier: "📊 第三梯隊：總經利率、宏觀突發與市場情緒", title: "金十數據 全球總體經濟與財經日曆", url: "https://www.jin10.com/", note: "監控 CPI、非農與聯準會決議瞬間衝擊" },
+      { type: "總經快訊", tier: "📊 第三梯隊：總經利率、宏觀突發與市場情緒", title: "華爾街見聞 即時財經快訊", url: "https://wallstreetcn.com/", note: "中文秒級全球財經與總經快訊推送" },
+      { type: "宏觀數據", tier: "📊 第三梯隊：總經利率、宏觀突發與市場情緒", title: "FedWatch 聯準會利率會議機率", url: "https://www.cmegroup.com/markets/interest-rates/cme-fedwatch-tool.html", note: "降息升息預期監控，判斷宏觀流動性" },
+      { type: "市場情緒", tier: "📊 第三梯隊：總經利率、宏觀突發與市場情緒", title: "Alternative 恐懼與貪婪指數", url: "https://alternative.me/crypto/fear-and-greed-index/", note: "衡量大盤極端情緒與反向指標" },
+      { type: "財經數據", tier: "📊 第三梯隊：總經利率、宏觀突發與市場情緒", title: "英為財情 Investing.com 經濟日曆", url: "https://hk.investing.com/economic-calendar/", note: "全球高影響力總經數據發布排程" },
+      { type: "交易所儲備", tier: "🛠️ 第四梯隊：鏈上導覽、儲備證明與基礎設施", title: "DefiLlama CEX Proof of Reserves", url: "https://defillama.com/cexs", note: "監控各大交易所儲備金，防範黑天鵝" },
+      { type: "鏈上熱度", tier: "🛠️ 第四梯隊：鏈上導覽、儲備證明與基礎設施", title: "DEXTools 去中心化交易圖表", url: "https://www.dextools.io/", note: "新幣與熱門山寨流動性監控" },
+      { type: "區塊瀏覽", tier: "🛠️ 第四梯隊：鏈上導覽、儲備證明與基礎設施", title: "Etherscan 以太坊區塊瀏覽器", url: "https://etherscan.io/", note: "查詢以太坊鏈上轉帳與 Gas 狀況" },
+      { type: "區塊瀏覽", tier: "🛠️ 第四梯隊：鏈上導覽、儲備證明與基礎設施", title: "BscScan 幣安鏈區塊瀏覽器", url: "https://bscscan.com/", note: "BSC 鏈上合約與轉帳查詢" },
+      { type: "區塊瀏覽", tier: "🛠️ 第四梯隊：鏈上導覽、儲備證明與基礎設施", title: "Solscan Solana 區塊瀏覽器", url: "https://solscan.io/", note: "Solana 鏈上合約交易查詢" },
+      { type: "比特幣數據", tier: "🛠️ 第四梯隊：鏈上導覽、儲備證明與基礎設施", title: "Mempool.space BTC 區塊與內存池", url: "https://mempool.space/", note: "比特幣網路擁堵與手續費狀況" },
+      { type: "穩定幣專區", tier: "🛠️ 第四梯隊：鏈上導覽、儲備證明與基礎設施", title: "Tether Transparency USDT 發行與儲備", url: "https://tether.to/en/transparency/", note: "穩定幣增發與動向監控" },
+      { type: "行情總覽", tier: "🛠️ 第四梯隊：鏈上導覽、儲備證明與基礎設施", title: "CoinGecko 幣種市值查詢", url: "https://www.coingecko.com/zh-tw", note: "各大幣種市值與基本行情" },
+      { type: "行情總覽", tier: "🛠️ 第四梯隊：鏈上導覽、儲備證明與基礎設施", title: "CoinMarketCap 虛擬貨幣市值排名", url: "https://coinmarketcap.com/zh-tw/", note: "市場總覽與數據參考" },
+      { type: "跨鏈橋工具", tier: "🌉 第五梯隊：跨鏈、DEX 聚合、解鎖與鏈上安全", title: "Bungee 最佳跨鏈路徑工具", url: "https://www.bungee.exchange/", note: "跨鏈橋手續費優化與資產轉移" },
+      { type: "跨鏈轉帳", tier: "🌉 第五梯隊：跨鏈、DEX 聚合、解鎖與鏈上安全", title: "DeBridge 高效跨鏈協議", url: "https://debridge.finance/", note: "安全跨鏈轉移合約保證金" },
+      { type: "DEX聚合", tier: "🌉 第五梯隊：跨鏈、DEX 聚合、解鎖與鏈上安全", title: "1inch Network 最佳匯率聚合器", url: "https://app.1inch.io/", note: "鏈上交易滑價最低工具" },
+      { type: "去中心化交易", tier: "🌉 第五梯隊：跨鏈、DEX 聚合、解鎖與鏈上安全", title: "Uniswap 最大的 DEX 交易平台", url: "https://app.uniswap.org/", note: "鏈上現貨與無常損失管理" },
+      { type: "SOL生態", tier: "🌉 第五梯隊：跨鏈、DEX 聚合、解鎖與鏈上安全", title: "Raydium Solana 鏈上 AMM 與流動性", url: "https://raydium.io/", note: "Solana 生態交易與挖礦" },
+      { type: "Layer2生態", tier: "🌉 第五梯隊：跨鏈、DEX 聚合、解鎖與鏈上安全", title: "L2BEAT 以太坊 Layer2 擴容數據", url: "https://l2beat.com/", note: "Rollup TVL 與鏈上安全性評估" },
+      { type: "安全工具", tier: "🌉 第五梯隊：跨鏈、DEX 聚合、解鎖與鏈上安全", title: "Revoke.cash 授權管理與防盜工具", url: "https://revoke.cash/", note: "檢查錢包授權，防止合約授權被盜" },
+      { type: "地址審計", tier: "🌉 第五梯隊：跨鏈、DEX 聚合、解鎖與鏈上安全", title: "Token Sniffer 智慧合約安全檢測", url: "https://tokensniffer.com/", note: "檢測合約有無老鼠倉或詐騙風險" },
+      { type: "合約安全", tier: "🌉 第五梯隊：跨鏈、DEX 聚合、解鎖與鏈上安全", title: "RugDoc DeFi 專案安全評級", url: "https://rugdoc.io/", note: "項目審計與合約風險評分" },
+      { type: "融資追蹤", tier: "🌉 第五梯隊：跨鏈、DEX 聚合、解鎖與鏈上安全", title: "CryptoRank 融資與解鎖數據", url: "https://cryptorank.io/", note: "機構融資與代幣解鎖追蹤" },
+      { type: "代幣解鎖", tier: "🌉 第五梯隊：跨鏈、DEX 聚合、解鎖與鏈上安全", title: "DropsTab 代幣經濟與解鎖面板", url: "https://dropstab.com/", note: "代幣釋放與流通量分析" },
+      { type: "專業研究", tier: "🌉 第五梯隊：跨鏈、DEX 聚合、解鎖與鏈上安全", title: "Dune Analytics 鏈上指標儀表板", url: "https://dune.com/", note: "深度鏈上合約數據儀表板" },
+      { type: "實體錢包", tier: "🌉 第五梯隊：跨鏈、DEX 聚合、解鎖與鏈上安全", title: "Glassnode Studio 進階鏈上數據", url: "https://studio.glassnode.com/", note: "機構級鏈上存量與籌碼分佈" },
+      { type: "宏觀經濟", tier: "📰 第六梯隊：新聞快訊、安全預警與宏觀社群", title: "Trading Economics 全球經濟指標", url: "https://tradingeconomics.com/", note: "總經利率與國家級經濟指標" },
+      { type: "美股期指", tier: "📰 第六梯隊：新聞快訊、安全預警與宏觀社群", title: "Investing.com 全球金融與加密指數", url: "https://www.investing.com/", note: "傳統金融與幣圈連動監控" },
+      { type: "新聞快訊", tier: "📰 第六梯隊：新聞快訊、安全預警與宏觀社群", title: "CoinDesk 全球加密貨幣權威新聞", url: "https://www.coindesk.com/", note: "即時幣圈頭條與政策消息" },
+      { type: "即時資訊", tier: "📰 第六梯隊：新聞快訊、安全預警與宏觀社群", title: "WuBlockchain (吳說區塊鏈)", url: "https://www.wublock123.com/", note: "中文深度行業內幕與政策監管新聞" },
+      { type: "區塊網媒", tier: "📰 第六梯隊：新聞快訊、安全預警與宏觀社群", title: "BlockBeats (律動 BlockBeats)", url: "https://www.theblockbeats.info/", note: "Web3 前沿研究、熱點與合約風向" },
+      { type: "安全預警", tier: "📰 第六梯隊：新聞快訊、安全預警與宏觀社群", title: "CertiK 區塊鏈安全與黑客事件通報", url: "https://www.certik.com/", note: "監控合約漏洞與黑客攻擊事件" },
+      { type: "幣種研究", tier: "📰 第六梯隊：新聞快訊、安全預警與宏觀社群", title: "Messari PRO 加密資產研究報告", url: "https://messari.io/", note: "機構級深度研報與基本面數據" },
+      { type: "Launchpad", tier: "📰 第六梯隊：新聞快訊、安全預警與宏觀社群", title: "Binance Launchpad 專案發射台", url: "https://launchpad.binance.com/", note: "新幣挖礦與首發造富效應" },
+      { type: "發起眾籌", tier: "📰 第六梯隊：新聞快訊、安全預警與宏觀社群", title: "CoinList 優質項目首發平台", url: "https://coinlist.co/", note: "一級市場公募與抽籤平台" },
+      { type: "稅務工具", tier: "📰 第六梯隊：新聞快訊、安全預警與宏觀社群", title: "Koinly 加密貨幣稅務計算器", url: "https://koinly.io/", note: "結算與損益計算" },
+      { type: "空投獵人", tier: "📰 第六梯隊：新聞快訊、安全預警與宏觀社群", title: "DefiLlama Airdrops 空投項目追蹤", url: "https://defillama.com/airdrops", note: "潛在空投專案導覽" },
+      { type: "NFT數據", tier: "📰 第六梯隊：新聞快訊、安全預警與宏觀社群", title: "Blur 專業 NFT 交易與地板價", url: "https://blur.io/", note: "NFT 市場流動性與借貸監控" },
+      { type: "NFT行情", tier: "📰 第六梯隊：新聞快訊、安全預警與宏觀社群", title: "CryptoSlam NFT 綜合數據統計", url: "https://www.cryptoslam.io/", note: "各鏈 NFT 交易額與熱度" },
+      { type: "社群論壇", tier: "📰 第六梯隊：新聞快訊、安全預警與宏觀社群", title: "Reddit r/CryptoCurrency", url: "https://www.reddit.com/r/CryptoCurrency/", note: "海外散戶與合約多空風向討論" }
+    ];
+
+    window.globalResources = [...DEFAULT_51_RESOURCES];
+    let currentUser = null;
+    let studentTrades = [];
+    let allTradesAdmin = [];
+    let allStudentsAdmin = [];
+    let globalLeaderboard = [];
+    let maxLimits = { maxVolume: 185000, maxProfit: 4850 };
+    let currentEntryMode = "single";
+    let currentLbMode = "profit";
+    let pendingScreenshotBase64 = "";
+
+    function showLoginBoxMsg(msg, isError = true) {
+      const box = document.getElementById("loginErrorMsg");
+      if (!box) return;
+      box.textContent = msg;
+      box.className = isError
+        ? "text-xs font-bold text-rose-500 bg-rose-500/10 border border-rose-500/30 rounded-xl p-3 block"
+        : "text-xs font-bold text-cyan-400 bg-cyan-500/10 border border-cyan-500/30 rounded-xl p-3 block";
+    }
+
+    function show

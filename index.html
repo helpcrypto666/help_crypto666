@@ -61,9 +61,12 @@
   <header class="sticky top-0 z-50 bg-slate-950/90 backdrop-blur-md border-b border-slate-800">
     <div class="max-w-7xl mx-auto px-3 sm:px-6 h-16 flex items-center justify-between gap-2">
       <a href="index.html" class="flex items-center gap-2.5 min-w-0 shrink">
-        <img src="avatar.png" alt="村長"
-             onerror="if(!this.dataset.t){this.dataset.t='1';this.src='avatar.jpg';}else{this.src='logo.png';}"
-             class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl object-cover border border-amber-400/60 shrink-0 bg-slate-800" />
+        <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-amber-400 to-orange-600 flex items-center justify-center font-black text-slate-950 text-sm shrink-0 overflow-hidden border border-amber-400/60">
+          <img src="avatar.png" alt="村長"
+               onerror="if(!this.dataset.t){this.dataset.t='1';this.src='avatar.jpg';}else{this.style.display='none';this.nextElementSibling.classList.remove('hidden');}"
+               class="w-full h-full object-cover" />
+          <span class="hidden font-black text-base text-slate-950">村</span>
+        </div>
         <div class="min-w-0">
           <div class="flex items-center gap-1.5 whitespace-nowrap">
             <span class="font-black text-sm sm:text-lg theme-text-main tracking-tight">幣圈新手村</span>
@@ -281,14 +284,21 @@
   <script>
     const SCRIPT_API_URL = "https://script.google.com/macros/s/AKfycby-oIzel0yPK_zLna564GdTHE_EFICkWT5UEghHkh_9kciPpWzhLzycZG-stPyhK8IR/exec";
 
+    function safeGetStorage(k) {
+      try { return window.localStorage.getItem(k); } catch (e) { return null; }
+    }
+    function safeSetStorage(k, v) {
+      try { window.localStorage.setItem(k, v); } catch (e) {}
+    }
+
     function applySavedTheme() {
-      const saved = localStorage.getItem('village_theme') || 'dark';
-      document.documentElement.classList.toggle('light', saved === 'light');
-      document.documentElement.classList.toggle('dark', saved !== 'light');
+      const saved = safeGetStorage("village_theme") || "dark";
+      document.documentElement.classList.toggle("light", saved === "light");
+      document.documentElement.classList.toggle("dark", saved !== "light");
     }
     function toggleTheme() {
-      const isLight = document.documentElement.classList.contains('light');
-      localStorage.setItem('village_theme', isLight ? 'dark' : 'light');
+      const isLight = document.documentElement.classList.contains("light");
+      safeSetStorage("village_theme", isLight ? "dark" : "light");
       applySavedTheme();
     }
     applySavedTheme();
@@ -332,18 +342,18 @@
     function handleIconError(imgEl, key) {
       const step = parseInt(imgEl.dataset.step || "0", 10);
       const candidates = [
-        `${key}.png`,
-        `${key}_icon.jpg`,
-        `${key}.jpg`,
-        `${key.toUpperCase()}_icon.png`,
-        `${key.toUpperCase()}.png`
+        key + ".png",
+        key + "_icon.jpg",
+        key + ".jpg",
+        key.toUpperCase() + "_icon.png",
+        key.toUpperCase() + ".png"
       ];
       if (step < candidates.length) {
         imgEl.dataset.step = String(step + 1);
         imgEl.src = candidates[step];
       } else {
-        imgEl.style.display = 'none';
-        if (imgEl.nextElementSibling) imgEl.nextElementSibling.classList.remove('hidden');
+        imgEl.style.display = "none";
+        if (imgEl.nextElementSibling) imgEl.nextElementSibling.classList.remove("hidden");
       }
     }
 
@@ -395,86 +405,92 @@
       { coin: "USDC", chain: "BEP20 (BSC)", address: "0x4cbb18c28b7606fafe7f7dc271b29db9a618b070" }
     ];
 
+    function copyTextSafe(text, msg) {
+      try {
+        navigator.clipboard.writeText(text);
+      } catch (e) {}
+      const toast = document.getElementById("applyResultMsg");
+      if (toast) {
+        toast.classList.remove("hidden");
+        toast.className = "mt-4 text-center text-xs sm:text-sm font-bold text-amber-500 p-3 rounded-xl bg-amber-500/10 border border-amber-500/30";
+        toast.textContent = msg || ("已複製：" + text);
+      }
+    }
+
     function renderExchanges(sheetLinks = {}) {
-      const container = document.getElementById('exchangesGridContainer');
+      const container = document.getElementById("exchangesGridContainer");
       container.innerHTML = EXCHANGE_CATEGORIES.map(cat => {
         const cards = cat.items.map(ex => {
           const override = sheetLinks[ex.id];
           const finalUrl = (override && override.url) ? override.url : ex.url;
           const finalCode = (override && override.code) ? override.code : ex.code;
-          return `
-            <div class="theme-card rounded-2xl p-4 flex flex-col justify-between hover:border-amber-500 transition-all">
-              <div>
-                <div class="flex items-center gap-3 mb-3">
-                  <div class="w-11 h-11 rounded-xl bg-slate-900 border border-slate-700/80 shrink-0 flex items-center justify-center overflow-hidden p-1 shadow">
-                    <img src="${ex.key}_icon.png" alt="${ex.name}"
-                         onerror="handleIconError(this, '${ex.key}')"
-                         class="w-full h-full object-contain rounded-lg" />
-                    <span class="hidden font-black text-xs text-amber-400">${ex.badge}</span>
-                  </div>
-                  <div>
-                    <h4 class="font-extrabold theme-text-main text-sm sm:text-base">${ex.name}</h4>
-                    <p class="text-[11px] theme-text-muted">${ex.desc}</p>
-                  </div>
-                </div>
-                ${finalCode && finalCode !== '無' ? `
-                  <div class="flex items-center justify-between theme-sub px-3 py-1.5 rounded-lg mb-3 text-xs">
-                    <span class="theme-text-muted">邀請碼: <strong class="text-amber-500 amber-badge-text font-mono">${finalCode}</strong></span>
-                    <button type="button" onclick="navigator.clipboard.writeText('${finalCode}'); alert('已複製邀請碼: ${finalCode}');" class="text-[11px] text-cyan-500 cyan-badge-text hover:underline font-bold">複製</button>
-                  </div>
-                ` : '<div class="mb-3"></div>'}
-              </div>
-              <a href="${finalUrl}" target="_blank" rel="noopener noreferrer" class="block w-full text-center py-2 rounded-xl font-bold text-xs bg-amber-500 hover:bg-amber-400 text-slate-950 transition-all">
-                立即註冊 / 前往 ↗
-              </a>
-            </div>
-          `;
-        }).join('');
+          const codeHtml = (finalCode && finalCode !== "無")
+            ? '<div class="flex items-center justify-between theme-sub px-3 py-1.5 rounded-lg mb-3 text-xs">' +
+                '<span class="theme-text-muted">邀請碼: <strong class="text-amber-500 amber-badge-text font-mono">' + finalCode + '</strong></span>' +
+                '<button type="button" onclick="copyTextSafe(\'' + finalCode + '\', \'✅ 已複製邀請碼: ' + finalCode + '\')" class="text-[11px] text-cyan-500 cyan-badge-text hover:underline font-bold">複製</button>' +
+              '</div>'
+            : '<div class="mb-3"></div>';
 
-        return `
-          <div>
-            <h3 class="text-base sm:text-lg font-extrabold text-amber-500 amber-badge-text mb-3">${cat.title}</h3>
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">${cards}</div>
-          </div>
-        `;
-      }).join('');
+          return (
+            '<div class="theme-card rounded-2xl p-4 flex flex-col justify-between hover:border-amber-500 transition-all">' +
+              '<div>' +
+                '<div class="flex items-center gap-3 mb-3">' +
+                  '<div class="w-11 h-11 rounded-xl bg-slate-900 border border-slate-700/80 shrink-0 flex items-center justify-center overflow-hidden p-1 shadow">' +
+                    '<img src="' + ex.key + '_icon.png" alt="' + ex.name + '" onerror="handleIconError(this, \'' + ex.key + '\')" class="w-full h-full object-contain rounded-lg" />' +
+                    '<span class="hidden font-black text-xs text-amber-400">' + ex.badge + '</span>' +
+                  '</div>' +
+                  '<div>' +
+                    '<h4 class="font-extrabold theme-text-main text-sm sm:text-base">' + ex.name + '</h4>' +
+                    '<p class="text-[11px] theme-text-muted">' + ex.desc + '</p>' +
+                  '</div>' +
+                '</div>' +
+                codeHtml +
+              '</div>' +
+              '<a href="' + finalUrl + '" target="_blank" rel="noopener noreferrer" class="block w-full text-center py-2 rounded-xl font-bold text-xs bg-amber-500 hover:bg-amber-400 text-slate-950 transition-all">立即註冊 / 前往 ↗</a>' +
+            '</div>'
+          );
+        }).join("");
+
+        return (
+          '<div>' +
+            '<h3 class="text-base sm:text-lg font-extrabold text-amber-500 amber-badge-text mb-3">' + cat.title + '</h3>' +
+            '<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">' + cards + '</div>' +
+          '</div>'
+        );
+      }).join("");
     }
 
     function renderAllTutorialPanes() {
       Object.keys(TUTORIAL_STEPS_DATA).forEach(key => {
-        const pane = document.getElementById(`tutPane-${key}`);
+        const pane = document.getElementById("tutPane-" + key);
         if (!pane) return;
         pane.innerHTML = TUTORIAL_STEPS_DATA[key].map(item => {
           const hasImg = item.img && item.img.trim() !== "";
-          const imgBlock = hasImg ? `
-            <div class="mt-2.5 rounded-xl overflow-hidden border border-slate-700/60 bg-slate-950/80 max-w-[200px] mx-auto">
-              <img src="${item.img}" alt="${item.step}" loading="lazy"
-                   onerror="this.parentElement.style.display='none'"
-                   class="w-full h-auto object-contain max-h-[260px] mx-auto block" />
-            </div>
-          ` : '';
+          const imgBlock = hasImg
+            ? '<div class="mt-2.5 rounded-xl overflow-hidden border border-slate-700/60 bg-slate-950/80 max-w-[200px] mx-auto">' +
+                '<img src="' + item.img + '" alt="' + item.step + '" loading="lazy" onerror="this.parentElement.style.display=\'none\'" class="w-full h-auto object-contain max-h-[260px] mx-auto block" />' +
+              '</div>'
+            : '';
 
-          return `
-            <div class="p-4 rounded-2xl theme-sub flex flex-col justify-between">
-              <div class="flex items-start gap-3">
-                <span class="shrink-0 px-2.5 py-1 rounded-lg bg-amber-500/20 text-amber-500 amber-badge-text border border-amber-500/30 font-extrabold text-xs">
-                  ${item.step}
-                </span>
-                <p class="theme-text-main text-xs sm:text-sm font-medium leading-relaxed flex-1">${item.text}</p>
-              </div>
-              ${imgBlock}
-            </div>
-          `;
-        }).join('');
+          return (
+            '<div class="p-4 rounded-2xl theme-sub flex flex-col justify-between">' +
+              '<div class="flex items-start gap-3">' +
+                '<span class="shrink-0 px-2.5 py-1 rounded-lg bg-amber-500/20 text-amber-500 amber-badge-text border border-amber-500/30 font-extrabold text-xs">' + item.step + '</span>' +
+                '<p class="theme-text-main text-xs sm:text-sm font-medium leading-relaxed flex-1">' + item.text + '</p>' +
+              '</div>' +
+              imgBlock +
+            '</div>'
+          );
+        }).join("");
       });
     }
 
     function switchTutorialTab(tabKey) {
-      ['bitopro', 'exchange', 'deposit', 'withdraw'].forEach(k => {
-        const pane = document.getElementById(`tutPane-${k}`);
-        const btn = document.getElementById(`tutBtn-${k}`);
+      ["bitopro", "exchange", "deposit", "withdraw"].forEach(k => {
+        const pane = document.getElementById("tutPane-" + k);
+        const btn = document.getElementById("tutBtn-" + k);
         const active = (k === tabKey);
-        if (pane) pane.classList.toggle('hidden', !active);
+        if (pane) pane.classList.toggle("hidden", !active);
         if (btn) {
           btn.className = active
             ? "py-2.5 px-3 rounded-xl font-bold text-xs sm:text-sm border bg-amber-500 text-slate-950 border-amber-400"
@@ -484,86 +500,95 @@
     }
 
     function switchApplyMode(mode) {
-      const uidForm = document.getElementById('uidForm');
-      const subForm = document.getElementById('subForm');
-      const btnUid = document.getElementById('tabBtnUid');
-      const btnSub = document.getElementById('tabBtnSub');
-      document.getElementById('applyResultMsg').classList.add('hidden');
+      const uidForm = document.getElementById("uidForm");
+      const subForm = document.getElementById("subForm");
+      const btnUid = document.getElementById("tabBtnUid");
+      const btnSub = document.getElementById("tabBtnSub");
+      document.getElementById("applyResultMsg").classList.add("hidden");
 
-      if (mode === 'uid') {
-        uidForm.classList.remove('hidden');
-        subForm.classList.add('hidden');
+      if (mode === "uid") {
+        uidForm.classList.remove("hidden");
+        subForm.classList.add("hidden");
         btnUid.className = "py-3 px-3 rounded-xl font-extrabold text-xs sm:text-sm border bg-amber-500 text-slate-950 border-amber-400";
         btnSub.className = "py-3 px-3 rounded-xl font-extrabold text-xs sm:text-sm theme-sub theme-text-main";
       } else {
-        uidForm.classList.add('hidden');
-        subForm.classList.remove('hidden');
+        uidForm.classList.add("hidden");
+        subForm.classList.remove("hidden");
         btnSub.className = "py-3 px-3 rounded-xl font-extrabold text-xs sm:text-sm border bg-cyan-400 text-slate-950 border-cyan-300";
         btnUid.className = "py-3 px-3 rounded-xl font-extrabold text-xs sm:text-sm theme-sub theme-text-main";
       }
     }
 
     function initSubWalletsUI() {
-      const coinSelect = document.getElementById('subCoinSelect');
+      const coinSelect = document.getElementById("subCoinSelect");
       const coins = [...new Set(globalWallets.map(w => w.coin))];
-      coinSelect.innerHTML = coins.map(c => `<option value="${c}">${c}</option>`).join('');
+      coinSelect.innerHTML = coins.map(c => '<option value="' + c + '">' + c + '</option>').join("");
       onSubCoinChange();
     }
 
     function onSubCoinChange() {
-      const selectedCoin = document.getElementById('subCoinSelect').value;
-      const chainSelect = document.getElementById('subChainSelect');
+      const selectedCoin = document.getElementById("subCoinSelect").value;
+      const chainSelect = document.getElementById("subChainSelect");
       const filtered = globalWallets.filter(w => w.coin === selectedCoin);
-      chainSelect.innerHTML = filtered.map((w, i) => `<option value="${i}">${w.chain}</option>`).join('');
+      chainSelect.innerHTML = filtered.map((w, i) => '<option value="' + i + '">' + w.chain + '</option>').join("");
       onSubChainChange();
     }
 
     function onSubChainChange() {
-      const selectedCoin = document.getElementById('subCoinSelect').value;
+      const selectedCoin = document.getElementById("subCoinSelect").value;
       const filtered = globalWallets.filter(w => w.coin === selectedCoin);
-      const idx = parseInt(document.getElementById('subChainSelect').value, 10) || 0;
+      const idx = parseInt(document.getElementById("subChainSelect").value, 10) || 0;
       const target = filtered[idx] || filtered[0];
       const addr = target ? target.address : "";
-      document.getElementById('subWalletAddressText').textContent = addr;
-      document.getElementById('subWalletQrImg').src = `https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${encodeURIComponent(addr)}`;
+      document.getElementById("subWalletAddressText").textContent = addr;
+      document.getElementById("subWalletQrImg").src = "https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=" + encodeURIComponent(addr);
     }
 
     function copyWalletAddress() {
-      const addr = document.getElementById('subWalletAddressText').textContent;
-      navigator.clipboard.writeText(addr);
-      alert("已複製收款地址：" + addr);
+      const addr = document.getElementById("subWalletAddressText").textContent;
+      copyTextSafe(addr, "✅ 已複製收款地址：" + addr);
     }
 
-    async function submitUid(e) {
-      e.preventDefault();
-      const btn = document.getElementById('uidSubmitBtn');
-      const msg = document.getElementById('applyResultMsg');
-      btn.disabled = true;
-      btn.textContent = "送出審核中...";
-
-      const contactPlatform = document.getElementById('uidContactType').value;
-      const contactId = document.getElementById('uidContactValue').value.trim();
-
-      const payload = {
-        action: "submitUid",
-        channel: "UID審核",
-        exchange: document.getElementById('uidExchange').value,
-        uid: document.getElementById('uidNumber').value.trim(),
-        contact: `${contactPlatform}:${contactId}`
-      };
-
+    async function sendApplyRequest(payload) {
+      const qs = new URLSearchParams();
+      Object.keys(payload).forEach(k => qs.append(k, String(payload[k])));
       try {
-        await fetch(SCRIPT_API_URL, {
+        await fetch(SCRIPT_API_URL + "?" + qs.toString(), {
           method: "POST",
           headers: { "Content-Type": "text/plain;charset=utf-8" },
           body: JSON.stringify(payload)
         });
-        msg.classList.remove('hidden');
+      } catch (err) {
+        await fetch(SCRIPT_API_URL + "?" + qs.toString());
+      }
+    }
+
+    async function submitUid(e) {
+      e.preventDefault();
+      const btn = document.getElementById("uidSubmitBtn");
+      const msg = document.getElementById("applyResultMsg");
+      btn.disabled = true;
+      btn.textContent = "送出審核中...";
+
+      const contactPlatform = document.getElementById("uidContactType").value;
+      const contactId = document.getElementById("uidContactValue").value.trim();
+
+      const payload = {
+        action: "submitUid",
+        channel: "UID審核",
+        exchange: document.getElementById("uidExchange").value,
+        uid: document.getElementById("uidNumber").value.trim(),
+        contact: contactPlatform + ": " + contactId
+      };
+
+      try {
+        await sendApplyRequest(payload);
+        msg.classList.remove("hidden");
         msg.className = "mt-4 text-center text-xs sm:text-sm font-bold text-emerald-500 p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30";
         msg.textContent = "✅ 審核申請已成功送出！村長審核通過後將透過您的聯絡方式發送專屬帳號與密碼。";
-        document.getElementById('uidForm').reset();
+        document.getElementById("uidForm").reset();
       } catch (err) {
-        msg.classList.remove('hidden');
+        msg.classList.remove("hidden");
         msg.className = "mt-4 text-center text-xs sm:text-sm font-bold text-emerald-500 p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30";
         msg.textContent = "✅ 審核申請已成功送出！請私訊村長加快開通。";
       } finally {
@@ -574,42 +599,38 @@
 
     async function submitSubscription(e) {
       e.preventDefault();
-      const btn = document.getElementById('subSubmitBtn');
-      const msg = document.getElementById('applyResultMsg');
+      const btn = document.getElementById("subSubmitBtn");
+      const msg = document.getElementById("applyResultMsg");
       btn.disabled = true;
       btn.textContent = "送出申請中...";
 
-      const selectedCoin = document.getElementById('subCoinSelect').value;
+      const selectedCoin = document.getElementById("subCoinSelect").value;
       const filtered = globalWallets.filter(w => w.coin === selectedCoin);
-      const idx = parseInt(document.getElementById('subChainSelect').value, 10) || 0;
+      const idx = parseInt(document.getElementById("subChainSelect").value, 10) || 0;
       const chainName = filtered[idx] ? filtered[idx].chain : "";
 
-      const contactPlatform = document.getElementById('subContactType').value;
-      const contactId = document.getElementById('subContactValue').value.trim();
+      const contactPlatform = document.getElementById("subContactType").value;
+      const contactId = document.getElementById("subContactValue").value.trim();
 
       const payload = {
         action: "submitSubscription",
         channel: "訂閱審核",
-        planLabel: document.getElementById('subPlanSelect').value,
+        planLabel: document.getElementById("subPlanSelect").value,
         coin: selectedCoin,
         chain: chainName,
-        txid: document.getElementById('subTxid').value.trim(),
-        contact: `${contactPlatform}:${contactId}`
+        txid: document.getElementById("subTxid").value.trim(),
+        contact: contactPlatform + ": " + contactId
       };
 
       try {
-        await fetch(SCRIPT_API_URL, {
-          method: "POST",
-          headers: { "Content-Type": "text/plain;charset=utf-8" },
-          body: JSON.stringify(payload)
-        });
-        msg.classList.remove('hidden');
+        await sendApplyRequest(payload);
+        msg.classList.remove("hidden");
         msg.className = "mt-4 text-center text-xs sm:text-sm font-bold text-emerald-500 p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30";
         msg.textContent = "✅ 訂閱申請已成功送出！村長核對後將透過您的聯絡方式發送專屬帳號與密碼。";
-        document.getElementById('subForm').reset();
+        document.getElementById("subForm").reset();
         initSubWalletsUI();
       } catch (err) {
-        msg.classList.remove('hidden');
+        msg.classList.remove("hidden");
         msg.className = "mt-4 text-center text-xs sm:text-sm font-bold text-emerald-500 p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30";
         msg.textContent = "✅ 訂閱申請已成功送出！請私訊村長核對。";
       } finally {
@@ -624,7 +645,7 @@
       initSubWalletsUI();
 
       try {
-        const res = await fetch(`${SCRIPT_API_URL}?action=getInitData`);
+        const res = await fetch(SCRIPT_API_URL + "?action=getInitData");
         const data = await res.json();
         if (data && data.success) {
           if (data.exchangeLinks) renderExchanges(data.exchangeLinks);
@@ -633,16 +654,16 @@
             initSubWalletsUI();
           }
           if (data.socialLinks) {
-            if (data.socialLinks.ig) document.getElementById('heroIgLink').href = data.socialLinks.ig;
-            if (data.socialLinks.threads) document.getElementById('heroThreadsLink').href = data.socialLinks.threads;
-            if (data.socialLinks.tgPersonal) document.getElementById('heroTgPersonalLink').href = data.socialLinks.tgPersonal;
-            if (data.socialLinks.tgGroup) document.getElementById('heroTgGroupLink').href = data.socialLinks.tgGroup;
+            if (data.socialLinks.ig) document.getElementById("heroIgLink").href = data.socialLinks.ig;
+            if (data.socialLinks.threads) document.getElementById("heroThreadsLink").href = data.socialLinks.threads;
+            if (data.socialLinks.tgPersonal) document.getElementById("heroTgPersonalLink").href = data.socialLinks.tgPersonal;
+            if (data.socialLinks.tgGroup) document.getElementById("heroTgGroupLink").href = data.socialLinks.tgGroup;
           }
         }
       } catch (err) {}
     }
 
-    document.addEventListener('DOMContentLoaded', initPage);
+    document.addEventListener("DOMContentLoaded", initPage);
   </script>
 </body>
 </html>
