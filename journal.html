@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>幣圈新手村 PRO v4.0｜交易復盤系統・倉位與加倉計算機・必備工具庫</title>
+  <title>幣圈新手村 PRO v3.2｜交易復盤系統・倉位與加倉計算機・必備工具庫</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
   <style>
@@ -66,29 +66,28 @@
     <header class="sticky top-0 z-40 bg-slate-950/90 backdrop-blur-md border-b border-slate-800">
       <div class="max-w-7xl mx-auto px-3 sm:px-6 h-16 flex items-center justify-between gap-2">
         <div class="flex items-center gap-2.5 min-w-0 shrink">
-          <a href="index.html" class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-amber-400 to-orange-600 flex items-center justify-center font-black text-slate-950 text-sm shrink-0 overflow-hidden border border-amber-400/60">
+          <a href="index.html" class="shrink-0">
             <img src="avatar.png" alt="村長"
-                 onerror="if(!this.dataset.t){this.dataset.t='1';this.src='avatar.jpg';}else{this.style.display='none';this.nextElementSibling.classList.remove('hidden');}"
-                 class="w-full h-full object-cover" />
-            <span class="hidden font-black text-base text-slate-950">村</span>
+                 onerror="if(!this.dataset.t){this.dataset.t='1';this.src='avatar.jpg';}else{this.style.display='none';}"
+                 class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl object-cover border border-amber-400/60 bg-slate-800" />
           </a>
           <div class="min-w-0">
             <div class="flex items-center gap-1 whitespace-nowrap">
               <span class="font-black text-sm sm:text-lg theme-text-main tracking-tight">幣圈新手村 PRO</span>
-              <span class="text-[10px] sm:text-xs font-extrabold px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-400">v4.0</span>
+              <span class="text-[10px] sm:text-xs font-extrabold px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-400">v3.2</span>
             </div>
             <span id="headerUserBadge" class="text-[11px] theme-text-muted block truncate">請先登入通行證帳號</span>
           </div>
         </div>
 
         <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
-          <button type="button" onclick="window.toggleTheme()" class="px-2.5 py-2 rounded-xl text-xs font-bold theme-sub theme-text-main hover:opacity-80 whitespace-nowrap">
+          <button type="button" onclick="toggleTheme()" class="px-2.5 py-2 rounded-xl text-xs font-bold theme-sub theme-text-main hover:opacity-80 whitespace-nowrap">
             ☀️/🌙
           </button>
           <a href="index.html" class="px-2.5 sm:px-3.5 py-2 rounded-xl text-xs font-bold theme-sub theme-text-main whitespace-nowrap">
             ← 首頁
           </a>
-          <button type="button" id="logoutBtn" onclick="window.handleLogout()" class="hidden px-2.5 sm:px-3.5 py-2 rounded-xl text-xs font-bold bg-rose-500/20 text-rose-500 border border-rose-500/30 whitespace-nowrap">
+          <button type="button" id="logoutBtn" onclick="handleLogout()" class="hidden px-2.5 sm:px-3.5 py-2 rounded-xl text-xs font-bold bg-rose-500/20 text-rose-500 border border-rose-500/30 whitespace-nowrap">
             登出
           </button>
         </div>
@@ -99,13 +98,10 @@
     <section id="loginSection" class="max-w-md mx-auto px-4 py-12">
       <div class="theme-card rounded-3xl p-6 sm:p-8 shadow-2xl">
         <div class="text-center mb-6">
-          <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-amber-400 to-orange-600 border-2 border-amber-400 mx-auto mb-3 shadow-lg flex items-center justify-center overflow-hidden">
-            <img src="avatar.png" alt="村長"
-                 onerror="if(!this.dataset.t){this.dataset.t='1';this.src='avatar.jpg';}else{this.style.display='none';this.nextElementSibling.classList.remove('hidden');}"
-                 class="w-full h-full object-cover" />
-            <span class="hidden font-black text-2xl text-slate-950">村</span>
-          </div>
-          <h1 class="text-xl sm:text-2xl font-black theme-text-main">登入 VIP 交易復盤系統 <span class="text-xs text-emerald-400 font-extrabold">v4.0</span></h1>
+          <img src="avatar.png" alt="村長"
+               onerror="if(!this.dataset.t){this.dataset.t='1';this.src='avatar.jpg';}else{this.style.display='none';}"
+               class="w-16 h-16 rounded-2xl object-cover border-2 border-amber-400 mx-auto mb-3 shadow-lg" />
+          <h1 class="text-xl sm:text-2xl font-black theme-text-main">登入 VIP 交易復盤系統 <span class="text-xs text-emerald-400 font-extrabold">v3.2</span></h1>
           <p class="text-xs theme-text-muted mt-1">請輸入村長核發之「專屬帳號（或 UID）」與「專屬密碼」</p>
         </div>
 
@@ -113,19 +109,19 @@
           <div>
             <label class="block text-xs font-bold theme-text-main mb-1.5">專屬帳號 (或審核之 UID)</label>
             <input type="text" id="loginAccount" placeholder="請輸入專屬帳號"
-                   onkeydown="if(event.key==='Enter'){event.preventDefault();window.doSystemLogin();}"
+                   onkeydown="if(event.key==='Enter') doSystemLogin()"
                    class="w-full px-4 py-3 rounded-xl theme-input text-sm" />
           </div>
           <div>
             <label class="block text-xs font-bold theme-text-main mb-1.5">專屬密碼</label>
             <input type="password" id="loginPassword" placeholder="請輸入專屬密碼"
-                   onkeydown="if(event.key==='Enter'){event.preventDefault();window.doSystemLogin();}"
+                   onkeydown="if(event.key==='Enter') doSystemLogin()"
                    class="w-full px-4 py-3 rounded-xl theme-input text-sm" />
           </div>
 
           <div id="loginErrorMsg" class="text-xs font-bold rounded-xl p-3 hidden"></div>
 
-          <button type="button" id="loginSubmitBtn" onclick="window.doSystemLogin()"
+          <button type="button" id="loginSubmitBtn" onclick="doSystemLogin()"
                   class="w-full py-3.5 rounded-xl font-extrabold text-sm bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-slate-950 shadow-lg active:scale-[0.98] transition-all cursor-pointer">
             🚀 登入復盤系統
           </button>
@@ -147,10 +143,10 @@
         <div class="flex flex-wrap items-center gap-2">
           <div class="flex items-center gap-1.5 theme-sub px-3 py-1.5 rounded-xl">
             <span class="text-xs theme-text-muted">初始本金(U):</span>
-            <input type="number" id="stuInitialCapitalInput" oninput="window.renderStudentTrades()" class="w-20 bg-transparent text-amber-500 amber-badge-text font-extrabold text-sm focus:outline-none" value="1000" />
+            <input type="number" id="stuInitialCapitalInput" oninput="renderStudentTrades()" class="w-20 bg-transparent text-amber-500 amber-badge-text font-extrabold text-sm focus:outline-none" value="1000" />
           </div>
-          <button type="button" id="cloudSyncBtn" onclick="window.syncTradesFromCloud(true)" class="px-3.5 py-2 rounded-xl text-xs font-extrabold bg-cyan-500/20 text-cyan-500 cyan-badge-text border border-cyan-500/30">🔄 雲端同步</button>
-          <button type="button" onclick="window.exportMyTradesCsv()" class="px-3 py-2 rounded-xl text-xs font-bold theme-sub theme-text-main">📥 匯出 CSV</button>
+          <button type="button" id="cloudSyncBtn" onclick="syncTradesFromCloud(true)" class="px-3.5 py-2 rounded-xl text-xs font-extrabold bg-cyan-500/20 text-cyan-500 cyan-badge-text border border-cyan-500/30">🔄 雲端同步</button>
+          <button type="button" onclick="exportMyTradesCsv()" class="px-3 py-2 rounded-xl text-xs font-bold theme-sub theme-text-main">📥 匯出 CSV</button>
         </div>
       </div>
 
@@ -184,12 +180,12 @@
 
       <!-- 功能分頁按鈕 -->
       <div class="flex flex-wrap gap-2 mb-6 border-b border-slate-800/50 pb-3">
-        <button type="button" id="stuTabBtn-journal" onclick="window.switchStudentTab('journal')" class="px-3.5 py-2 rounded-xl font-extrabold text-xs sm:text-sm bg-amber-500 text-slate-950">📝 我的交易復盤日誌</button>
-        <button type="button" id="stuTabBtn-resources" onclick="window.switchStudentTab('resources')" class="px-3.5 py-2 rounded-xl font-bold text-xs sm:text-sm theme-sub theme-text-main">⚡ 好用工具與講義</button>
-        <button type="button" id="stuTabBtn-calc" onclick="window.switchStudentTab('calc')" class="px-3.5 py-2 rounded-xl font-bold text-xs sm:text-sm theme-sub theme-text-main">🧮 倉位 & 加倉計算機</button>
-        <button type="button" id="stuTabBtn-leaderboard" onclick="window.switchStudentTab('leaderboard')" class="px-3.5 py-2 rounded-xl font-bold text-xs sm:text-sm theme-sub theme-text-main">🏆 排行榜</button>
-        <button type="button" id="stuTabBtn-admin" onclick="window.switchStudentTab('admin')" class="hidden px-3.5 py-2 rounded-xl font-extrabold text-xs sm:text-sm bg-rose-500 text-white">⚙️ 村長管理後台</button>
-        <button type="button" id="stuTabBtn-review" onclick="window.switchStudentTab('review')" class="hidden px-3.5 py-2 rounded-xl font-extrabold text-xs sm:text-sm bg-purple-500 text-white">✍️ 批改學員倉位</button>
+        <button type="button" id="stuTabBtn-journal" onclick="switchStudentTab('journal')" class="px-3.5 py-2 rounded-xl font-extrabold text-xs sm:text-sm bg-amber-500 text-slate-950">📝 我的交易復盤日誌</button>
+        <button type="button" id="stuTabBtn-resources" onclick="switchStudentTab('resources')" class="px-3.5 py-2 rounded-xl font-bold text-xs sm:text-sm theme-sub theme-text-main">⚡ 好用工具與講義</button>
+        <button type="button" id="stuTabBtn-calc" onclick="switchStudentTab('calc')" class="px-3.5 py-2 rounded-xl font-bold text-xs sm:text-sm theme-sub theme-text-main">🧮 倉位 & 加倉計算機</button>
+        <button type="button" id="stuTabBtn-leaderboard" onclick="switchStudentTab('leaderboard')" class="px-3.5 py-2 rounded-xl font-bold text-xs sm:text-sm theme-sub theme-text-main">🏆 排行榜</button>
+        <button type="button" id="stuTabBtn-admin" onclick="switchStudentTab('admin')" class="hidden px-3.5 py-2 rounded-xl font-extrabold text-xs sm:text-sm bg-rose-500 text-white">⚙️ 村長管理後台</button>
+        <button type="button" id="stuTabBtn-review" onclick="switchStudentTab('review')" class="hidden px-3.5 py-2 rounded-xl font-extrabold text-xs sm:text-sm bg-purple-500 text-white">✍️ 批改學員倉位</button>
       </div>
 
       <!-- 分頁 1：個人交易復盤日誌 -->
@@ -198,12 +194,12 @@
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5 border-b border-slate-800/40 pb-3">
             <h2 id="tradeFormTitle" class="text-base sm:text-lg font-black theme-text-main">➕ 新增我的交易復盤紀錄</h2>
             <div class="grid grid-cols-2 rounded-xl theme-sub p-1 w-full sm:w-auto">
-              <button type="button" id="modeBtnSingle" onclick="window.setEntryMode('single')" class="px-3 py-1.5 rounded-lg text-xs font-extrabold bg-amber-500 text-slate-950 text-center">單筆模式</button>
-              <button type="button" id="modeBtnBatch" onclick="window.setEntryMode('batch')" class="px-3 py-1.5 rounded-lg text-xs font-bold theme-text-muted text-center">分批進出場模式</button>
+              <button type="button" id="modeBtnSingle" onclick="setEntryMode('single')" class="px-3 py-1.5 rounded-lg text-xs font-extrabold bg-amber-500 text-slate-950 text-center">單筆模式</button>
+              <button type="button" id="modeBtnBatch" onclick="setEntryMode('batch')" class="px-3 py-1.5 rounded-lg text-xs font-bold theme-text-muted text-center">分批進出場模式</button>
             </div>
           </div>
 
-          <form id="tradeRecordForm" onsubmit="window.addOrUpdateTradeRecord(event)" class="space-y-4">
+          <form id="tradeRecordForm" onsubmit="addOrUpdateTradeRecord(event)" class="space-y-4">
             <input type="hidden" id="editTradeRowIndex" value="" />
 
             <div class="p-3.5 sm:p-4 rounded-2xl theme-sub space-y-3">
@@ -223,7 +219,7 @@
                 </div>
                 <div>
                   <label class="block text-xs font-bold theme-text-main mb-1">多空方向 *</label>
-                  <select id="trSide" onchange="window.previewAutoFee()" class="w-full px-3 py-2.5 rounded-xl theme-input text-sm font-bold">
+                  <select id="trSide" onchange="previewAutoFee()" class="w-full px-3 py-2.5 rounded-xl theme-input text-sm font-bold">
                     <option value="做多 Long">🟢 做多 Long</option>
                     <option value="做空 Short">🔴 做空 Short</option>
                   </select>
@@ -235,7 +231,7 @@
               <div class="space-y-2.5">
                 <div class="flex items-center justify-between gap-2">
                   <span class="text-xs font-extrabold text-cyan-500 cyan-badge-text">📥 分批進場（自動算開倉均價與總持倉）</span>
-                  <button type="button" onclick="window.addBatchInRow()" class="px-2.5 py-1 rounded-lg bg-cyan-500/20 text-cyan-500 cyan-badge-text text-xs font-bold shrink-0">+ 新增進場</button>
+                  <button type="button" onclick="addBatchInRow()" class="px-2.5 py-1 rounded-lg bg-cyan-500/20 text-cyan-500 cyan-badge-text text-xs font-bold shrink-0">+ 新增進場</button>
                 </div>
                 <div id="batchInRowsContainer" class="space-y-2"></div>
               </div>
@@ -243,7 +239,7 @@
               <div class="space-y-2.5 pt-3 lg:pt-0 border-t lg:border-t-0 border-slate-700/40">
                 <div class="flex items-center justify-between gap-2">
                   <span class="text-xs font-extrabold text-amber-500 amber-badge-text">📤 分批出場（自動算平倉均價）</span>
-                  <button type="button" onclick="window.addBatchOutRow()" class="px-2.5 py-1 rounded-lg bg-amber-500/20 text-amber-500 amber-badge-text text-xs font-bold shrink-0">+ 新增出場</button>
+                  <button type="button" onclick="addBatchOutRow()" class="px-2.5 py-1 rounded-lg bg-amber-500/20 text-amber-500 amber-badge-text text-xs font-bold shrink-0">+ 新增出場</button>
                 </div>
                 <div id="batchOutRowsContainer" class="space-y-2"></div>
               </div>
@@ -258,15 +254,15 @@
                 </div>
                 <div>
                   <label class="block text-xs font-bold theme-text-main mb-1">開倉均價 *</label>
-                  <input type="number" id="trEntryPrice" required step="any" placeholder="0.00" oninput="window.previewAutoFee()" class="w-full px-3 py-2.5 rounded-xl theme-input text-sm" />
+                  <input type="number" id="trEntryPrice" required step="any" placeholder="0.00" oninput="previewAutoFee()" class="w-full px-3 py-2.5 rounded-xl theme-input text-sm" />
                 </div>
                 <div>
                   <label class="block text-xs font-bold theme-text-main mb-1">平倉均價 *</label>
-                  <input type="number" id="trExitPrice" required step="any" placeholder="0.00" oninput="window.previewAutoFee()" class="w-full px-3 py-2.5 rounded-xl theme-input text-sm" />
+                  <input type="number" id="trExitPrice" required step="any" placeholder="0.00" oninput="previewAutoFee()" class="w-full px-3 py-2.5 rounded-xl theme-input text-sm" />
                 </div>
                 <div>
                   <label class="block text-xs font-bold theme-text-main mb-1">持倉量 *</label>
-                  <input type="number" id="trQuantity" required step="any" placeholder="顆數/張數" oninput="window.previewAutoFee()" class="w-full px-3 py-2.5 rounded-xl theme-input text-sm" />
+                  <input type="number" id="trQuantity" required step="any" placeholder="顆數/張數" oninput="previewAutoFee()" class="w-full px-3 py-2.5 rounded-xl theme-input text-sm" />
                 </div>
                 <div>
                   <label class="block text-xs font-bold theme-text-main mb-1">預期 RR</label>
@@ -284,7 +280,7 @@
               <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div>
                   <label class="block text-xs font-bold theme-text-main mb-1">實際淨利 (USDT，虧損請加負號) *</label>
-                  <input type="number" id="trNetProfit" required step="any" placeholder="例如 50 或 -25" oninput="window.previewAutoFee()" class="w-full px-3 py-2.5 rounded-xl theme-input font-bold text-sm border-amber-500/60" />
+                  <input type="number" id="trNetProfit" required step="any" placeholder="例如 50 或 -25" oninput="previewAutoFee()" class="w-full px-3 py-2.5 rounded-xl theme-input font-bold text-sm border-amber-500/60" />
                 </div>
                 <div>
                   <label class="block text-xs font-bold text-rose-500 mb-1">系統自動算出之手續費磨耗 (免填)</label>
@@ -294,7 +290,7 @@
                 </div>
                 <div>
                   <label class="block text-xs font-bold theme-text-main mb-1">上傳盤面截圖</label>
-                  <input type="file" id="trScreenshotFile" accept="image/*" onchange="window.handleScreenshotSelect(event)" class="w-full text-xs theme-text-muted file:mr-2 file:py-2 file:px-3 file:rounded-xl file:border-0 file:bg-amber-500 file:text-slate-950 file:font-bold" />
+                  <input type="file" id="trScreenshotFile" accept="image/*" onchange="handleScreenshotSelect(event)" class="w-full text-xs theme-text-muted file:mr-2 file:py-2 file:px-3 file:rounded-xl file:border-0 file:bg-amber-500 file:text-slate-950 file:font-bold" />
                   <input type="hidden" id="trExistingScreenshotUrl" value="" />
                 </div>
               </div>
@@ -311,7 +307,7 @@
                 </div>
                 <div class="flex gap-2 max-w-md">
                   <input type="text" id="customStrategyInput" placeholder="輸入自訂策略名稱..." class="flex-1 px-3 py-2 rounded-xl theme-input text-xs" />
-                  <button type="button" onclick="window.addCustomStrategyTag()" class="px-3.5 py-2 rounded-xl bg-cyan-500/20 text-cyan-500 cyan-badge-text border border-cyan-500/30 text-xs font-bold shrink-0">+ 新增策略</button>
+                  <button type="button" onclick="addCustomStrategyTag()" class="px-3.5 py-2 rounded-xl bg-cyan-500/20 text-cyan-500 cyan-badge-text border border-cyan-500/30 text-xs font-bold shrink-0">+ 新增策略</button>
                 </div>
               </div>
 
@@ -323,7 +319,7 @@
 
             <div class="flex items-center gap-3 pt-1">
               <button type="submit" id="saveTradeBtn" class="w-full sm:w-auto px-8 py-3 rounded-xl font-extrabold text-sm bg-amber-500 hover:bg-amber-400 text-slate-950 shadow-lg">💾 儲存復盤紀錄</button>
-              <button type="button" id="cancelEditBtn" onclick="window.cancelEditMode()" class="hidden px-5 py-3 rounded-xl font-bold text-sm theme-sub theme-text-main">取消修改</button>
+              <button type="button" id="cancelEditBtn" onclick="cancelEditMode()" class="hidden px-5 py-3 rounded-xl font-bold text-sm theme-sub theme-text-main">取消修改</button>
             </div>
           </form>
         </div>
@@ -347,7 +343,7 @@
               <h3 class="text-lg sm:text-xl font-black theme-text-main">⚡ 虛擬貨幣必備數據網站與好用工具</h3>
               <p class="text-xs theme-text-muted mt-0.5">按實戰梯隊分類整理，點擊卡片即可前往</p>
             </div>
-            <input type="text" id="resSearchInput" oninput="window.renderStudentResources()" placeholder="搜尋工具名稱或用途..." class="px-3.5 py-2 rounded-xl theme-input text-xs w-full sm:w-60" />
+            <input type="text" id="resSearchInput" oninput="renderStudentResources()" placeholder="搜尋工具名稱或用途..." class="px-3.5 py-2 rounded-xl theme-input text-xs w-full sm:w-60" />
           </div>
           <div id="studentWebsitesContainer" class="space-y-6"></div>
         </div>
@@ -362,27 +358,27 @@
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
               <div>
                 <label class="block text-xs font-bold theme-text-main mb-1">總本金 (USDT)</label>
-                <input type="number" id="calcCapital" value="1000" oninput="window.runRiskCalc()" class="w-full px-3 py-2 rounded-xl theme-input text-sm" />
+                <input type="number" id="calcCapital" value="1000" oninput="runRiskCalc()" class="w-full px-3 py-2 rounded-xl theme-input text-sm" />
               </div>
               <div>
                 <label class="block text-xs font-bold theme-text-main mb-1">單筆允許虧損 (%)</label>
-                <input type="number" id="calcRiskPct" value="2" step="0.5" oninput="window.runRiskCalc()" class="w-full px-3 py-2 rounded-xl theme-input text-sm" />
+                <input type="number" id="calcRiskPct" value="2" step="0.5" oninput="runRiskCalc()" class="w-full px-3 py-2 rounded-xl theme-input text-sm" />
               </div>
               <div>
                 <label class="block text-xs font-bold theme-text-main mb-1">預計進場價</label>
-                <input type="number" id="calcEntry" step="any" oninput="window.runRiskCalc()" class="w-full px-3 py-2 rounded-xl theme-input text-sm" />
+                <input type="number" id="calcEntry" step="any" oninput="runRiskCalc()" class="w-full px-3 py-2 rounded-xl theme-input text-sm" />
               </div>
               <div>
                 <label class="block text-xs font-bold theme-text-main mb-1">預計止損價 (SL)</label>
-                <input type="number" id="calcSl" step="any" oninput="window.runRiskCalc()" class="w-full px-3 py-2 rounded-xl theme-input text-sm" />
+                <input type="number" id="calcSl" step="any" oninput="runRiskCalc()" class="w-full px-3 py-2 rounded-xl theme-input text-sm" />
               </div>
               <div>
                 <label class="block text-xs font-bold theme-text-main mb-1">預計止盈價 (TP)</label>
-                <input type="number" id="calcTp" step="any" oninput="window.runRiskCalc()" class="w-full px-3 py-2 rounded-xl theme-input text-sm" />
+                <input type="number" id="calcTp" step="any" oninput="runRiskCalc()" class="w-full px-3 py-2 rounded-xl theme-input text-sm" />
               </div>
               <div>
                 <label class="block text-xs font-bold theme-text-main mb-1">槓桿倍數 (X)</label>
-                <input type="number" id="calcLev" value="10" oninput="window.runRiskCalc()" class="w-full px-3 py-2 rounded-xl theme-input text-sm" />
+                <input type="number" id="calcLev" value="10" oninput="runRiskCalc()" class="w-full px-3 py-2 rounded-xl theme-input text-sm" />
               </div>
             </div>
             <div class="grid grid-cols-2 gap-3 p-4 rounded-2xl theme-sub text-center">
@@ -396,7 +392,7 @@
           <div class="theme-card rounded-3xl p-5 sm:p-6">
             <div class="flex items-center justify-between mb-1">
               <h2 class="text-lg font-black theme-text-main">📈 2. 加倉倉位計算機</h2>
-              <button type="button" onclick="window.addPyramidRow()" class="px-3 py-1 rounded-lg bg-cyan-500/20 text-cyan-500 cyan-badge-text text-xs font-bold">+ 新增一筆加倉</button>
+              <button type="button" onclick="addPyramidRow()" class="px-3 py-1 rounded-lg bg-cyan-500/20 text-cyan-500 cyan-badge-text text-xs font-bold">+ 新增一筆加倉</button>
             </div>
             <p class="text-xs theme-text-muted mb-4">輸入原持倉與各次加倉的價格與持倉量，自動算出加倉後的最新均價與總持倉量</p>
             <div id="pyramidRowsContainer" class="space-y-2.5 mb-4"></div>
@@ -418,8 +414,8 @@
               <p class="text-xs theme-text-muted mt-0.5">全程匿名顯示 UID (***** 遮罩)，點擊切換「盈利排行榜」或「交易量排行榜」</p>
             </div>
             <div class="inline-flex rounded-xl theme-sub p-1">
-              <button type="button" id="lbBtnProfit" onclick="window.switchLeaderboardMode('profit')" class="px-3.5 py-1.5 rounded-lg text-xs font-extrabold bg-amber-500 text-slate-950">💰 盈利排行榜</button>
-              <button type="button" id="lbBtnVolume" onclick="window.switchLeaderboardMode('volume')" class="px-3.5 py-1.5 rounded-lg text-xs font-bold theme-text-muted">📊 交易量排行榜</button>
+              <button type="button" id="lbBtnProfit" onclick="switchLeaderboardMode('profit')" class="px-3.5 py-1.5 rounded-lg text-xs font-extrabold bg-amber-500 text-slate-950">💰 盈利排行榜</button>
+              <button type="button" id="lbBtnVolume" onclick="switchLeaderboardMode('volume')" class="px-3.5 py-1.5 rounded-lg text-xs font-bold theme-text-muted">📊 交易量排行榜</button>
             </div>
           </div>
           <div id="leaderboardContainer" class="space-y-2.5"></div>
@@ -447,7 +443,7 @@
               <h3 class="text-lg font-black theme-text-main">✍️ 批改學員實戰倉位紀錄</h3>
               <p class="text-xs theme-text-muted">此區專門顯示所有學員的交易復盤紀錄，村長可直接輸入評語點評</p>
             </div>
-            <input type="text" id="reviewFilterInput" oninput="window.renderAdminReviewTrades()" placeholder="篩選學員帳號、UID 或幣種..." class="px-3.5 py-2 rounded-xl theme-input text-xs w-full sm:w-64" />
+            <input type="text" id="reviewFilterInput" oninput="renderAdminReviewTrades()" placeholder="篩選學員帳號、UID 或幣種..." class="px-3.5 py-2 rounded-xl theme-input text-xs w-full sm:w-64" />
           </div>
           <div id="adminReviewTradesContainer" class="space-y-3.5"></div>
         </div>
@@ -462,33 +458,12 @@
       <p class="text-xs theme-text-muted leading-relaxed">
         加密貨幣與衍生品合約交易屬於高波動、高槓桿風險之投資行為，可能導致本金部分或全部損失。本系統提供之復盤紀錄、倉位計算機、核心講義與數據網站導覽僅供教育學習與個人交易管理使用，絕不構成任何投資建議或獲利保證。投資理財風險自負，請務必做好嚴格止損與資金控管。
       </p>
-      <div class="text-[11px] theme-text-muted pt-1">© 2026 幣圈新手村 PRO v4.0. All Rights Reserved.</div>
+      <div class="text-[11px] theme-text-muted pt-1">© 2026 幣圈新手村 PRO v3.2. All Rights Reserved.</div>
     </div>
   </footer>
 
   <script>
     const SCRIPT_API_URL = "https://script.google.com/macros/s/AKfycby-oIzel0yPK_zLna564GdTHE_EFICkWT5UEghHkh_9kciPpWzhLzycZG-stPyhK8IR/exec";
-
-    // 安全存取 localStorage（徹底防止 macOS 預覽視窗或無痕環境丟出 SecurityError 導致腳本崩潰）
-    function safeGetStorage(key) {
-      try {
-        return window.localStorage.getItem(key);
-      } catch (e) {
-        return null;
-      }
-    }
-
-    function safeSetStorage(key, val) {
-      try {
-        window.localStorage.setItem(key, val);
-      } catch (e) {}
-    }
-
-    function safeRemoveStorage(key) {
-      try {
-        window.localStorage.removeItem(key);
-      } catch (e) {}
-    }
 
     function escapeHtmlAttr(str) {
       return String(str || "")
@@ -500,17 +475,16 @@
     }
 
     function applySavedTheme() {
-      const saved = safeGetStorage("village_theme") || "dark";
+      const saved = localStorage.getItem("village_theme") || "dark";
       document.documentElement.classList.toggle("light", saved === "light");
       document.documentElement.classList.toggle("dark", saved !== "light");
     }
 
     function toggleTheme() {
       const isLight = document.documentElement.classList.contains("light");
-      safeSetStorage("village_theme", isLight ? "dark" : "light");
+      localStorage.setItem("village_theme", isLight ? "dark" : "light");
       applySavedTheme();
     }
-    window.toggleTheme = toggleTheme;
     applySavedTheme();
 
     const DEFAULT_51_RESOURCES = [
@@ -590,4 +564,957 @@
         : "text-xs font-bold text-cyan-400 bg-cyan-500/10 border border-cyan-500/30 rounded-xl p-3 block";
     }
 
-    function show
+    function showSyncToast(msg, autoHideMs = 0) {
+      const toast = document.getElementById("syncStatusToast");
+      if (!toast) return;
+      toast.textContent = msg;
+      toast.classList.remove("hidden");
+      if (autoHideMs > 0) {
+        setTimeout(() => { toast.classList.add("hidden"); }, autoHideMs);
+      }
+    }
+
+    function hideSyncToast() {
+      const toast = document.getElementById("syncStatusToast");
+      if (toast) toast.classList.add("hidden");
+    }
+
+    async function callApi(payload) {
+      try {
+        const resPost = await fetch(SCRIPT_API_URL, {
+          method: "POST",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify(payload)
+        });
+        const text = await resPost.text();
+        return JSON.parse(text);
+      } catch (err) {
+        const qs = new URLSearchParams();
+        Object.keys(payload).forEach(k => {
+          if (payload[k] !== undefined && payload[k] !== null && typeof payload[k] !== "object") {
+            qs.append(k, String(payload[k]));
+          }
+        });
+        const resGet = await fetch(SCRIPT_API_URL + "?" + qs.toString());
+        return await resGet.json();
+      }
+    }
+
+    function saveSessionCache() {
+      if (!currentUser) return;
+      try {
+        localStorage.setItem("village_pro_cache", JSON.stringify({
+          user: currentUser,
+          trades: studentTrades,
+          allTrades: allTradesAdmin,
+          students: allStudentsAdmin,
+          leaderboard: globalLeaderboard,
+          maxLimits: maxLimits
+        }));
+      } catch (e) {}
+    }
+
+    function setDefaultDates() {
+      const today = new Date().toISOString().split("T")[0];
+      const e1 = document.getElementById("trEntryDate");
+      const e2 = document.getElementById("trExitDate");
+      if (e1) e1.value = today;
+      if (e2) e2.value = today;
+    }
+
+    function maskIdDisplay(rawStr) {
+      const s = String(rawStr || "").trim();
+      if (!s) return "VIP*****";
+      if (s.includes("*")) return s;
+      if (s.toUpperCase().startsWith("VIP")) return "VIP****" + s.slice(-2);
+      if (s.length <= 4) return s.charAt(0) + "****" + s.slice(-1);
+      return s.slice(0, 2) + "*****" + s.slice(-2);
+    }
+
+    function calculateAutoFee(side, entryPrice, exitPrice, quantity, netProfit) {
+      const ep = parseFloat(entryPrice) || 0;
+      const xp = parseFloat(exitPrice) || 0;
+      const qty = parseFloat(quantity) || 0;
+      const net = parseFloat(netProfit) || 0;
+      if (ep <= 0 || xp <= 0 || qty <= 0) return 0;
+
+      const isShort = String(side || "").includes("空") || String(side || "").toLowerCase().includes("short");
+      const grossPnl = isShort ? (ep - xp) * qty : (xp - ep) * qty;
+      const diff = grossPnl - net;
+
+      if (Math.abs(diff) >= 0.01) {
+        return Math.round(Math.abs(diff) * 100) / 100;
+      }
+      const turnover = (ep * qty) + (xp * qty);
+      return Math.round((turnover * 0.0005) * 100) / 100;
+    }
+
+    function previewAutoFee() {
+      const side = document.getElementById("trSide").value;
+      const ep = document.getElementById("trEntryPrice").value;
+      const xp = document.getElementById("trExitPrice").value;
+      const qty = document.getElementById("trQuantity").value;
+      const net = document.getElementById("trNetProfit").value;
+      const fee = calculateAutoFee(side, ep, xp, qty, net);
+      const box = document.getElementById("autoFeePreviewBox");
+      if (box) box.textContent = "$" + fee.toFixed(2) + " U (系統自動精算)";
+      return fee;
+    }
+
+    async function doSystemLogin() {
+      const acc = (document.getElementById("loginAccount")?.value || "").trim();
+      const pwd = (document.getElementById("loginPassword")?.value || "").trim();
+      const btn = document.getElementById("loginSubmitBtn");
+
+      if (!acc || !pwd) {
+        showLoginBoxMsg("⚠️ 請輸入您的「專屬帳號」與「專屬密碼」！", true);
+        return;
+      }
+
+      const isBoss = (acc.toLowerCase() === "henry" && pwd === "henry29004") ||
+                     (acc.toLowerCase() === "admin" && pwd === "admin888");
+
+      if (isBoss) {
+        currentUser = { account: acc, nickname: "村長", role: "admin", isUidUser: true, expireDate: "永久" };
+        localStorage.setItem("village_pro_user", JSON.stringify({ account: acc, password: pwd }));
+        enterDashboardUI();
+        syncTradesFromCloud(true);
+        return;
+      }
+
+      if (btn) {
+        btn.disabled = true;
+        btn.textContent = "⏳ 正在驗證登入中...";
+      }
+      showLoginBoxMsg("⏳ 正在驗證帳號密碼，請稍候...", false);
+
+      try {
+        const data = await callApi({
+          action: "login",
+          account: acc,
+          password: pwd,
+          uid: acc,
+          pwd: pwd,
+          username: acc
+        });
+
+        const isOk = data && (
+          data.success === true ||
+          data.status === "success" ||
+          data.status === "ok" ||
+          data.role === "admin" ||
+          data.role === "student" ||
+          Boolean(data.user)
+        );
+
+        if (!isOk) {
+          showLoginBoxMsg("❌ " + ((data && (data.message || data.msg || data.error)) || "帳號或密碼錯誤，或尚未開通！"), true);
+          return;
+        }
+
+        currentUser = data.user || {
+          account: data.account || data.uid || acc,
+          nickname: data.nickname || data.account || acc,
+          exchange: data.exchange || "Bitunix",
+          uid: data.uid || acc,
+          expireDate: data.expireDate || "永久",
+          isUidUser: data.isUidUser !== undefined ? data.isUidUser : true
+        };
+        currentUser.role = (data.role === "admin" || data.isAdmin === true) ? "admin" : "student";
+        if (data.maxLimits) maxLimits = data.maxLimits;
+
+        studentTrades = Array.isArray(data.trades) ? data.trades : [];
+        allTradesAdmin = Array.isArray(data.allTrades) ? data.allTrades : [];
+        if (Array.isArray(data.resources) && data.resources.length > 0) window.globalResources = data.resources;
+        if (Array.isArray(data.leaderboard)) globalLeaderboard = data.leaderboard;
+        allStudentsAdmin = (currentUser.role === "admin" && Array.isArray(data.students)) ? data.students : [];
+
+        localStorage.setItem("village_pro_user", JSON.stringify({ account: acc, password: pwd }));
+        saveSessionCache();
+        enterDashboardUI();
+      } catch (err) {
+        showLoginBoxMsg("⚠️ 連線失敗：" + err.message, true);
+      } finally {
+        if (btn) {
+          btn.disabled = false;
+          btn.textContent = "🚀 登入復盤系統";
+        }
+      }
+    }
+
+    function enterDashboardUI() {
+      document.getElementById("loginSection").classList.add("hidden");
+      document.getElementById("studentSection").classList.remove("hidden");
+      document.getElementById("logoutBtn").classList.remove("hidden");
+
+      const adminBtn = document.getElementById("stuTabBtn-admin");
+      const adminPane = document.getElementById("stuPane-admin");
+      const reviewBtn = document.getElementById("stuTabBtn-review");
+      const reviewPane = document.getElementById("stuPane-review");
+
+      if (currentUser && currentUser.role === "admin") {
+        adminBtn.classList.remove("hidden");
+        reviewBtn.classList.remove("hidden");
+        renderAdminStudents();
+        renderAdminReviewTrades();
+      } else {
+        adminBtn.classList.add("hidden");
+        adminPane.classList.add("hidden");
+        reviewBtn.classList.add("hidden");
+        reviewPane.classList.add("hidden");
+      }
+
+      document.getElementById("headerUserBadge").textContent = "目前登入：" + currentUser.account + " (" + (currentUser.role === "admin" ? "村長" : "VIP學員") + ")";
+      document.getElementById("stuWelcomeName").textContent = "歡迎回來，" + currentUser.account;
+
+      const badgeEl = document.getElementById("stuExpireBadge");
+      const isSubUser = (currentUser.isUidUser === false) || (String(currentUser.exchange || "").includes("訂閱"));
+      const expStr = currentUser.expireDate || "";
+
+      if (isSubUser && expStr && expStr !== "永久") {
+        const expTime = new Date(expStr + "T23:59:59").getTime();
+        const diffDays = Math.ceil((expTime - Date.now()) / 86400000);
+        badgeEl.textContent = diffDays > 0 ? ("訂閱效期至 " + expStr + " (剩餘 " + diffDays + " 天)") : ("訂閱效期至 " + expStr);
+      } else {
+        badgeEl.textContent = "💎 VIP 專屬通行證";
+      }
+
+      setDefaultDates();
+      renderStudentTrades();
+      renderStudentResources();
+      renderLeaderboard();
+      runRiskCalc();
+      initPyramidCalc();
+    }
+
+    function handleLogout() {
+      localStorage.removeItem("village_pro_user");
+      localStorage.removeItem("village_pro_cache");
+      currentUser = null;
+      studentTrades = [];
+      allTradesAdmin = [];
+      allStudentsAdmin = [];
+      document.getElementById("stuTabBtn-admin").classList.add("hidden");
+      document.getElementById("stuPane-admin").classList.add("hidden");
+      document.getElementById("stuTabBtn-review").classList.add("hidden");
+      document.getElementById("stuPane-review").classList.add("hidden");
+      document.getElementById("studentSection").classList.add("hidden");
+      document.getElementById("loginSection").classList.remove("hidden");
+      document.getElementById("logoutBtn").classList.add("hidden");
+      document.getElementById("loginErrorMsg").classList.add("hidden");
+    }
+
+    function switchStudentTab(tab) {
+      if ((tab === "admin" || tab === "review") && (!currentUser || currentUser.role !== "admin")) return;
+      ["journal", "resources", "calc", "leaderboard", "admin", "review"].forEach(t => {
+        const pane = document.getElementById("stuPane-" + t);
+        const btn = document.getElementById("stuTabBtn-" + t);
+        const active = (t === tab);
+        if (pane) pane.classList.toggle("hidden", !active);
+        if (btn && !btn.classList.contains("hidden")) {
+          if (t === "admin" && !active) {
+            btn.className = "px-3.5 py-2 rounded-xl font-extrabold text-xs sm:text-sm bg-rose-500/20 text-rose-500 border border-rose-500/30";
+          } else if (t === "review" && !active) {
+            btn.className = "px-3.5 py-2 rounded-xl font-extrabold text-xs sm:text-sm bg-purple-500/20 text-purple-400 border border-purple-500/30";
+          } else {
+            btn.className = active
+              ? "px-3.5 py-2 rounded-xl font-extrabold text-xs sm:text-sm bg-amber-500 text-slate-950"
+              : "px-3.5 py-2 rounded-xl font-bold text-xs sm:text-sm theme-sub theme-text-main";
+          }
+        }
+      });
+    }
+
+    function addCustomStrategyTag() {
+      const input = document.getElementById("customStrategyInput");
+      const val = input.value.trim();
+      if (!val) return;
+      const group = document.getElementById("strategyCheckboxGroup");
+      const label = document.createElement("label");
+      label.className = "cursor-pointer inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl theme-input border-cyan-500/50 text-xs font-bold text-cyan-500 cyan-badge-text";
+      const safeVal = escapeHtmlAttr(val);
+      label.innerHTML = '<input type="checkbox" value="' + safeVal + '" checked class="strat-chk accent-amber-500" /> ' + safeVal;
+      group.appendChild(label);
+      input.value = "";
+    }
+
+    function setEntryMode(mode) {
+      currentEntryMode = mode;
+      const box = document.getElementById("batchEntryBox");
+      if (mode === "batch") {
+        box.classList.remove("hidden");
+        document.getElementById("modeBtnBatch").className = "px-3 py-1.5 rounded-lg text-xs font-extrabold bg-cyan-400 text-slate-950 text-center";
+        document.getElementById("modeBtnSingle").className = "px-3 py-1.5 rounded-lg text-xs font-bold theme-text-muted text-center";
+        if (document.getElementById("batchInRowsContainer").children.length === 0) { addBatchInRow(); addBatchInRow(); }
+        if (document.getElementById("batchOutRowsContainer").children.length === 0) { addBatchOutRow(); addBatchOutRow(); }
+      } else {
+        box.classList.add("hidden");
+        document.getElementById("modeBtnSingle").className = "px-3 py-1.5 rounded-lg text-xs font-extrabold bg-amber-500 text-slate-950 text-center";
+        document.getElementById("modeBtnBatch").className = "px-3 py-1.5 rounded-lg text-xs font-bold theme-text-muted text-center";
+      }
+    }
+
+    function addBatchInRow() {
+      const div = document.createElement("div");
+      div.className = "flex items-center gap-2 batch-in-row";
+      div.innerHTML =
+        '<input type="number" step="any" placeholder="進場價格" oninput="recalcBatchesIn()" class="batch-in-price flex-1 min-w-0 px-3 py-2 rounded-xl theme-input text-xs" />' +
+        '<input type="number" step="any" placeholder="進場持倉量" oninput="recalcBatchesIn()" class="batch-in-qty flex-1 min-w-0 px-3 py-2 rounded-xl theme-input text-xs" />' +
+        '<button type="button" onclick="this.parentElement.remove(); recalcBatchesIn();" class="px-2.5 py-2 rounded-xl bg-rose-500/15 text-rose-500 text-xs font-bold shrink-0">✕</button>';
+      document.getElementById("batchInRowsContainer").appendChild(div);
+    }
+
+    function recalcBatchesIn() {
+      let totalQ = 0, wSum = 0;
+      document.querySelectorAll(".batch-in-row").forEach(r => {
+        const p = parseFloat(r.querySelector(".batch-in-price")?.value) || 0;
+        const q = parseFloat(r.querySelector(".batch-in-qty")?.value) || 0;
+        if (p > 0 && q > 0) { totalQ += q; wSum += p * q; }
+      });
+      if (totalQ > 0) {
+        document.getElementById("trQuantity").value = Math.round(totalQ * 10000) / 10000;
+        document.getElementById("trEntryPrice").value = Math.round((wSum / totalQ) * 10000) / 10000;
+        previewAutoFee();
+      }
+    }
+
+    function addBatchOutRow() {
+      const div = document.createElement("div");
+      div.className = "flex items-center gap-2 batch-out-row";
+      div.innerHTML =
+        '<input type="number" step="any" placeholder="出場價格" oninput="recalcBatchesOut()" class="batch-out-price flex-1 min-w-0 px-3 py-2 rounded-xl theme-input text-xs" />' +
+        '<input type="number" step="any" placeholder="出場持倉量" oninput="recalcBatchesOut()" class="batch-out-qty flex-1 min-w-0 px-3 py-2 rounded-xl theme-input text-xs" />' +
+        '<button type="button" onclick="this.parentElement.remove(); recalcBatchesOut();" class="px-2.5 py-2 rounded-xl bg-rose-500/15 text-rose-500 text-xs font-bold shrink-0">✕</button>';
+      document.getElementById("batchOutRowsContainer").appendChild(div);
+    }
+
+    function recalcBatchesOut() {
+      let totalQ = 0, wSum = 0;
+      document.querySelectorAll(".batch-out-row").forEach(r => {
+        const p = parseFloat(r.querySelector(".batch-out-price")?.value) || 0;
+        const q = parseFloat(r.querySelector(".batch-out-qty")?.value) || 0;
+        if (p > 0 && q > 0) { totalQ += q; wSum += p * q; }
+      });
+      if (totalQ > 0) {
+        document.getElementById("trExitPrice").value = Math.round((wSum / totalQ) * 10000) / 10000;
+        previewAutoFee();
+      }
+    }
+
+    function handleScreenshotSelect(e) {
+      const file = e.target.files?.[0];
+      if (!file) { pendingScreenshotBase64 = ""; return; }
+      const reader = new FileReader();
+      reader.onload = evt => { pendingScreenshotBase64 = evt.target.result; };
+      reader.readAsDataURL(file);
+    }
+
+    async function addOrUpdateTradeRecord(e) {
+      e.preventDefault();
+      if (!currentUser) return;
+      const btn = document.getElementById("saveTradeBtn");
+      btn.disabled = true;
+      btn.textContent = "⏳ 儲存中...";
+      showSyncToast("⏳ 正在儲存交易紀錄並同步...");
+
+      const selectedStrategies = Array.from(document.querySelectorAll(".strat-chk:checked")).map(cb => cb.value);
+      const sideVal = document.getElementById("trSide").value;
+      const entryPriceVal = parseFloat(document.getElementById("trEntryPrice").value) || 0;
+      const exitPriceVal = parseFloat(document.getElementById("trExitPrice").value) || 0;
+      const qtyVal = parseFloat(document.getElementById("trQuantity").value) || 0;
+      const netProfitVal = parseFloat(document.getElementById("trNetProfit").value) || 0;
+      const autoFeeVal = calculateAutoFee(sideVal, entryPriceVal, exitPriceVal, qtyVal, netProfitVal);
+
+      const tradeObj = {
+        rowIndex: document.getElementById("editTradeRowIndex").value || "",
+        entryDate: document.getElementById("trEntryDate").value,
+        exitDate: document.getElementById("trExitDate").value,
+        symbol: document.getElementById("trSymbol").value.trim().toUpperCase(),
+        side: sideVal,
+        leverage: parseFloat(document.getElementById("trLeverage").value) || 10,
+        entryPrice: entryPriceVal,
+        exitPrice: exitPriceVal,
+        quantity: qtyVal,
+        expectedRR: document.getElementById("trExpectedRR").value.trim(),
+        actualRR: document.getElementById("trActualRR").value.trim(),
+        fee: autoFeeVal,
+        netProfit: netProfitVal,
+        result: netProfitVal > 0 ? "止盈" : (netProfitVal < 0 ? "止損" : "保本"),
+        strategies: selectedStrategies,
+        strategy: selectedStrategies.join(", "),
+        note: document.getElementById("trNote").value.trim(),
+        screenshotUrl: document.getElementById("trExistingScreenshotUrl").value || "",
+        imageBase64: pendingScreenshotBase64 || ""
+      };
+
+      try {
+        const data = await callApi({
+          action: "saveTrade",
+          account: currentUser.account,
+          uid: currentUser.uid || "",
+          exchange: currentUser.exchange || "Bitunix",
+          trade: tradeObj
+        });
+        if (data && Array.isArray(data.trades)) studentTrades = data.trades;
+        if (data && Array.isArray(data.allTrades)) allTradesAdmin = data.allTrades;
+        if (data && Array.isArray(data.leaderboard)) { globalLeaderboard = data.leaderboard; renderLeaderboard(); }
+        saveSessionCache();
+        cancelEditMode();
+        renderStudentTrades();
+        if (currentUser.role === "admin") renderAdminReviewTrades();
+        showSyncToast("✅ 交易紀錄已儲存完成！", 1800);
+      } catch (err) {
+        hideSyncToast();
+        alert("儲存失敗：" + err.message);
+      } finally {
+        btn.disabled = false;
+        btn.textContent = "💾 儲存復盤紀錄";
+      }
+    }
+
+    function editTrade(idx) {
+      const t = studentTrades[idx];
+      if (!t) return;
+      document.getElementById("tradeFormTitle").textContent = "✏️ 修改交易紀錄 (" + t.symbol + ")";
+      document.getElementById("editTradeRowIndex").value = t.rowIndex || "";
+      document.getElementById("trEntryDate").value = t.entryDate || "";
+      document.getElementById("trExitDate").value = t.exitDate || "";
+      document.getElementById("trSymbol").value = t.symbol || "BTCUSDT";
+      document.getElementById("trSide").value = t.side || "做多 Long";
+      document.getElementById("trLeverage").value = t.leverage || 10;
+      document.getElementById("trEntryPrice").value = t.entryPrice || 0;
+      document.getElementById("trExitPrice").value = t.exitPrice || 0;
+      document.getElementById("trQuantity").value = t.quantity || t.margin || 0;
+      document.getElementById("trExpectedRR").value = t.expectedRR || t.rrRatio || "";
+      document.getElementById("trActualRR").value = t.actualRR || "";
+      document.getElementById("trNetProfit").value = t.netProfit || 0;
+      document.getElementById("trNote").value = t.note || "";
+      document.getElementById("trExistingScreenshotUrl").value = t.screenshotUrl || "";
+      previewAutoFee();
+      document.getElementById("cancelEditBtn").classList.remove("hidden");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function cancelEditMode() {
+      document.getElementById("tradeRecordForm").reset();
+      document.getElementById("tradeFormTitle").textContent = "➕ 新增我的交易復盤紀錄";
+      document.getElementById("editTradeRowIndex").value = "";
+      document.getElementById("trExistingScreenshotUrl").value = "";
+      document.getElementById("autoFeePreviewBox").textContent = "自動計算中 ($0.00 U)";
+      pendingScreenshotBase64 = "";
+      document.getElementById("cancelEditBtn").classList.add("hidden");
+      setDefaultDates();
+    }
+
+    async function deleteTrade(idx) {
+      const t = studentTrades[idx];
+      if (!t || !confirm("確定刪除此筆紀錄？")) return;
+      showSyncToast("⏳ 正在刪除...");
+      try {
+        const data = await callApi({ action: "deleteTrade", account: currentUser.account, uid: currentUser.uid || "", rowIndex: t.rowIndex });
+        if (data && Array.isArray(data.trades)) studentTrades = data.trades;
+        if (data && Array.isArray(data.allTrades)) allTradesAdmin = data.allTrades;
+        saveSessionCache();
+        renderStudentTrades();
+        if (currentUser.role === "admin") renderAdminReviewTrades();
+        showSyncToast("✅ 已刪除完成", 1500);
+      } catch (err) {
+        hideSyncToast();
+      }
+    }
+
+    function renderStudentTrades() {
+      const container = document.getElementById("studentTradesContainer");
+      const initCap = parseFloat(document.getElementById("stuInitialCapitalInput").value) || 1000;
+      let totalPnl = 0, totalFee = 0, wins = 0;
+
+      studentTrades.forEach(t => {
+        const pnl = parseFloat(t.netProfit) || 0;
+        const qty = parseFloat(t.quantity || t.margin) || 0;
+        const computedFee = (t.fee && parseFloat(t.fee) > 0)
+          ? parseFloat(t.fee)
+          : calculateAutoFee(t.side, t.entryPrice, t.exitPrice, qty, pnl);
+        t._computedFee = computedFee;
+        totalPnl += pnl;
+        totalFee += computedFee;
+        if (pnl > 0) wins++;
+      });
+
+      const count = studentTrades.length;
+      const winRate = count > 0 ? ((wins / count) * 100).toFixed(1) : "0.0";
+      const roi = initCap > 0 ? ((totalPnl / initCap) * 100).toFixed(1) : "0.0";
+
+      document.getElementById("statCurrentEquity").textContent = "$" + (initCap + totalPnl).toFixed(2);
+      document.getElementById("statTotalPnl").textContent = (totalPnl >= 0 ? "+" : "") + "$" + totalPnl.toFixed(2);
+      document.getElementById("statTotalRoi").textContent = (totalPnl >= 0 ? "+" : "") + roi + "%";
+      document.getElementById("statWinRate").textContent = winRate + "%";
+      document.getElementById("statTotalFee").textContent = "$" + totalFee.toFixed(2);
+      document.getElementById("statTradeCount").textContent = count + " 筆";
+
+      if (count === 0) {
+        container.innerHTML = '<div class="text-center py-8 theme-text-muted text-sm">目前尚無您個人的交易紀錄。</div>';
+        return;
+      }
+
+      container.innerHTML = studentTrades.map((t, idx) => {
+        const pnl = parseFloat(t.netProfit) || 0;
+        const pnlCls = pnl >= 0 ? "bg-emerald-500/20 text-emerald-500" : "bg-rose-500/20 text-rose-500";
+        const pnlStr = (pnl >= 0 ? "+" : "") + pnl + " U";
+        const noteHtml = t.note ? '<div class="text-xs theme-text-main mt-2 theme-input p-2.5 rounded-xl">' + escapeHtmlAttr(t.note) + '</div>' : '';
+        const imgHtml = t.screenshotUrl ? '<a href="' + escapeHtmlAttr(t.screenshotUrl) + '" target="_blank" class="inline-block mt-2"><img src="' + escapeHtmlAttr(t.screenshotUrl) + '" class="h-24 rounded-lg border border-slate-700" /></a>' : '';
+        const replyHtml = t.coachReply ? '<div class="mt-2 p-2 rounded-lg bg-amber-500/10 border border-amber-500/30 text-xs text-amber-500 amber-badge-text">👨‍🏫 村長評語：' + escapeHtmlAttr(t.coachReply) + '</div>' : '';
+
+        return (
+          '<div class="p-4 rounded-2xl theme-sub">' +
+            '<div class="flex flex-wrap items-center justify-between gap-2 mb-2">' +
+              '<div class="flex items-center gap-2">' +
+                '<span class="font-black theme-text-main">' + escapeHtmlAttr(t.symbol) + '</span>' +
+                '<span class="text-xs px-2 py-0.5 rounded bg-amber-500/15 text-amber-500 amber-badge-text font-bold">' + escapeHtmlAttr(t.side) + ' ' + escapeHtmlAttr(t.leverage) + 'x</span>' +
+                '<span class="text-xs theme-text-muted">' + escapeHtmlAttr(t.entryDate) + ' ~ ' + escapeHtmlAttr(t.exitDate || t.entryDate) + '</span>' +
+              '</div>' +
+              '<div class="flex items-center gap-2">' +
+                '<span class="px-3 py-1 rounded-lg font-black text-xs ' + pnlCls + '">' + pnlStr + '</span>' +
+                '<button type="button" onclick="editTrade(' + idx + ')" class="px-2.5 py-1 rounded-lg theme-card text-xs theme-text-main font-bold">修改</button>' +
+                '<button type="button" onclick="deleteTrade(' + idx + ')" class="px-2.5 py-1 rounded-lg bg-rose-500/15 text-xs text-rose-500 font-bold">刪除</button>' +
+              '</div>' +
+            '</div>' +
+            '<div class="text-xs theme-text-muted flex flex-wrap gap-3">' +
+              '<span>開倉均價: <strong class="theme-text-main">' + escapeHtmlAttr(t.entryPrice) + '</strong></span>' +
+              '<span>平倉均價: <strong class="theme-text-main">' + escapeHtmlAttr(t.exitPrice) + '</strong></span>' +
+              '<span>持倉量: <strong class="theme-text-main">' + escapeHtmlAttr(t.quantity || t.margin || 0) + '</strong></span>' +
+              '<span>預期RR: <strong class="theme-text-main">' + escapeHtmlAttr(t.expectedRR || "-") + '</strong></span>' +
+              '<span>實際RR: <strong class="text-cyan-500 cyan-badge-text">' + escapeHtmlAttr(t.actualRR || "-") + '</strong></span>' +
+              '<span>手續費磨耗: <strong class="text-rose-500">$' + (t._computedFee || 0).toFixed(2) + ' U</strong></span>' +
+              '<span>策略: <strong class="text-amber-500 amber-badge-text">' + escapeHtmlAttr(t.strategy || "-") + '</strong></span>' +
+            '</div>' +
+            noteHtml + imgHtml + replyHtml +
+          '</div>'
+        );
+      }).join("");
+    }
+
+    function renderAdminReviewTrades() {
+      if (!currentUser || currentUser.role !== "admin") return;
+      const container = document.getElementById("adminReviewTradesContainer");
+      if (!container) return;
+      const kw = (document.getElementById("reviewFilterInput")?.value || "").trim().toLowerCase();
+
+      const filtered = allTradesAdmin.filter(t => {
+        if (!kw) return true;
+        return String(t.account || "").toLowerCase().includes(kw) ||
+               String(t.symbol || "").toLowerCase().includes(kw) ||
+               String(t.strategy || "").toLowerCase().includes(kw);
+      });
+
+      if (filtered.length === 0) {
+        container.innerHTML = '<div class="text-center py-8 theme-text-muted text-sm">目前尚無符合條件的學員交易紀錄。</div>';
+        return;
+      }
+
+      container.innerHTML = filtered.map(t => {
+        const pnl = parseFloat(t.netProfit) || 0;
+        const qty = parseFloat(t.quantity || t.margin) || 0;
+        const fee = (t.fee && parseFloat(t.fee) > 0) ? parseFloat(t.fee) : calculateAutoFee(t.side, t.entryPrice, t.exitPrice, qty, pnl);
+        const pnlCls = pnl >= 0 ? "bg-emerald-500/20 text-emerald-500" : "bg-rose-500/20 text-rose-500";
+        const pnlStr = (pnl >= 0 ? "+" : "") + pnl + " U";
+        const noteHtml = t.note ? '<div class="text-xs theme-text-main theme-input p-2.5 rounded-xl">📝 學員心得：' + escapeHtmlAttr(t.note) + '</div>' : '';
+        const imgHtml = t.screenshotUrl ? '<a href="' + escapeHtmlAttr(t.screenshotUrl) + '" target="_blank" class="inline-block"><img src="' + escapeHtmlAttr(t.screenshotUrl) + '" class="h-28 rounded-xl border border-slate-700" /></a>' : '';
+
+        return (
+          '<div class="p-4 rounded-2xl theme-sub space-y-2.5">' +
+            '<div class="flex flex-wrap items-center justify-between gap-2">' +
+              '<div class="flex flex-wrap items-center gap-2">' +
+                '<span class="px-2.5 py-0.5 rounded-lg bg-purple-500/20 text-purple-400 font-extrabold text-xs">學員: ' + escapeHtmlAttr(t.account) + '</span>' +
+                '<span class="font-black theme-text-main text-sm">' + escapeHtmlAttr(t.symbol) + '</span>' +
+                '<span class="text-xs px-2 py-0.5 rounded bg-amber-500/15 text-amber-500 amber-badge-text font-bold">' + escapeHtmlAttr(t.side) + ' ' + escapeHtmlAttr(t.leverage) + 'x</span>' +
+                '<span class="text-xs theme-text-muted">' + escapeHtmlAttr(t.entryDate) + ' ~ ' + escapeHtmlAttr(t.exitDate || t.entryDate) + '</span>' +
+              '</div>' +
+              '<span class="px-3 py-1 rounded-lg font-black text-xs ' + pnlCls + '">' + pnlStr + '</span>' +
+            '</div>' +
+            '<div class="text-xs theme-text-muted flex flex-wrap gap-3">' +
+              '<span>開倉均價: <strong class="theme-text-main">' + escapeHtmlAttr(t.entryPrice) + '</strong></span>' +
+              '<span>平倉均價: <strong class="theme-text-main">' + escapeHtmlAttr(t.exitPrice) + '</strong></span>' +
+              '<span>持倉量: <strong class="theme-text-main">' + qty + '</strong></span>' +
+              '<span>預期RR: <strong class="theme-text-main">' + escapeHtmlAttr(t.expectedRR || "-") + '</strong></span>' +
+              '<span>實際RR: <strong class="text-cyan-500 cyan-badge-text">' + escapeHtmlAttr(t.actualRR || "-") + '</strong></span>' +
+              '<span>手續費磨耗: <strong class="text-rose-500">$' + fee.toFixed(2) + ' U</strong></span>' +
+              '<span>策略: <strong class="text-amber-500 amber-badge-text">' + escapeHtmlAttr(t.strategy || "-") + '</strong></span>' +
+            '</div>' +
+            noteHtml + imgHtml +
+            '<div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 pt-2 border-t border-slate-700/40">' +
+              '<input type="text" id="replyInput_' + t.rowIndex + '" value="' + escapeHtmlAttr(t.coachReply || "") + '" placeholder="輸入村長指導評語..." class="flex-1 px-3 py-2 rounded-xl theme-input text-xs" />' +
+              '<button type="button" onclick="saveAdminTradeReply(' + t.rowIndex + ')" class="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold text-xs shrink-0">💬 儲存評語</button>' +
+            '</div>' +
+          '</div>'
+        );
+      }).join("");
+    }
+
+    async function saveAdminTradeReply(tradeRowIndex) {
+      const val = document.getElementById("replyInput_" + tradeRowIndex)?.value || "";
+      showSyncToast("⏳ 正在儲存村長評語...");
+      try {
+        const data = await callApi({
+          action: "saveCoachComment",
+          tradeRowIndex: tradeRowIndex,
+          tradeComment: val
+        });
+        if (data && Array.isArray(data.allTrades)) {
+          allTradesAdmin = data.allTrades;
+          saveSessionCache();
+          renderAdminReviewTrades();
+        }
+        showSyncToast("✅ 村長評語已儲存！", 1800);
+      } catch (err) {
+        hideSyncToast();
+      }
+    }
+
+    function renderStudentResources() {
+      const lecturesContainer = document.getElementById("studentLecturesContainer");
+      const websitesContainer = document.getElementById("studentWebsitesContainer");
+      const kw = (document.getElementById("resSearchInput")?.value || "").trim().toLowerCase();
+      const resources = Array.isArray(window.globalResources) ? window.globalResources : [];
+
+      const lectures = resources.filter(item => String(item.type).includes("講義"));
+      const websites = resources.filter(item => !String(item.type).includes("講義") && (
+        !kw || String(item.title).toLowerCase().includes(kw) || String(item.note).toLowerCase().includes(kw) || String(item.tier).toLowerCase().includes(kw)
+      ));
+
+      if (lecturesContainer) {
+        lecturesContainer.innerHTML = lectures.map((item, idx) => (
+          '<a href="' + escapeHtmlAttr(item.url || "#") + '" target="_blank" rel="noopener noreferrer" class="block p-4 rounded-xl theme-sub hover:border-amber-500 transition-all">' +
+            '<div class="text-xs font-bold text-amber-500 amber-badge-text mb-1">' + escapeHtmlAttr(item.tier || "核心講義") + ' #' + (idx + 1) + '</div>' +
+            '<h4 class="font-bold theme-text-main text-sm mb-1">' + escapeHtmlAttr(item.title) + '</h4>' +
+            '<p class="text-xs theme-text-muted">' + escapeHtmlAttr(item.note || "") + '</p>' +
+          '</a>'
+        )).join("");
+      }
+
+      if (websitesContainer) {
+        const tierGroups = {};
+        const tierOrder = [];
+        websites.forEach(site => {
+          const tName = (site.tier && String(site.tier).trim()) ? String(site.tier).trim() : "🏆 第一梯隊：即時看盤、爆倉清算與多空籌碼";
+          if (!tierGroups[tName]) { tierGroups[tName] = []; tierOrder.push(tName); }
+          tierGroups[tName].push(site);
+        });
+
+        websitesContainer.innerHTML = tierOrder.map(tierName => {
+          const groupSites = tierGroups[tierName];
+          const cards = groupSites.map((site, i) => (
+            '<a href="' + escapeHtmlAttr(site.url || "#") + '" target="_blank" rel="noopener noreferrer" class="p-4 rounded-xl theme-card hover:border-cyan-500 transition-all block">' +
+              '<div class="flex items-center justify-between mb-1.5">' +
+                '<span class="text-[11px] font-bold px-2 py-0.5 rounded bg-cyan-500/15 text-cyan-500 cyan-badge-text">#' + (i + 1) + ' ' + escapeHtmlAttr(site.type) + '</span>' +
+                '<span class="text-xs theme-text-muted">前往 ↗</span>' +
+              '</div>' +
+              '<h5 class="font-bold theme-text-main text-sm mb-1">' + escapeHtmlAttr(site.title) + '</h5>' +
+              '<p class="text-xs theme-text-muted">' + escapeHtmlAttr(site.note || "") + '</p>' +
+            '</a>'
+          )).join("");
+
+          return (
+            '<div class="theme-sub rounded-2xl p-4 sm:p-5">' +
+              '<div class="flex items-center justify-between border-b border-slate-700/40 pb-2.5 mb-3.5">' +
+                '<h4 class="text-base font-extrabold text-amber-500 amber-badge-text">' + escapeHtmlAttr(tierName) + '</h4>' +
+                '<span class="text-xs theme-text-muted">共 ' + groupSites.length + ' 站</span>' +
+              '</div>' +
+              '<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">' + cards + '</div>' +
+            '</div>'
+          );
+        }).join("");
+      }
+    }
+
+    async function syncTradesFromCloud(showToastAlert = true) {
+      if (!currentUser) return;
+      const syncBtn = document.getElementById("cloudSyncBtn");
+      if (syncBtn) {
+        syncBtn.disabled = true;
+        syncBtn.textContent = "⏳ 正在同步...";
+      }
+      if (showToastAlert) showSyncToast("⏳ 正在同步雲端最新資料...");
+
+      try {
+        const data = await callApi({ action: "getStudentData", account: currentUser.account });
+        if (data) {
+          if (data.maxLimits) maxLimits = data.maxLimits;
+          if (Array.isArray(data.trades)) studentTrades = data.trades;
+          if (Array.isArray(data.allTrades)) allTradesAdmin = data.allTrades;
+          if (Array.isArray(data.resources) && data.resources.length > 0) window.globalResources = data.resources;
+          if (Array.isArray(data.leaderboard)) globalLeaderboard = data.leaderboard;
+          if (currentUser.role === "admin" && Array.isArray(data.students)) {
+            allStudentsAdmin = data.students;
+            renderAdminStudents();
+            renderAdminReviewTrades();
+          }
+          saveSessionCache();
+          renderStudentTrades();
+          renderStudentResources();
+          renderLeaderboard();
+          if (showToastAlert) showSyncToast("✅ 雲端同步完成！", 1600);
+        } else {
+          if (showToastAlert) hideSyncToast();
+        }
+      } catch (err) {
+        if (showToastAlert) hideSyncToast();
+      } finally {
+        if (syncBtn) {
+          syncBtn.disabled = false;
+          syncBtn.textContent = "🔄 雲端同步";
+        }
+      }
+    }
+
+    function exportMyTradesCsv() {
+      if (studentTrades.length === 0) return alert("無紀錄可匯出");
+      const headers = ["開倉時間", "平倉時間", "幣種", "方向", "槓桿", "開倉均價", "平倉均價", "持倉量", "預期RR", "實際RR", "自動手續費磨耗", "淨利(U)", "策略", "心得"];
+      const rows = studentTrades.map(t => [
+        t.entryDate, t.exitDate, t.symbol, t.side, t.leverage, t.entryPrice, t.exitPrice,
+        t.quantity || 0, t.expectedRR || "", t.actualRR || "", t._computedFee || 0, t.netProfit,
+        '"' + String(t.strategy || "").replace(/"/g, '""') + '"',
+        '"' + String(t.note || "").replace(/"/g, '""') + '"'
+      ]);
+      const csv = "\uFEFF" + [headers.join(","), ...rows.map(r => r.join(","))].join("\n");
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8;" }));
+      a.download = "復盤紀錄_" + currentUser.account + ".csv";
+      a.click();
+    }
+
+    function runRiskCalc() {
+      const cap = parseFloat(document.getElementById("calcCapital").value) || 0;
+      const riskPct = parseFloat(document.getElementById("calcRiskPct").value) || 0;
+      const entry = parseFloat(document.getElementById("calcEntry").value) || 0;
+      const sl = parseFloat(document.getElementById("calcSl").value) || 0;
+      const tp = parseFloat(document.getElementById("calcTp").value) || 0;
+      const lev = parseFloat(document.getElementById("calcLev").value) || 10;
+
+      const riskUsd = cap * (riskPct / 100);
+      document.getElementById("resRiskUsd").textContent = "$" + riskUsd.toFixed(2) + " U";
+      if (entry > 0 && sl > 0 && entry !== sl) {
+        const posVal = riskUsd / (Math.abs(entry - sl) / entry);
+        document.getElementById("resPosValue").textContent = "$" + posVal.toFixed(2) + " U";
+        document.getElementById("resMarginNeed").textContent = "$" + (posVal / lev).toFixed(2) + " U";
+        document.getElementById("resRR").textContent = tp > 0 ? ("1 : " + (Math.abs(tp - entry) / Math.abs(entry - sl)).toFixed(2)) : "--";
+      }
+    }
+
+    function initPyramidCalc() {
+      const container = document.getElementById("pyramidRowsContainer");
+      if (!container) return;
+      container.innerHTML = "";
+      addPyramidRow("原持倉（第 1 批）");
+      addPyramidRow("第 2 批加倉");
+    }
+
+    function addPyramidRow(labelPlaceholder) {
+      const container = document.getElementById("pyramidRowsContainer");
+      const idx = container.children.length + 1;
+      const div = document.createElement("div");
+      div.className = "flex items-center gap-2 pyr-row";
+      const ph = escapeHtmlAttr(labelPlaceholder || ("第 " + idx + " 批價格"));
+      div.innerHTML =
+        '<input type="number" step="any" placeholder="' + ph + '" oninput="runPyramidCalc()" class="pyr-price flex-1 min-w-0 px-3 py-2 rounded-xl theme-input text-xs" />' +
+        '<input type="number" step="any" placeholder="持倉量" oninput="runPyramidCalc()" class="pyr-qty flex-1 min-w-0 px-3 py-2 rounded-xl theme-input text-xs" />' +
+        '<button type="button" onclick="this.parentElement.remove(); runPyramidCalc();" class="px-2.5 py-2 rounded-xl bg-rose-500/15 text-rose-500 text-xs font-bold shrink-0">✕</button>';
+      container.appendChild(div);
+    }
+
+    function runPyramidCalc() {
+      let totalQ = 0, totalVal = 0;
+      document.querySelectorAll(".pyr-row").forEach(r => {
+        const p = parseFloat(r.querySelector(".pyr-price")?.value) || 0;
+        const q = parseFloat(r.querySelector(".pyr-qty")?.value) || 0;
+        if (p > 0 && q > 0) {
+          totalQ += q;
+          totalVal += (p * q);
+        }
+      });
+      const avg = totalQ > 0 ? (totalVal / totalQ) : 0;
+      document.getElementById("pyrAvgPrice").textContent = avg > 0 ? avg.toFixed(4) : "0.00";
+      document.getElementById("pyrTotalQty").textContent = totalQ > 0 ? totalQ.toFixed(4) : "0.00";
+      document.getElementById("pyrTotalVal").textContent = "$" + totalVal.toFixed(2) + " U";
+    }
+
+    function switchLeaderboardMode(mode) {
+      currentLbMode = mode;
+      document.getElementById("lbBtnProfit").className = mode === "profit"
+        ? "px-3.5 py-1.5 rounded-lg text-xs font-extrabold bg-amber-500 text-slate-950"
+        : "px-3.5 py-1.5 rounded-lg text-xs font-bold theme-text-muted";
+      document.getElementById("lbBtnVolume").className = mode === "volume"
+        ? "px-3.5 py-1.5 rounded-lg text-xs font-extrabold bg-cyan-400 text-slate-950"
+        : "px-3.5 py-1.5 rounded-lg text-xs font-bold theme-text-muted";
+      renderLeaderboard();
+    }
+
+    function renderLeaderboard() {
+      const container = document.getElementById("leaderboardContainer");
+      const capProfit = parseFloat(maxLimits.maxProfit) || 4850;
+      const capVolume = parseFloat(maxLimits.maxVolume) || 185000;
+
+      const rawList = (globalLeaderboard.length > 0 ? [...globalLeaderboard] : [
+        { nickname: "VIP****88", winRate: 78.5, netProfit: capProfit, volume: capVolume },
+        { nickname: "83*****19", winRate: 74.2, netProfit: Math.round(capProfit * 0.78), volume: Math.round(capVolume * 0.82) },
+        { nickname: "VIP****06", winRate: 71.0, netProfit: Math.round(capProfit * 0.62), volume: Math.round(capVolume * 0.65) }
+      ]).map(item => ({
+        nickname: maskIdDisplay(item.nickname),
+        winRate: item.winRate || 68.0,
+        netProfit: Math.min(parseFloat(item.netProfit) || 0, capProfit),
+        volume: Math.min(parseFloat(item.volume) || 0, capVolume)
+      }));
+
+      if (currentLbMode === "volume") {
+        rawList.sort((a, b) => (b.volume || 0) - (a.volume || 0));
+      } else {
+        rawList.sort((a, b) => (b.netProfit || 0) - (a.netProfit || 0));
+      }
+
+      container.innerHTML = rawList.slice(0, 10).map((item, i) => {
+        const rightText = currentLbMode === "volume"
+          ? '<span class="font-black text-cyan-500 cyan-badge-text text-sm">交易量 $' + Math.round(item.volume || 0).toLocaleString() + ' U</span>'
+          : '<span class="font-black text-emerald-500 text-sm">盈利 +$' + Math.round(item.netProfit || 0).toLocaleString() + ' U</span>';
+        return (
+          '<div class="flex items-center justify-between p-3.5 rounded-xl theme-sub">' +
+            '<div class="flex items-center gap-3">' +
+              '<span class="font-black text-amber-500 amber-badge-text w-6">#' + (i + 1) + '</span>' +
+              '<span class="font-bold theme-text-main text-sm font-mono">' + escapeHtmlAttr(item.nickname) + ' <span class="text-xs theme-text-muted font-sans ml-1">(勝率 ' + item.winRate + '%)</span></span>' +
+            '</div>' +
+            rightText +
+          '</div>'
+        );
+      }).join("");
+    }
+
+    function copyStudentInvite(idx) {
+      const stu = allStudentsAdmin[idx];
+      if (!stu || !stu.inviteMessage) return;
+      navigator.clipboard.writeText(stu.inviteMessage);
+      alert("已複製最新私訊發送文案！");
+    }
+
+    function renderAdminStudents() {
+      if (!currentUser || currentUser.role !== "admin") return;
+      const container = document.getElementById("adminStudentsContainer");
+      if (!container) return;
+
+      if (allStudentsAdmin.length === 0) {
+        container.innerHTML = '<div class="text-xs theme-text-muted py-4">尚無學員申請資料（可點上方「🔄 雲端同步」拉取最新名單）。</div>';
+        return;
+      }
+
+      const defaultSubDate = new Date(Date.now() + 30 * 86400000).toISOString().split("T")[0];
+
+      container.innerHTML = allStudentsAdmin.map((stu, idx) => {
+        const isSuspended = (stu.status === "已暫停" || stu.status === "暫停");
+        const isApproved = (stu.status === "已開通" || stu.status === "已通過");
+        const badgeCls = isSuspended
+          ? "bg-rose-500/20 text-rose-500 border-rose-500/30"
+          : (isApproved ? "bg-emerald-500/20 text-emerald-500 border-emerald-500/30" : "bg-amber-500/20 text-amber-500 border-amber-500/30");
+
+        const dateVal = (!stu.isUidUser && stu.expireDate && stu.expireDate !== "永久") ? stu.expireDate : defaultSubDate;
+        const copyBtnHtml = stu.inviteMessage
+          ? '<button type="button" onclick="copyStudentInvite(' + idx + ')" class="px-3 py-1.5 rounded-xl bg-amber-500/20 text-amber-500 amber-badge-text font-extrabold">📋 複製私訊發送文案</button>'
+          : '';
+
+        return (
+          '<div class="p-4 rounded-2xl theme-sub space-y-3">' +
+            '<div class="flex flex-wrap items-center justify-between gap-2">' +
+              '<div class="flex flex-wrap items-center gap-2 text-xs">' +
+                '<span class="px-2.5 py-0.5 rounded-full font-extrabold border ' + badgeCls + '">' + escapeHtmlAttr(stu.status || "待審核") + '</span>' +
+                '<strong class="theme-text-main text-sm">' + escapeHtmlAttr(stu.exchange) + '</strong>' +
+                '<span class="theme-text-muted">｜ UID/TxID: <strong class="text-cyan-500 cyan-badge-text font-mono">' + escapeHtmlAttr(stu.uid) + '</strong></span>' +
+                '<span class="theme-text-muted">｜ 聯絡: ' + escapeHtmlAttr(stu.contact) + '</span>' +
+              '</div>' +
+              '<div class="flex flex-wrap items-center gap-2 text-xs">' +
+                '<span class="px-2.5 py-1 rounded-lg bg-cyan-500/15 text-cyan-500 cyan-badge-text font-extrabold">📊 累積交易量: $' + (stu.totalVolume || 0).toLocaleString() + ' U (' + (stu.tradeCount || 0) + ' 筆)</span>' +
+                '<span class="px-2.5 py-1 rounded-lg bg-emerald-500/15 text-emerald-500 font-extrabold">💰 累積淨利: $' + (stu.totalProfit || 0).toLocaleString() + ' U</span>' +
+              '</div>' +
+            '</div>' +
+            '<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-2.5 items-end pt-2 border-t border-slate-700/40">' +
+              '<div>' +
+                '<label class="block text-[11px] theme-text-muted mb-1">審核狀態 (下拉選擇)</label>' +
+                '<select id="admStatus_' + stu.rowIndex + '" class="w-full px-3 py-2 rounded-xl theme-input text-xs font-bold">' +
+                  '<option value="待審核" ' + (stu.status === "待審核" ? "selected" : "") + '>待審核</option>' +
+                  '<option value="已開通" ' + ((stu.status === "已開通" || stu.status === "已通過") ? "selected" : "") + '>已開通</option>' +
+                  '<option value="已暫停" ' + ((stu.status === "已暫停" || stu.status === "暫停") ? "selected" : "") + '>已暫停</option>' +
+                  '<option value="已到期" ' + (stu.status === "已到期" ? "selected" : "") + '>已到期</option>' +
+                '</select>' +
+              '</div>' +
+              '<div>' +
+                '<label class="block text-[11px] theme-text-muted mb-1">專屬帳號 (可修改)</label>' +
+                '<input type="text" id="admAcc_' + stu.rowIndex + '" value="' + escapeHtmlAttr(stu.account || "") + '" placeholder="自動生成" class="w-full px-3 py-2 rounded-xl theme-input text-xs font-mono font-bold" />' +
+              '</div>' +
+              '<div>' +
+                '<label class="block text-[11px] theme-text-muted mb-1">專屬密碼 (可修改)</label>' +
+                '<input type="text" id="admPwd_' + stu.rowIndex + '" value="' + escapeHtmlAttr(stu.password || "") + '" placeholder="自動生成" class="w-full px-3 py-2 rounded-xl theme-input text-xs font-mono font-bold" />' +
+              '</div>' +
+              '<div>' +
+                '<label class="block text-[11px] theme-text-muted mb-1">自訂訂閱到期日</label>' +
+                '<input type="date" id="admExp_' + stu.rowIndex + '" value="' + escapeHtmlAttr(dateVal) + '" class="w-full px-3 py-2 rounded-xl theme-input text-xs" />' +
+              '</div>' +
+              '<div class="flex gap-1.5">' +
+                '<button type="button" onclick="saveStudentRow(' + stu.rowIndex + ', \'\')" class="flex-1 py-2 px-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold text-xs">💾 儲存設定與文案</button>' +
+              '</div>' +
+            '</div>' +
+            '<div class="flex flex-wrap items-center justify-between gap-2 pt-1 text-xs">' +
+              '<div class="flex flex-wrap items-center gap-2">' +
+                '<button type="button" onclick="saveStudentRow(' + stu.rowIndex + ', \'toSub\')" class="px-3 py-1.5 rounded-xl bg-cyan-500/20 text-cyan-500 cyan-badge-text border border-cyan-500/30 font-extrabold">📅 轉為訂閱（依上方選擇之日期到期）</button>' +
+                '<button type="button" onclick="saveStudentRow(' + stu.rowIndex + ', \'toUid\')" class="px-3 py-1.5 rounded-xl theme-card theme-text-main font-bold">🔄 轉為 UID 永久用戶</button>' +
+              '</div>' +
+              copyBtnHtml +
+            '</div>' +
+          '</div>'
+        );
+      }).join("");
+    }
+
+    async function saveStudentRow(rowIndex, convertMode) {
+      if (!currentUser || currentUser.role !== "admin") return;
+      const statusVal = document.getElementById("admStatus_" + rowIndex)?.value || "已開通";
+      const accVal = document.getElementById("admAcc_" + rowIndex)?.value.trim() || "";
+      const pwdVal = document.getElementById("admPwd_" + rowIndex)?.value.trim() || "";
+      const expVal = document.getElementById("admExp_" + rowIndex)?.value || "";
+
+      showSyncToast("⏳ 正在儲存學員帳密並同步更新私訊文案...");
+      try {
+        const data = await callApi({
+          action: "adminUpdateStudent",
+          rowIndex: rowIndex,
+          newStatus: convertMode ? "已開通" : statusVal,
+          customAccount: accVal,
+          customPassword: pwdVal,
+          customExpireDate: expVal,
+          convertMode: convertMode || ""
+        });
+        if (data && Array.isArray(data.students)) {
+          allStudentsAdmin = data.students;
+          saveSessionCache();
+          renderAdminStudents();
+        }
+        showSyncToast("✅ 已更新學員設定與私訊發送文案！", 1800);
+      } catch (err) {
+        hideSyncToast();
+        alert("更新失敗：" + err.message);
+      }
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      setDefaultDates();
+      renderStudentResources();
+      initPyramidCalc();
+
+      const savedCreds = localStorage.getItem("village_pro_user");
+      if (savedCreds) {
+        try {
+          const parsed = JSON.parse(savedCreds);
+          if (parsed && parsed.account && parsed.password) {
+            document.getElementById("loginAccount").value = parsed.account;
+            document.getElementById("loginPassword").value = parsed.password;
+          }
+        } catch (e) {}
+      }
+    });
+  </script>
+</body>
+</html>
