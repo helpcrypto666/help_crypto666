@@ -1,835 +1,647 @@
 <!DOCTYPE html>
-<html lang="zh-TW" class="dark">
+<html lang="zh-Hant">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>PRO 交易復盤與講義系統｜幣圈新手村村長</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <style>
-    :root {
-      --bg-main: #090d16;
-      --bg-card: rgba(30, 41, 59, 0.72);
-      --bg-sub: #0f172a;
-      --bg-input: #020617;
-      --border-main: rgba(212, 175, 55, 0.28);
-      --border-sub: #1e293b;
-      --text-main: #f8fafc;
-      --text-sub: #cbd5e1;
-      --text-muted: #94a3b8;
-      --gold: #D4AF37;
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>幣圈新手村 PRO</title>
+<link rel="icon" href="avatar.png">
+<script>
+  // 先套用上次選的主題，避免畫面閃爍
+  (function () {
+    var t = null;
+    try { t = localStorage.getItem('theme'); } catch (e) {}
+    if (t !== 'dark' && t !== 'light') {
+      t = (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
     }
-    html.light {
-      --bg-main: #f1f5f9;
-      --bg-card: #ffffff;
-      --bg-sub: #f8fafc;
-      --bg-input: #ffffff;
-      --border-main: rgba(180, 130, 20, 0.45);
-      --border-sub: #cbd5e1;
-      --text-main: #0f172a;
-      --text-sub: #1e293b;
-      --text-muted: #475569;
-      --gold: #9A6F1A;
-    }
-    body {
-      background-color: var(--bg-main);
-      color: var(--text-main);
-      min-height: 100vh;
-      overflow-x: hidden;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      transition: background-color 0.2s, color 0.2s;
-    }
-    .glass-card {
-      background: var(--bg-card);
-      backdrop-filter: blur(12px);
-      border: 1px solid var(--border-main);
-    }
-    .sub-box {
-      background: var(--bg-sub);
-      border: 1px solid var(--border-sub);
-    }
-    .form-input {
-      background: var(--bg-input);
-      border: 1px solid var(--border-sub);
-      color: var(--text-main);
-    }
-    .text-main { color: var(--text-main); }
-    .text-sub { color: var(--text-sub); }
-    .text-muted { color: var(--text-muted); }
-    .text-gold { color: var(--gold); }
-    .btn-gold {
-      background: linear-gradient(135deg, #D4AF37 0%, #AA8222 100%);
-      color: #0f172a;
-    }
-    .btn-gold:hover {
-      background: linear-gradient(135deg, #ECC44A 0%, #C4982B 100%);
-    }
-    .tab-nav-btn { transition: all 0.2s ease; }
-    .tab-nav-btn.active { background: #D4AF37; color: #0f172a; font-weight: 900; }
-    .tab-nav-btn.inactive { background: var(--bg-sub); color: var(--text-muted); font-weight: bold; border: 1px solid var(--border-sub); }
-    .mode-btn-active { background: #D4AF37 !important; color: #0f172a !important; font-weight: 900 !important; }
-    input[type="datetime-local"], input[type="date"] { min-width: 0; width: 100%; }
-  </style>
+    document.documentElement.setAttribute('data-theme', t);
+  })();
+
+  // 圖片備援：先換 data-alt 的檔名，再失敗就隱藏
+  function iconFallback(img) {
+    if (img.dataset.tried) { img.style.display = 'none'; return; }
+    img.dataset.tried = '1';
+    img.src = img.dataset.alt;
+  }
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+  :root {
+    --bg: #f4f6fb; --card: #ffffff; --text: #111827; --muted: #4b5563; --border: #cbd5e1;
+    --primary: #2563eb; --primary-text: #ffffff; --link: #1d4ed8; --accent: #b45309;
+    --input-bg: #ffffff; --input-text: #111827; --code-bg: #e5e7eb;
+    --warn-bg: #fef3c7; --warn-text: #78350f; --ok: #15803d; --err: #b91c1c;
+    --shadow: 0 1px 3px rgba(15, 23, 42, .08);
+  }
+  :root[data-theme="dark"] {
+    --bg: #0b1220; --card: #131c31; --text: #e5e7eb; --muted: #a3afc2; --border: #334155;
+    --primary: #2563eb; --primary-text: #ffffff; --link: #93c5fd; --accent: #fbbf24;
+    --input-bg: #0f172a; --input-text: #e5e7eb; --code-bg: #1e293b;
+    --warn-bg: #3b2f0b; --warn-text: #fde68a; --ok: #4ade80; --err: #f87171;
+    --shadow: none;
+  }
+
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang TC", "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+    font-size: 16px;
+    line-height: 1.7;
+  }
+  a { color: var(--link); }
+  img { max-width: 100%; }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+  :focus-visible { outline: 3px solid var(--link); outline-offset: 2px; }
+  .wrap { max-width: 1100px; margin: 0 auto; padding: 0 16px; }
+  .muted { color: var(--muted); }
+  h1 { font-size: clamp(1.45rem, 4.5vw, 2.1rem); line-height: 1.3; margin: 0 0 12px; }
+  h2 { font-size: 1.3rem; margin: 0 0 10px; }
+  h3 { font-size: 1.1rem; color: var(--accent); margin: 22px 0 10px; }
+  h4 { font-size: 1rem; margin: 0 0 10px; }
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 20px; margin: 18px 0; box-shadow: var(--shadow); }
+  .card[id] { scroll-margin-top: 84px; }
+
+  /* 導覽列 */
+  .nav { position: sticky; top: 0; z-index: 10; background: var(--card); border-bottom: 1px solid var(--border); }
+  .nav-inner { max-width: 1100px; margin: 0 auto; padding: 10px 16px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; }
+  .brand { display: flex; align-items: center; gap: 10px; min-width: 0; color: var(--text); text-decoration: none; }
+  .brand img { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
+  .brand-title { font-weight: 700; font-size: 1.05rem; white-space: nowrap; }
+  .nav-links { display: flex; gap: 4px; }
+  .nav-links a { color: var(--text); text-decoration: none; padding: 6px 10px; border-radius: 8px; }
+  .nav-links a:hover { background: var(--bg); }
+  .nav-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; justify-content: flex-end; }
+  @media (max-width: 720px) {
+    .nav-links { display: none; }
+    .brand-title { font-size: .95rem; }
+  }
+
+  /* 按鈕 */
+  .btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; background: var(--primary); color: var(--primary-text); border: 1px solid var(--primary); border-radius: 10px; padding: 10px 16px; font: inherit; font-size: .95rem; font-weight: 600; text-decoration: none; cursor: pointer; white-space: nowrap; text-align: center; }
+  .btn:hover { filter: brightness(1.08); }
+  .btn:disabled { opacity: .55; cursor: not-allowed; filter: none; }
+  .btn-sm { padding: 6px 12px; font-size: .88rem; }
+  .btn-outline { background: transparent; color: var(--link); border-color: var(--link); }
+  .btn-ghost { background: var(--card); color: var(--text); border: 1px solid var(--border); }
+  .btn-block { width: 100%; }
+  .btn-mini { font: inherit; font-size: .8rem; padding: 4px 10px; border-radius: 8px; border: 1px solid var(--border); background: var(--card); color: var(--text); cursor: pointer; }
+
+  /* 首屏 */
+  .hero { text-align: center; padding: 36px 0 8px; }
+  .hero-avatar { width: 96px; height: 96px; border-radius: 50%; object-fit: cover; border: 3px solid var(--primary); }
+  .hero .sub { color: var(--muted); max-width: 720px; margin: 0 auto 18px; }
+  .hero-btns { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+  .socials { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px; }
+
+  /* 交易所卡片 */
+  .ex-grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
+  @media (min-width: 640px) { .ex-grid { grid-template-columns: 1fr 1fr; } }
+  @media (min-width: 960px) { .ex-grid { grid-template-columns: 1fr 1fr 1fr; } }
+  .ex-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 14px; display: flex; flex-direction: column; gap: 10px; }
+  .ex-head { display: flex; align-items: center; gap: 10px; }
+  .ex-icon { width: 40px; height: 40px; object-fit: contain; border-radius: 8px; flex-shrink: 0; }
+  .ex-name { font-weight: 700; }
+  .invite { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; font-size: .9rem; color: var(--muted); }
+  .invite code { background: var(--code-bg); color: var(--text); padding: 2px 8px; border-radius: 6px; font-size: .95rem; }
+
+  /* 教學 */
+  .tabs { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 16px; }
+  .tab { font: inherit; font-size: .92rem; background: var(--card); color: var(--text); border: 1px solid var(--border); border-radius: 999px; padding: 8px 14px; cursor: pointer; }
+  .tab[aria-selected="true"] { background: var(--primary); border-color: var(--primary); color: var(--primary-text); }
+  .steps { display: grid; grid-template-columns: 1fr; gap: 14px; }
+  @media (min-width: 768px) { .steps { grid-template-columns: 1fr 1fr; } }
+  .step { display: flex; gap: 12px; align-items: flex-start; background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 14px; }
+  .step.warn { background: var(--warn-bg); color: var(--warn-text); border-color: var(--accent); }
+  .step-no { width: 30px; height: 30px; border-radius: 50%; background: var(--primary); color: var(--primary-text); display: flex; align-items: center; justify-content: center; font-weight: 700; flex-shrink: 0; }
+  .step-body { flex: 1; min-width: 0; }
+  .step-body p { margin: 0 0 8px; }
+  .step-img img { display: block; max-width: 200px; max-height: 260px; width: auto; height: auto; border-radius: 8px; border: 1px solid var(--border); }
+
+  /* 表單 */
+  label { display: block; font-weight: 600; margin-bottom: 6px; }
+  .form-row { margin-bottom: 14px; }
+  .field { width: 100%; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--border); background: var(--input-bg); color: var(--input-text); font: inherit; }
+  .field::placeholder { color: var(--muted); opacity: 1; }
+  select.field option { background: var(--input-bg); color: var(--input-text); }
+  .inline { display: flex; gap: 8px; }
+  .inline select.field { flex: 0 0 130px; width: auto; }
+  .inline input.field { flex: 1; min-width: 0; }
+  .step-box { border: 1px dashed var(--border); border-radius: 12px; padding: 14px; margin-bottom: 14px; }
+  .addr { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; background: var(--code-bg); border-radius: 10px; padding: 10px; margin: 8px 0; }
+  .addr code { flex: 1; min-width: 0; word-break: break-all; color: var(--text); font-size: .9rem; }
+  .qr-box { display: inline-block; background: #ffffff; padding: 8px; border-radius: 10px; margin-top: 10px; }
+  .msg { margin-top: 12px; padding: 10px 12px; border-radius: 10px; font-size: .95rem; }
+  .msg:empty { display: none; }
+  .msg.ok { color: var(--ok); border: 1px solid var(--ok); }
+  .msg.err { color: var(--err); border: 1px solid var(--err); }
+
+  /* 免責聲明 */
+  .disclaimer { border-top: 1px solid var(--border); margin-top: 28px; padding: 18px 0 32px; font-size: .86rem; color: var(--muted); }
+  .disclaimer strong { color: var(--accent); }
+</style>
 </head>
-<body class="antialiased flex flex-col items-center py-5 sm:py-8 px-3 sm:px-6">
+<body>
 
-  <div id="toastMsg" class="fixed top-5 z-50 hidden font-bold px-6 py-3 rounded-full shadow-2xl text-sm transition-all"></div>
-
-  <!-- 戰績炫耀卡視窗 -->
-  <div id="shareCardModal" class="fixed inset-0 z-50 hidden bg-black/80 flex items-center justify-center p-4">
-    <div class="glass-card border-2 border-[#D4AF37] rounded-2xl p-6 max-w-sm w-full space-y-4 text-center">
-      <div class="text-xs text-gold font-black tracking-widest uppercase">🏆 幣圈新手村 PRO 實戰戰績卡</div>
-      <div id="shareCardPair" class="text-2xl font-black text-main"></div>
-      <div id="shareCardPnl" class="text-3xl font-mono font-black"></div>
-      <div id="shareCardDetails" class="sub-box p-3 rounded-xl text-xs text-sub space-y-1 font-mono text-left"></div>
-      <div class="text-[11px] text-muted pt-2 border-t border-slate-700/40">直接螢幕截圖即可分享至 Threads / IG！</div>
-      <button type="button" onclick="document.getElementById('shareCardModal').classList.add('hidden')" class="w-full btn-gold font-black py-2.5 rounded-xl text-xs">關閉視窗</button>
+<header class="nav">
+  <div class="nav-inner">
+    <a class="brand" href="#top">
+      <img src="avatar.png" data-alt="avatar.jpg" alt="村長" onerror="iconFallback(this)">
+      <span class="brand-title">幣圈新手村 PRO</span>
+    </a>
+    <nav class="nav-links">
+      <a href="#exchanges">交易所</a>
+      <a href="#tutorial">新手教學</a>
+      <a href="#apply">VIP 申請</a>
+    </nav>
+    <div class="nav-actions">
+      <a class="btn btn-sm" href="journal.html">PRO 復盤系統</a>
+      <button id="themeBtn" class="btn btn-ghost btn-sm" type="button" aria-label="切換亮色或暗色模式">☀️ 亮色 / 🌙 暗色</button>
     </div>
   </div>
+</header>
 
-  <!-- ================= 🔐 登入畫面 ================= -->
-  <div id="loginSection" class="w-full max-w-md mt-4 min-w-0">
-    <div class="glass-card p-6 sm:p-8 rounded-2xl shadow-2xl space-y-6 text-center">
-      <div class="flex justify-between items-center">
-        <a href="index.html" class="sub-box text-sub text-xs font-bold px-3 py-1.5 rounded-lg">⬅ 回首頁</a>
-        <button type="button" onclick="toggleThemeMode()" class="theme-toggle-btn sub-box text-gold text-xs font-bold px-3 py-1.5 rounded-lg">☀️ 亮色</button>
-      </div>
-      <div>
-        <img src="avatar.png" alt="村長"
-             onerror="if(!this.dataset.t){this.dataset.t='1';this.src='avatar.jpg';}else{this.src='https://ui-avatars.com/api/?name=%E6%9D%91%E9%95%BF&background=D4AF37&color=090A0F&size=96&bold=true';}"
-             class="w-24 h-24 rounded-full mx-auto mb-3 border-2 border-[#D4AF37] object-cover" />
-        <h1 class="text-xl sm:text-2xl font-black text-gold">PRO 交易復盤與講義系統</h1>
-        <p class="text-xs text-muted mt-1">請輸入村長審核通過後發放的專屬帳號與密碼</p>
-      </div>
+<main class="wrap" id="top">
 
-      <div class="space-y-4 text-left">
-        <div>
-          <label class="block text-xs text-muted mb-1 font-bold">專屬帳號 (或審核之 UID)</label>
-          <input type="text" id="loginUser" placeholder="請輸入專屬帳號"
-                 onkeydown="if(event.key==='Enter') handleLogin()"
-                 class="w-full form-input rounded-xl p-3.5 text-sm outline-none" />
-        </div>
-        <div>
-          <label class="block text-xs text-muted mb-1 font-bold">專屬密碼</label>
-          <input type="password" id="loginPass" placeholder="請輸入專屬密碼"
-                 onkeydown="if(event.key==='Enter') handleLogin()"
-                 class="w-full form-input rounded-xl p-3.5 text-sm outline-none" />
-        </div>
-
-        <div id="loginStatusBox" class="hidden text-xs font-bold p-3 rounded-xl"></div>
-
-        <button type="button" id="loginBtn" onclick="handleLogin()" class="w-full btn-gold font-black py-3.5 rounded-xl text-sm shadow-lg cursor-pointer">
-          🔓 驗證並登入系統
-        </button>
-      </div>
-
-      <div class="pt-4 border-t border-slate-700/40 space-y-3">
-        <div class="text-xs text-muted font-bold">尚未開通系統權限？請選擇開通方式：</div>
-        <div class="grid grid-cols-2 gap-2 text-xs">
-          <a href="index.html#applySection" class="sub-box text-gold font-bold py-2.5 rounded-xl">🔗 提交 UID 開通</a>
-          <a href="index.html#applySection" class="sub-box text-emerald-500 font-bold py-2.5 rounded-xl">💳 訂閱制開通</a>
-        </div>
-        <p class="text-[11px] text-muted leading-relaxed pt-2">
-          ⚠️ 投資理財風險自負聲明：本系統僅供個人交易復盤與學術交流使用，不構成任何投資與理財建議。加密貨幣交易具高度風險，投資理財風險自負，請自行辨別風險。
-        </p>
-      </div>
+  <section class="hero">
+    <img class="hero-avatar" src="avatar.png" data-alt="avatar.jpg" alt="村長大頭照" onerror="iconFallback(this)">
+    <h1>安全出入金・實戰教學・PRO 交易復盤系統</h1>
+    <p class="sub">使用村長專屬連結註冊交易所，即可免費申請開通『PRO 交易復盤系統』（內含核心講義以及眾多功能）。</p>
+    <div class="hero-btns">
+      <a class="btn" href="#exchanges">看交易所推薦</a>
+      <a class="btn btn-outline" href="#apply">申請 VIP 通行證</a>
     </div>
-  </div>
+  </section>
 
-  <!-- ================= 📊 主系統畫面（學員與村長共用，村長額外解鎖批改與管理後台分頁） ================= -->
-  <div id="studentSection" class="hidden w-full max-w-6xl space-y-6 min-w-0">
+  <section class="card" id="about">
+    <h2>👑 村長介紹</h2>
+    <!-- 這段是範例文字，請換成你自己的介紹 -->
+    <p>歡迎來到幣圈新手村。這裡會帶你從交易所註冊、台幣出入金開始，一步一步學會如何安全地進入加密貨幣市場，並用復盤養成自己的交易紀律。</p>
+    <div class="socials">
+      <a class="btn btn-outline btn-sm" id="sIg" href="https://www.instagram.com/help_crypto666?srtk=MTZlbGxsc3VzZTYyaw==" target="_blank" rel="noopener noreferrer">Instagram</a>
+      <a class="btn btn-outline btn-sm" id="sThreads" href="https://www.threads.com/@help_crypto666" target="_blank" rel="noopener noreferrer">Threads</a>
+      <a class="btn btn-outline btn-sm" id="sTgP" href="https://t.me/hijfknbv" target="_blank" rel="noopener noreferrer">@hijfknbv</a>
+      <a class="btn btn-outline btn-sm" id="sTgG" href="https://t.me/+xyRLxOqigKI5ZWE1" target="_blank" rel="noopener noreferrer">Telegram 群組</a>
+    </div>
+  </section>
 
-    <header class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 glass-card p-4 sm:p-5 rounded-2xl">
-      <div class="flex items-center gap-3 min-w-0">
-        <img src="avatar.png" alt="村長"
-             onerror="if(!this.dataset.t){this.dataset.t='1';this.src='avatar.jpg';}else{this.src='https://ui-avatars.com/api/?name=V&background=D4AF37&color=090A0F&size=48&bold=true';}"
-             class="w-11 h-11 rounded-full border border-[#D4AF37] object-cover shrink-0" />
-        <div class="min-w-0">
-          <div class="flex flex-wrap items-center gap-2">
-            <h2 class="font-black text-main text-base sm:text-lg whitespace-nowrap">幣圈新手村 PRO 復盤系統</h2>
-            <span id="studentPlanBadge" class="text-xs bg-[#D4AF37]/20 text-gold border border-[#D4AF37]/40 px-2.5 py-0.5 rounded-full font-bold">VIP 學員</span>
-            <span id="studentExpiryBadge" class="hidden text-xs bg-emerald-500/20 text-emerald-500 border border-emerald-500/40 px-2.5 py-0.5 rounded-full font-bold"></span>
-          </div>
-          <p class="text-xs text-muted mt-1 truncate">
-            登入帳號：<span id="userUidDisplay" class="font-mono text-emerald-500 font-bold"></span> ｜ 
-            累積交易量：<span id="studentMonthlyVol" class="font-mono text-gold font-bold">0 U</span>
-          </p>
-        </div>
-      </div>
+  <section class="card" id="exchanges">
+    <h2>🔗 交易所與工具推薦</h2>
+    <p class="muted">點擊「立即註冊」前往官網，邀請碼可一鍵複製。</p>
+    <div id="exchangeList"><p class="muted">載入中…</p></div>
+  </section>
 
-      <div class="flex flex-wrap items-center gap-2 self-end sm:self-auto shrink-0">
-        <a href="index.html" class="sub-box text-main text-xs font-bold px-3 py-2 rounded-xl whitespace-nowrap">← 首頁</a>
-        <button type="button" onclick="toggleThemeMode()" class="theme-toggle-btn sub-box text-gold text-xs font-bold px-3 py-2 rounded-xl whitespace-nowrap">☀️ 亮色</button>
-        <button type="button" id="syncCloudBtn" onclick="syncTradesFromCloud(true)" class="sub-box text-gold text-xs font-bold px-3 py-2 rounded-xl whitespace-nowrap">🔄 雲端同步</button>
-        <button type="button" onclick="handleLogout()" class="bg-rose-500/20 text-rose-500 text-xs font-bold px-3 py-2 rounded-xl border border-rose-500/40 whitespace-nowrap">登出</button>
-      </div>
-    </header>
+  <section class="card" id="tutorial">
+    <h2>📚 四大圖文教學</h2>
+    <p class="muted">請依序完成。截圖僅供參考，實際畫面以各平台為準。</p>
+    <div class="tabs" role="tablist" id="tutTabs"></div>
+    <div id="tutPanels"></div>
+  </section>
 
-    <!-- 導覽分頁列 -->
-    <div class="flex flex-wrap gap-2 sub-box p-2 rounded-2xl">
-      <button type="button" onclick="switchStudentTab('journal')" id="stuTab-journal" class="flex-1 min-w-[110px] tab-nav-btn active py-2.5 px-3 rounded-xl text-xs sm:text-sm">📊 我的交易復盤</button>
-      <button type="button" onclick="switchStudentTab('rank')" id="stuTab-rank" class="flex-1 min-w-[110px] tab-nav-btn inactive py-2.5 px-3 rounded-xl text-xs sm:text-sm">🏆 全村排行榜</button>
-      <button type="button" onclick="switchStudentTab('calc')" id="stuTab-calc" class="flex-1 min-w-[110px] tab-nav-btn inactive py-2.5 px-3 rounded-xl text-xs sm:text-sm">🧮 風控與加倉計算機</button>
-      <button type="button" onclick="switchStudentTab('lectures')" id="stuTab-lectures" class="flex-1 min-w-[110px] tab-nav-btn inactive py-2.5 px-3 rounded-xl text-xs sm:text-sm">📚 私藏講義</button>
-      <button type="button" onclick="switchStudentTab('websites')" id="stuTab-websites" class="flex-1 min-w-[110px] tab-nav-btn inactive py-2.5 px-3 rounded-xl text-xs sm:text-sm">🌐 好用網站(51站)</button>
-      <!-- 僅村長可見的兩個專屬分頁按鈕 -->
-      <button type="button" onclick="switchStudentTab('review')" id="stuTab-review" class="hidden flex-1 min-w-[120px] tab-nav-btn inactive py-2.5 px-3 rounded-xl text-xs sm:text-sm">✍️ 批改學員倉位</button>
-      <button type="button" onclick="switchStudentTab('admin')" id="stuTab-admin" class="hidden flex-1 min-w-[120px] tab-nav-btn inactive py-2.5 px-3 rounded-xl text-xs sm:text-sm">👑 村長管理後台</button>
+  <section class="card" id="apply">
+    <h2>🎫 VIP 通行證申請</h2>
+    <p class="muted">送出申請後，村長審核通過會私訊您專屬帳號與密碼。</p>
+
+    <div class="tabs" role="tablist">
+      <button class="tab" role="tab" type="button" data-ch="uid" aria-selected="true">通道一：交易所 UID 審核</button>
+      <button class="tab" role="tab" type="button" data-ch="sub" aria-selected="false">通道二：訂閱制開通</button>
     </div>
 
-    <!-- 分頁 1：個人交易復盤 -->
-    <div id="stuPane-journal" class="space-y-6">
-      <div class="grid grid-cols-2 sm:grid-cols-5 gap-3">
-        <div class="glass-card p-4 rounded-2xl">
-          <div class="text-xs text-muted">總交易筆數</div>
-          <div id="statTotalTrades" class="text-2xl font-black text-main mt-1">0</div>
-        </div>
-        <div class="glass-card p-4 rounded-2xl">
-          <div class="text-xs text-muted">實戰勝率 / 紀律分</div>
-          <div class="text-lg font-black text-gold mt-1"><span id="statWinRate">0%</span> / <span id="statAvgScore">0分</span></div>
-        </div>
-        <div class="glass-card p-4 rounded-2xl">
-          <div class="text-xs text-muted">累計總淨利 (USDT)</div>
-          <div id="statTotalPnl" class="text-2xl font-black text-emerald-500 mt-1">0.00</div>
-        </div>
-        <div class="glass-card p-4 rounded-2xl">
-          <div class="text-xs text-muted">手續費磨耗 (自動算)</div>
-          <div id="statTotalFee" class="text-2xl font-black text-rose-500 mt-1">0.00</div>
-        </div>
-        <div class="glass-card p-4 rounded-2xl col-span-2 sm:col-span-1">
-          <div class="text-xs text-muted">最賺幣種 / 最虧幣種</div>
-          <div id="statBestWorstCoin" class="text-xs font-black text-sky-500 mt-1.5">尚無數據</div>
+    <form id="formUid" autocomplete="off">
+      <div class="form-row">
+        <label for="uidExchange">選擇註冊的交易所</label>
+        <select id="uidExchange" class="field" required></select>
+      </div>
+      <div class="form-row">
+        <label for="uidValue">交易所 UID</label>
+        <input id="uidValue" class="field" type="text" maxlength="40" placeholder="請輸入交易所 UID" required>
+      </div>
+      <div class="form-row">
+        <label>聯絡方式</label>
+        <div class="inline">
+          <select id="uidContactType" class="field" required></select>
+          <input id="uidContactId" class="field" type="text" maxlength="100" placeholder="請輸入帳號" required>
         </div>
       </div>
+      <button class="btn btn-block" type="submit">送出 UID 申請</button>
+      <div class="msg" id="msgUid" role="status"></div>
+    </form>
 
-      <!-- 策略勝率分析表 -->
-      <div class="glass-card p-5 rounded-2xl space-y-3">
-        <div class="flex justify-between items-center">
-          <h3 class="text-sm font-black text-gold">📈 我的各策略實戰勝率與淨利分析</h3>
-          <button type="button" onclick="exportMyTradesCsv()" class="sub-box text-emerald-500 text-xs font-bold px-3 py-1.5 rounded-lg">📥 匯出 CSV</button>
-        </div>
-        <div id="strategyStatsContainer" class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-xs"></div>
+    <form id="formSub" autocomplete="off" hidden>
+      <div class="step-box">
+        <h4>步驟 1：選擇訂閱方案</h4>
+        <select id="subPlan" class="field" required></select>
       </div>
-
-      <!-- 新增 / 修改交易復盤表單（手機版清晰區塊排版） -->
-      <div class="glass-card p-4 sm:p-6 rounded-2xl space-y-5">
-        <div class="flex justify-between items-center">
-          <h3 id="formTitleText" class="text-base font-black text-gold border-l-4 border-[#D4AF37] pl-2.5">📝 新增交易復盤與紀律打分</h3>
-          <button type="button" id="cancelEditBtn" onclick="cancelEditMode()" class="hidden text-xs sub-box text-rose-500 px-3 py-1.5 rounded-lg font-bold">取消修改</button>
-        </div>
-
-        <form id="tradeForm" onsubmit="addOrUpdateTradeRecord(event)" class="space-y-4 text-sm">
-          <input type="hidden" id="editingTradeId" value="" />
-
-          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 sub-box p-4 rounded-xl">
-            <div>
-              <label class="block text-xs text-muted mb-1 font-bold">交易幣種 / 交易對 *</label>
-              <input type="text" id="tradePair" required placeholder="例如 BTCUSDT" class="w-full form-input rounded-xl p-2.5 uppercase font-bold outline-none" />
-            </div>
-            <div>
-              <label class="block text-xs text-muted mb-1 font-bold">多空方向 *</label>
-              <select id="tradeSide" class="w-full form-input rounded-xl p-2.5 font-bold outline-none">
-                <option value="LONG">🟢 做多 (Long)</option>
-                <option value="SHORT">🔴 做空 (Short)</option>
-              </select>
-            </div>
-            <div>
-              <label class="block text-xs text-muted mb-1 font-bold">槓桿倍數 (倍)</label>
-              <input type="number" id="tradeLeverage" value="10" min="1" max="200" class="w-full form-input rounded-xl p-2.5 outline-none" />
-            </div>
-          </div>
-
-          <div class="space-y-2 sub-box p-4 rounded-xl">
-            <label class="block text-xs font-bold text-gold">🎯 進場策略標籤 (可複選或於下方自訂輸入)：</label>
-            <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 text-xs text-sub">
-              <label class="flex items-center gap-2"><input type="checkbox" name="stratCheck" value="SMC 訂單塊 (OB)" /> SMC 訂單塊 (OB)</label>
-              <label class="flex items-center gap-2"><input type="checkbox" name="stratCheck" value="FVG 失衡區" /> FVG 失衡區回補</label>
-              <label class="flex items-center gap-2"><input type="checkbox" name="stratCheck" value="流動性獵殺" /> 流動性獵殺 (Sweep)</label>
-              <label class="flex items-center gap-2"><input type="checkbox" name="stratCheck" value="PA 價格行為" /> PA 價格行為支撐壓力</label>
-              <label class="flex items-center gap-2"><input type="checkbox" name="stratCheck" value="鏈上數據" /> 鏈上數據 / 巨鯨動向</label>
-              <label class="flex items-center gap-2"><input type="checkbox" name="stratCheck" value="斐波那契回撤" /> 斐波那契回撤</label>
-            </div>
-            <input type="text" id="tradeCustomStrategy" placeholder="自訂進場策略（選填，可自己打字輸入）" class="w-full form-input rounded-xl p-2.5 text-xs outline-none mt-2" />
-          </div>
-
-          <div class="space-y-2 sub-box p-4 rounded-xl">
-            <label class="block text-xs font-bold text-emerald-500">🏷️ 交易結果標籤 (可複選)：</label>
-            <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 text-xs text-sub">
-              <label class="flex items-center gap-2"><input type="checkbox" name="resultCheck" value="止盈" /> 止盈 (TP)</label>
-              <label class="flex items-center gap-2"><input type="checkbox" name="resultCheck" value="手動止盈" /> 手動止盈</label>
-              <label class="flex items-center gap-2"><input type="checkbox" name="resultCheck" value="止損" /> 止損 (SL)</label>
-              <label class="flex items-center gap-2"><input type="checkbox" name="resultCheck" value="手動止損" /> 手動止損</label>
-              <label class="flex items-center gap-2"><input type="checkbox" name="resultCheck" value="打保本" /> 打保本 (BE)</label>
-              <label class="flex items-center gap-2"><input type="checkbox" name="resultCheck" value="打移動止損" /> 打移動止損 (Trailing)</label>
-            </div>
-          </div>
-
-          <div class="space-y-2.5 sub-box p-4 rounded-xl">
-            <label class="block text-xs font-bold text-sky-500">🧠 交易心態與紀律檢討 (基礎70分，正向+6分 / 負向-10分)：</label>
-            <div class="text-[11px] text-emerald-500 font-bold">🟢 正向紀律表現：</div>
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs text-sub">
-              <label class="flex items-center gap-2"><input type="checkbox" name="disciplineCheck" data-score="6" value="嚴格執行交易計畫" /> 嚴格執行交易計畫</label>
-              <label class="flex items-center gap-2"><input type="checkbox" name="disciplineCheck" data-score="6" value="耐心等待關鍵位回踩" /> 耐心等待關鍵位回踩</label>
-              <label class="flex items-center gap-2"><input type="checkbox" name="disciplineCheck" data-score="6" value="確實設定並執行止損" /> 確實設定並執行止損</label>
-              <label class="flex items-center gap-2"><input type="checkbox" name="disciplineCheck" data-score="6" value="分批止盈 / 推保本損" /> 分批止盈 / 推保本損</label>
-              <label class="flex items-center gap-2"><input type="checkbox" name="disciplineCheck" data-score="6" value="倉位大小符合風控" /> 倉位大小符合風控</label>
-            </div>
-            <div class="text-[11px] text-rose-500 font-bold pt-2">🔴 負向犯錯檢討：</div>
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs text-sub">
-              <label class="flex items-center gap-2"><input type="checkbox" name="disciplineCheck" data-score="-10" value="FOMO 追高殺低" /> FOMO 追高殺低</label>
-              <label class="flex items-center gap-2"><input type="checkbox" name="disciplineCheck" data-score="-10" value="扛單 / 偷移放大止損" /> 扛單 / 偷移放大止損</label>
-              <label class="flex items-center gap-2"><input type="checkbox" name="disciplineCheck" data-score="-10" value="重倉梭哈 / 槓桿過大" /> 重倉梭哈 / 槓桿過大</label>
-              <label class="flex items-center gap-2"><input type="checkbox" name="disciplineCheck" data-score="-10" value="虧損後報復性頻繁開單" /> 虧損後報復性頻繁開單</label>
-              <label class="flex items-center gap-2"><input type="checkbox" name="disciplineCheck" data-score="-10" value="賺一點就跑（拿不住單）" /> 賺一點就跑（拿不住單）</label>
-              <label class="flex items-center gap-2"><input type="checkbox" name="disciplineCheck" data-score="-10" value="逆勢摸頭抄底" /> 逆勢摸頭抄底</label>
-            </div>
-          </div>
-
-          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sub-box p-4 rounded-xl">
-            <div>
-              <label class="block text-xs text-muted mb-1 font-bold">開倉日期 *</label>
-              <input type="date" id="tradeOpenTime" required class="w-full form-input rounded-xl p-2.5 text-xs outline-none" />
-            </div>
-            <div>
-              <label class="block text-xs text-muted mb-1 font-bold">平倉日期 *</label>
-              <input type="date" id="tradeCloseTime" required class="w-full form-input rounded-xl p-2.5 text-xs outline-none" />
-            </div>
-            <div>
-              <label class="block text-xs text-muted mb-1 font-bold">預期 RR</label>
-              <input type="number" step="any" id="tradeExpectedRr" value="2.0" class="w-full form-input rounded-xl p-2.5 text-xs font-mono" />
-            </div>
-            <div>
-              <label class="block text-xs text-muted mb-1 font-bold">實際 RR</label>
-              <input type="number" step="any" id="tradeActualRr" value="1.5" class="w-full form-input rounded-xl p-2.5 text-xs font-mono" />
-            </div>
-          </div>
-
-          <div class="sub-box p-4 rounded-xl space-y-4">
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-              <label class="block text-xs font-bold text-gold">📊 紀錄填寫模式：</label>
-              <div class="grid grid-cols-2 gap-2">
-                <button type="button" id="btnModeManual" onclick="switchInputMode('manual')" class="px-4 py-2 rounded-xl text-xs font-bold mode-btn-active">一般單筆模式</button>
-                <button type="button" id="btnModeBatch" onclick="switchInputMode('batch')" class="px-4 py-2 rounded-xl text-xs font-bold form-input text-muted">分批進場 & 分批出場模式</button>
-              </div>
-            </div>
-
-            <div id="manualModeBox" class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
-              <div>
-                <label class="block text-xs text-muted mb-1 font-bold">開倉均價 *</label>
-                <input type="number" step="any" id="manualAvgEntry" class="w-full form-input rounded-xl p-2.5 text-xs font-mono" />
-              </div>
-              <div>
-                <label class="block text-xs text-muted mb-1 font-bold">平倉均價 *</label>
-                <input type="number" step="any" id="manualAvgExit" class="w-full form-input rounded-xl p-2.5 text-xs font-mono" />
-              </div>
-              <div>
-                <label class="block text-xs text-muted mb-1 font-bold">持倉量 *</label>
-                <input type="number" step="any" id="manualTotalQty" class="w-full form-input rounded-xl p-2.5 text-xs font-mono" />
-              </div>
-            </div>
-
-            <div id="batchModeBox" class="hidden grid grid-cols-1 lg:grid-cols-2 gap-4 pt-1">
-              <div class="space-y-2.5 form-input p-3.5 rounded-xl">
-                <div class="flex justify-between items-center">
-                  <span class="text-xs font-bold text-emerald-500">📥 分批進場紀錄</span>
-                  <button type="button" onclick="addBatchRow('entry')" class="text-xs bg-emerald-500/20 text-emerald-500 px-2.5 py-1 rounded-lg font-bold">+ 新增進場批次</button>
-                </div>
-                <div id="entryBatchesContainer" class="space-y-2"></div>
-                <div class="text-xs text-muted pt-2 flex justify-between border-t border-slate-700/30">
-                  <span>開倉均價：<b id="calcAvgEntry" class="text-main font-mono">--</b></span>
-                  <span>總持倉量：<b id="calcTotalEntryQty" class="text-main font-mono">0</b></span>
-                </div>
-              </div>
-              <div class="space-y-2.5 form-input p-3.5 rounded-xl">
-                <div class="flex justify-between items-center">
-                  <span class="text-xs font-bold text-amber-500">📤 分批出場紀錄</span>
-                  <button type="button" onclick="addBatchRow('exit')" class="text-xs bg-amber-500/20 text-amber-500 px-2.5 py-1 rounded-lg font-bold">+ 新增出場批次</button>
-                </div>
-                <div id="exitBatchesContainer" class="space-y-2"></div>
-                <div class="text-xs text-muted pt-2 flex justify-between border-t border-slate-700/30">
-                  <span>平倉均價：<b id="calcAvgExit" class="text-main font-mono">--</b></span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 sub-box p-4 rounded-xl">
-            <div>
-              <label class="block text-xs text-muted mb-1 font-bold">實際淨利盈虧 (USDT，虧損加負號) *</label>
-              <input type="number" step="any" id="tradeNetPnl" required class="w-full form-input rounded-xl p-2.5 font-mono font-bold outline-none" />
-            </div>
-            <div class="sm:col-span-2">
-              <label class="block text-xs text-muted mb-1 font-bold">交易復盤心得 / 檢討 *</label>
-              <input type="text" id="tradeNote" required class="w-full form-input rounded-xl p-2.5 outline-none" />
-            </div>
-          </div>
-
-          <div class="sub-box p-4 rounded-xl">
-            <label class="block text-xs text-muted mb-1 font-bold">📷 上傳盤面截圖 (選填)</label>
-            <input type="file" id="tradeImageFile" accept="image/*" class="w-full form-input rounded-xl p-2 text-xs text-sub" />
-          </div>
-
-          <button type="submit" id="saveTradeBtn" class="w-full btn-gold font-black py-3.5 rounded-xl shadow-lg text-sm">💾 儲存並上傳交易紀錄</button>
-        </form>
+      <div class="step-box">
+        <h4>步驟 2：選擇支付幣種</h4>
+        <select id="subCurrency" class="field" required></select>
       </div>
-
-      <div class="glass-card p-5 sm:p-6 rounded-2xl space-y-4">
-        <h3 class="text-base font-black text-gold border-l-4 border-[#D4AF37] pl-2.5">📜 我的歷史倉位與村長評語</h3>
-        <div id="tradeListContainer" class="space-y-3"></div>
-      </div>
-    </div>
-
-    <!-- 分頁 2：全村匿名排行榜 (交易量排行榜 & 盈利排行榜) -->
-    <div id="stuPane-rank" class="hidden space-y-6">
-      <div class="glass-card p-6 rounded-2xl space-y-6">
-        <div class="border-b border-slate-700/40 pb-3">
-          <h3 class="text-lg font-black text-gold">🏆 幣圈新手村｜本月匿名榮譽風雲榜</h3>
-          <p class="text-xs text-muted mt-1">全程匿名保護隱私（顯示格式如 VIP****88 / 84*****12）</p>
-        </div>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div class="sub-box p-5 rounded-xl space-y-3">
-            <h4 class="font-black text-main text-sm">🔥 本月交易量排行榜 (前 10 名)</h4>
-            <div id="volumeRankList" class="space-y-2 text-xs font-mono"></div>
+      <div class="step-box">
+        <h4>步驟 3：選擇轉帳主鏈，並向下方地址付款</h4>
+        <select id="subChain" class="field" required></select>
+        <div id="addrWrap" hidden>
+          <p class="muted" style="margin:10px 0 0">請將款項轉至以下地址：</p>
+          <div class="addr">
+            <code id="addrText"></code>
+            <button id="copyAddr" class="btn-mini" type="button">複製地址</button>
           </div>
-          <div class="sub-box p-5 rounded-xl space-y-3">
-            <h4 class="font-black text-gold text-sm">💰 本月盈利排行榜 (前 10 名)</h4>
-            <div id="profitRankList" class="space-y-2 text-xs font-mono"></div>
-          </div>
+          <div id="qrBox" class="qr-box"></div>
         </div>
       </div>
-    </div>
-
-    <!-- 分頁 3：風控計算機 & 多段加倉計算機 -->
-    <div id="stuPane-calc" class="hidden space-y-6">
-      <div class="glass-card p-6 rounded-2xl space-y-4">
-        <h3 class="text-base font-black text-gold border-l-4 border-[#D4AF37] pl-2.5">🧮 1. 以損定量・倉位與風險風控計算機</h3>
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
-          <div><label class="block text-muted mb-1">開倉方向</label><select id="calcRiskSide" class="w-full form-input rounded-xl p-2.5 font-bold"><option value="LONG">🟢 做多 (Long)</option><option value="SHORT">🔴 做空 (Short)</option></select></div>
-          <div><label class="block text-muted mb-1">總資金 (USDT)</label><input type="number" id="calcRiskBalance" value="10000" class="w-full form-input rounded-xl p-2.5 font-mono" /></div>
-          <div><label class="block text-muted mb-1">單筆風險比例 (%)</label><input type="number" step="any" id="calcRiskPercent" value="2" class="w-full form-input rounded-xl p-2.5 font-mono" /></div>
-          <div><label class="block text-muted mb-1">開倉價</label><input type="number" step="any" id="calcRiskEntry" class="w-full form-input rounded-xl p-2.5 font-mono" /></div>
-          <div><label class="block text-muted mb-1">止損價</label><input type="number" step="any" id="calcRiskSl" class="w-full form-input rounded-xl p-2.5 font-mono" /></div>
-          <div><label class="block text-muted mb-1">槓桿倍數</label><input type="number" id="calcRiskLev" value="10" class="w-full form-input rounded-xl p-2.5 font-mono" /></div>
-        </div>
-        <button type="button" onclick="runRiskCalculator()" class="w-full btn-gold font-black py-2.5 rounded-xl text-xs shadow">計算建議倉位規模</button>
-        <div id="calcRiskResult" class="hidden sub-box p-4 rounded-xl text-xs space-y-2 font-mono"></div>
+      <div class="step-box">
+        <h4>步驟 4：填寫轉帳哈希值 (TxID)</h4>
+        <input id="subTxid" class="field" type="text" maxlength="120" placeholder="請貼上交易哈希值" required>
       </div>
-
-      <div class="glass-card p-6 rounded-2xl space-y-4">
-        <h3 class="text-base font-black text-gold border-l-4 border-[#D4AF37] pl-2.5">📈 2. 加倉倉位計算機（多段加倉均價與總持倉計算）</h3>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
-          <div class="sub-box p-4 rounded-xl space-y-2">
-            <div class="font-bold text-emerald-500">1️⃣ 原始倉位 (價格 / 持倉量)</div>
-            <div class="grid grid-cols-2 gap-2"><input type="number" step="any" id="origPrice" placeholder="價格" class="form-input rounded-lg p-2 font-mono" /><input type="number" step="any" id="origQty" placeholder="持倉量" class="form-input rounded-lg p-2 font-mono" /></div>
-          </div>
-          <div class="sub-box p-4 rounded-xl space-y-2">
-            <div class="font-bold text-amber-500">2️⃣ 加倉批次 1 (價格 / 持倉量)</div>
-            <div class="grid grid-cols-2 gap-2"><input type="number" step="any" id="add1Price" placeholder="價格" class="form-input rounded-lg p-2 font-mono" /><input type="number" step="any" id="add1Qty" placeholder="持倉量" class="form-input rounded-lg p-2 font-mono" /></div>
-          </div>
-          <div class="sub-box p-4 rounded-xl space-y-2">
-            <div class="font-bold text-amber-500">3️⃣ 加倉批次 2 (價格 / 持倉量)</div>
-            <div class="grid grid-cols-2 gap-2"><input type="number" step="any" id="add2Price" placeholder="價格" class="form-input rounded-lg p-2 font-mono" /><input type="number" step="any" id="add2Qty" placeholder="持倉量" class="form-input rounded-lg p-2 font-mono" /></div>
-          </div>
-          <div class="sub-box p-4 rounded-xl space-y-2">
-            <div class="font-bold text-amber-500">4️⃣ 加倉批次 3 (價格 / 持倉量)</div>
-            <div class="grid grid-cols-2 gap-2"><input type="number" step="any" id="add3Price" placeholder="價格" class="form-input rounded-lg p-2 font-mono" /><input type="number" step="any" id="add3Qty" placeholder="持倉量" class="form-input rounded-lg p-2 font-mono" /></div>
-          </div>
-        </div>
-        <button type="button" onclick="runDcaCalculator()" class="w-full btn-gold font-black py-2.5 rounded-xl text-xs shadow">計算加倉後總均價與總成本</button>
-        <div id="calcDcaResult" class="hidden sub-box p-4 rounded-xl text-xs space-y-2 font-mono"></div>
-      </div>
-    </div>
-
-    <!-- 分頁 4：私藏講義 -->
-    <div id="stuPane-lectures" class="hidden glass-card p-6 rounded-2xl space-y-4">
-      <h3 class="text-lg font-black text-gold border-l-4 border-[#D4AF37] pl-2.5">📚 村長私藏實戰講義專區</h3>
-      <div id="studentLecturesContainer" class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2"></div>
-    </div>
-
-    <!-- 分頁 5：好用網站 (6 大實戰梯隊 51 站) -->
-    <div id="stuPane-websites" class="hidden glass-card p-6 rounded-2xl space-y-5">
-      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-        <h3 class="text-lg font-black text-gold border-l-4 border-[#D4AF37] pl-2.5">🌐 虛擬貨幣必備數據網站與好用工具（6大實戰梯隊）</h3>
-        <input type="text" id="siteSearchBox" oninput="renderStudentResources()" placeholder="搜尋網站名稱或用途..." class="form-input rounded-xl px-3.5 py-2 text-xs w-full sm:w-64 outline-none" />
-      </div>
-      <div id="studentWebsitesContainer" class="space-y-6"></div>
-    </div>
-
-    <!-- 分頁 6 (僅村長可見)：✍️ 批改學員倉位 -->
-    <div id="stuPane-review" class="hidden space-y-4">
-      <div class="glass-card p-5 rounded-2xl flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <h3 class="text-base font-black text-gold">✍️ 批改學員倉位總覽</h3>
-          <p class="text-xs text-muted">此區顯示所有學員上傳的倉位紀錄，村長可直接填寫評語並儲存</p>
-        </div>
-        <div class="flex flex-wrap items-center gap-2 text-xs">
-          <select id="adminTradeExFilter" onchange="renderAdminTrades()" class="form-input rounded-xl px-3 py-2 outline-none">
-            <option value="ALL">全部來源</option>
-          </select>
-          <select id="adminStudentFilter" onchange="renderAdminTrades()" class="form-input rounded-xl px-3 py-2 outline-none">
-            <option value="ALL">全部學員</option>
-          </select>
+      <div class="step-box">
+        <h4>步驟 5：填寫聯絡方式</h4>
+        <div class="inline">
+          <select id="subContactType" class="field" required></select>
+          <input id="subContactId" class="field" type="text" maxlength="100" placeholder="請輸入帳號" required>
         </div>
       </div>
-      <div id="adminStudentsContainer" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
-    </div>
+      <button id="subSubmit" class="btn btn-block" type="submit">送出訂閱申請</button>
+      <div class="msg" id="msgSub" role="status"></div>
+    </form>
+  </section>
 
-    <!-- 分頁 7 (僅村長可見)：👑 村長管理後台 -->
-    <div id="stuPane-admin" class="hidden space-y-5">
-      <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <div class="glass-card p-4 rounded-2xl">
-          <div class="text-xs text-muted">全村總交易量</div>
-          <div id="adminTotalVolume" class="text-xl font-black text-emerald-500 mt-1">0 U</div>
-        </div>
-        <div class="glass-card p-4 rounded-2xl">
-          <div class="text-xs text-muted">待寫評語筆數</div>
-          <div id="adminStatPending" class="text-xl font-black text-amber-500 mt-1">0</div>
-        </div>
-        <div class="glass-card p-4 rounded-2xl">
-          <div class="text-xs text-muted">全村累計總淨利</div>
-          <div id="adminStatTotalPnl" class="text-xl font-black text-emerald-500 mt-1">0.00</div>
-        </div>
-        <div class="glass-card p-4 rounded-2xl">
-          <div class="text-xs text-muted">已開通學員數</div>
-          <div id="adminStatVipCount" class="text-xl font-black text-gold mt-1">0</div>
-        </div>
-      </div>
+  <footer class="disclaimer">
+    <p><strong>⚠️ 投資理財風險自負聲明</strong></p>
+    <p>本網站所有內容（包含村長的教學、講義、復盤紀錄與工具推薦）僅供學習與經驗分享，不構成任何投資建議、買賣推薦或財務建議。加密貨幣與衍生品價格波動劇烈，可能導致本金全部損失，請依自身風險承受能力審慎評估。所有交易與投資決策均由使用者自行判斷，並自負盈虧。</p>
+    <p>本站部分連結為推薦連結，透過連結註冊時，村長可能獲得推薦獎勵。各交易所之服務條款、活動規則與可用地區，請以各平台官方公告為準。</p>
+    <p>© 幣圈新手村 PRO</p>
+  </footer>
+</main>
 
-      <div class="glass-card p-4 rounded-2xl flex flex-wrap items-center justify-between gap-3">
-        <div class="text-xs font-bold text-gold">🏆 排行榜最高上限控制（前端排行榜絕不超過此上限）：</div>
-        <div class="flex flex-wrap items-center gap-3 text-xs">
-          <label class="text-sub">最高交易量上限(U)：<input type="number" id="adminRankMaxVol" value="150000" class="form-input rounded-lg px-2.5 py-1.5 font-mono w-28 ml-1" /></label>
-          <label class="text-sub">最高盈利上限(U)：<input type="number" id="adminRankMaxPnl" value="1200" class="form-input rounded-lg px-2.5 py-1.5 font-mono w-24 ml-1" /></label>
-          <button type="button" onclick="saveAdminRankConfig()" class="btn-gold font-black px-4 py-1.5 rounded-lg">💾 儲存上限</button>
-        </div>
-      </div>
+<script>
+  const API_URL = 'https://script.google.com/macros/s/AKfycby-oIzel0yPK_zLna564GdTHE_EFICkWT5UEghHkh_9kciPpWzhLzycZG-stPyhK8IR/exec';
+  const CONTACT_TYPES = ['IG', 'TG', 'Threads'];
+  let PAYMENTS = [];
 
-      <div class="glass-card p-5 sm:p-6 rounded-2xl space-y-4">
-        <div>
-          <h3 class="text-base font-black text-gold">🔑 學員審核狀態、交易量監控、修改帳密與「轉為訂閱 / 轉為UID」管理</h3>
-          <p class="text-xs text-muted mt-1">修改專屬帳號、密碼或狀態後點擊「💾 儲存設定」，系統會自動更新私訊發送文案！</p>
-        </div>
-        <div id="adminVipsContainer" class="space-y-3"></div>
-      </div>
-    </div>
+  const TUTORIALS = [
+    { title: '🟢 註冊幣託 BitoPro', steps: [
+      { t: '選擇一個方式註冊。', img: 'reg_bitopro_1.png' },
+      { t: '確認有填寫邀請碼後同意使用條款，然後按下一步。', img: 'reg_bitopro_2.png' },
+      { t: '填寫手機號碼。', img: 'reg_bitopro_3.png' },
+      { t: '點選身分驗證，送出後等待一兩個工作天。', img: 'reg_bitopro_4.png' },
+      { t: '到『帳戶』裡面選擇『銀行帳戶』點進去，選擇立即綁定。', img: 'reg_bitopro_5.png' },
+      { t: '照著上面要求的項目填寫，送出後等待五到七個工作天審核。', img: 'reg_bitopro_6.png' }
+    ]},
+    { title: '🔵 註冊國際交易所', steps: [
+      { t: '和村長討論後使用村長的連結和邀請碼註冊，然後去應用商店下載對應的交易所 App。', img: 'reg_exchange_1.png' },
+      { t: '登入剛剛註冊的帳號密碼。', img: 'reg_exchange_2.png' },
+      { t: '點擊左上角頭像，會有身分驗證、身分認證或實名認證，照指示完成認證。', img: 'reg_exchange_3.png' }
+    ]},
+    { title: '📥 台幣入金與轉帳', steps: [
+      { t: '身分驗證通過和銀行帳號審核成功後，回到幣託主頁選擇『台幣加值』。', img: 'dep_1.png' },
+      { t: '複製幣託生成的專屬銀行帳號。', img: 'dep_2.png' },
+      { t: '用當初在幣託綁定的銀行帳戶，轉新台幣到幣託生成的銀行帳號。' },
+      { t: '台幣到帳後，回到首頁選擇『一鍵買賣』，並點擊中間那個轉換符號確認買賣方向（TWD 換成 USDT）。', img: 'dep_4.png' },
+      { t: '輸入想要購買的金額，勾選同意條款後按下一步。', img: 'dep_5.png' },
+      { t: '到國際交易所的主畫面或是右下角的資產頁面選擇『充值』。' },
+      { t: '在充值頁面中選擇幣種『USDT』。' },
+      { t: '充值鏈種選擇『BEP 20』，並複製交易所提供的一串地址代碼。' },
+      { t: '回到幣託的資產頁面點擊『提領』。', img: 'dep_9.png' },
+      { t: '在提領頁面中選擇幣種『USDT』。', img: 'dep_10.png' },
+      { t: '在提領網路中選擇鏈種『BEP 20』。', img: 'dep_11.png' },
+      { t: '將交易所複製的地址貼上至『提領到』，確認幣託和交易所這兩個畫面的提領鏈種（BEP 20）跟錢包地址都要完全一樣（否則資產會遺失），輸入提領金額後按下一步，並按照要求驗證。', img: 'dep_12.png', warn: true },
+      { t: '驗證後 3 到 5 分鐘，交易所就會收到剛剛轉帳的 USDT 了！' }
+    ]},
+    { title: '📤 國際交易所出金', steps: [
+      { t: '到幣託的資產頁面選擇『加值』，選擇幣種 USDT 與鏈種『BEP 20』，並複製幣託提供的一串地址代碼。', img: 'with_1.png' },
+      { t: '到國際交易所右下角的資產頁面點擊『提領』或是『提幣』，選擇幣種『USDT』，提領鏈種選擇『BEP 20』。' },
+      { t: '將剛剛從幣託複製的一串地址代碼，貼上至交易所的提領地址欄位，並確認鏈種與地址無誤。', img: 'with_3.png' },
+      { t: '輸入提領金額後按下一步並照著要求驗證，3 到 5 分鐘後幣託就會收到剛剛轉帳的 USDT 了。' },
+      { t: '到幣託首頁選擇『一鍵買賣』，點擊中間那個轉換符號，把 USDT 賣出轉換成新台幣（TWD）。', img: 'with_5.png' },
+      { t: '到幣託的資產頁面選擇『提領』。', img: 'with_6.png' },
+      { t: '在提領頁面中選擇『新台幣』。', img: 'with_7.png' },
+      { t: '輸入提款金額然後按下一步。', img: 'with_8.png' },
+      { t: '兩個工作天內就會收到提領的新台幣匯入您的銀行帳戶了！' }
+    ]}
+  ];
 
-    <footer class="glass-card p-4 rounded-2xl text-center">
-      <p class="text-[11px] text-muted leading-relaxed">
-        ⚠️ 投資理財風險自負聲明：本網站與系統僅供個人交易復盤記錄與學術交流使用，不構成任何投資與理財建議。加密貨幣與衍生品交易具高度風險，投資理財風險自負，請自行辨別風險並獨立承擔所有盈虧責任。
-      </p>
-    </footer>
+  const ERR_TEXT = {
+    BAD_REQUEST: '系統版本不一致，請重新整理頁面',
+    UNKNOWN_ACTION: '系統版本不一致，請重新整理頁面',
+    INVALID_INPUT: '資料格式有誤，請檢查欄位',
+    DUPLICATE_UID: '此 UID 已申請過，如有疑問請私訊村長',
+    DUPLICATE_TXID: '此轉帳紀錄已提交過，請勿重複申請',
+    DUPLICATE_ACCOUNT: '此專屬帳號已被使用，請換一個',
+    AUTH_FAILED: '帳號或密碼錯誤',
+    TOO_MANY_ATTEMPTS: '嘗試次數過多，請 10 分鐘後再試',
+    PENDING_REVIEW: '申請審核中，審核通過後即可登入',
+    PAUSED: '您的帳號目前已暫停使用，請聯繫村長恢復權限',
+    EXPIRED: '您的訂閱已到期，請續費後再登入',
+    NOT_READY: '帳號設定尚未完成，請聯繫村長',
+    SESSION_INVALID: '登入已過期，請重新登入',
+    FORBIDDEN: '沒有權限執行此操作',
+    NOT_FOUND: '找不到這筆資料，請重新整理',
+    SYSTEM_BUSY: '系統忙碌，請稍後再試',
+    DB_WRITE_FAILED: '儲存失敗，請稍後再試',
+    SYSTEM_NOT_READY: '系統維護中，請稍後再試',
+    INTERNAL_ERROR: '系統維護中，請稍後再試',
+    NETWORK: '網路連線異常，請稍後再試'
+  };
 
-  </div>
-
-  <script>
-    const SCRIPT_API_URL = "https://script.google.com/macros/s/AKfycby-oIzel0yPK_zLna564GdTHE_EFICkWT5UEghHkh_9kciPpWzhLzycZG-stPyhK8IR/exec";
-
-    const DEFAULT_51_RESOURCES = [
-      { type: "講義", tier: "核心講義", title: "K棒型態基礎與買賣力道", url: "https://drive.google.com/", note: "新手必讀基礎 K 線結構與多空力道判讀" },
-      { type: "講義", tier: "核心講義", title: "SMC 聰明錢概念：訂單塊 (OB) 與失衡區 (FVG)", url: "https://drive.google.com/", note: "主力機構進出場邏輯與高勝率狙擊點位" },
-      { type: "講義", tier: "核心講義", title: "合約倉位管理與風控鐵律", url: "https://drive.google.com/", note: "以損定量計算方式與避免扛單爆倉的核心法則" },
-      { type: "好用網站", tag: "合約數據", tier: "🏆 第一梯隊：即時看盤、爆倉清算與多空籌碼", title: "CoinGlass 爆倉與資金費率監控", url: "https://www.coinglass.com/zh-TW", note: "合約數據神器，監控全網爆倉、費率與清算熱力圖" },
-      { type: "好用網站", tag: "合約數據", tier: "🏆 第一梯隊：即時看盤、爆倉清算與多空籌碼", title: "CoinAnk 專業衍生品與爆倉熱圖", url: "https://coinank.com/zh", note: "訂單流、清算熱圖與未平倉量追蹤" },
-      { type: "好用網站", tag: "實用工具", tier: "🏆 第一梯隊：即時看盤、爆倉清算與多空籌碼", title: "TradingView 專業看盤圖表", url: "https://tw.tradingview.com/", note: "價格走勢、SMC 畫線與指標看盤必備" },
-      { type: "好用網站", tag: "期權數據", tier: "🏆 第一梯隊：即時看盤、爆倉清算與多空籌碼", title: "Deribit 全球最大加密期權與期貨所", url: "https://www.deribit.com/", note: "最大痛點、隱含波動率與選擇權大單" },
-      { type: "好用網站", tag: "多空數據", tier: "🏆 第一梯隊：即時看盤、爆倉清算與多空籌碼", title: "CryptoMeter 即時買賣力道與資金流向", url: "https://www.cryptometer.io/", note: "市場多空情緒與資金流動可視化" },
-      { type: "好用網站", tag: "多空比數據", tier: "🔥 第二梯隊：多空籌碼、鏈上大戶與流動性監控", title: "Coinalyze 衍生品與未平倉合約分析", url: "https://coinalyze.net/", note: "深入分析多空比與主力開倉動向" },
-      { type: "好用網站", tag: "鏈上數據", tier: "🔥 第二梯隊：多空籌碼、鏈上大戶與流動性監控", title: "CryptoQuant 機構級鏈上與礦工指標", url: "https://cryptoquant.com/", note: "追蹤交易所大額充提與礦工拋壓" },
-      { type: "好用網站", tag: "流動性監控", tier: "🔥 第二梯隊：多空籌碼、鏈上大戶與流動性監控", title: "Dexscreener 各鏈 DEX 實時行情", url: "https://dexscreener.com/", note: "山寨幣合約標的之鏈上即時成交追蹤" },
-      { type: "好用網站", tag: "鏈上標記", tier: "🔥 第二梯隊：多空籌碼、鏈上大戶與流動性監控", title: "Arkham 巨鯨錢包與地址追蹤", url: "https://platform.arkhamintelligence.com/", note: "追蹤市場大戶與機構錢包即時動向" },
-      { type: "好用網站", tag: "技術指標", tier: "🔥 第二梯隊：多空籌碼、鏈上大戶與流動性監控", title: "TradingLite 專業訂單簿與成交量圖表", url: "https://www.tradinglite.com/", note: "訂單流、成交熱圖與掛單牆分析" },
-      { type: "好用網站", tag: "總經快訊", tier: "📊 第三梯隊：總經利率、宏觀突發與市場情緒", title: "金十數據 全球總體經濟與財經日曆", url: "https://www.jin10.com/", note: "監控 CPI、非農與聯準會決議瞬間衝擊" },
-      { type: "好用網站", tag: "總經快訊", tier: "📊 第三梯隊：總經利率、宏觀突發與市場情緒", title: "華爾街見聞 即時財經快訊", url: "https://wallstreetcn.com/", note: "中文秒級全球財經與總經快訊推送" },
-      { type: "好用網站", tag: "宏觀數據", tier: "📊 第三梯隊：總經利率、宏觀突發與市場情緒", title: "FedWatch 聯準會利率會議機率", url: "https://www.cmegroup.com/markets/interest-rates/cme-fedwatch-tool.html", note: "降息升息預期監控，判斷宏觀流動性" },
-      { type: "好用網站", tag: "市場情緒", tier: "📊 第三梯隊：總經利率、宏觀突發與市場情緒", title: "Alternative 恐懼與貪婪指數", url: "https://alternative.me/crypto/fear-and-greed-index/", note: "衡量大盤極端情緒與反向指標" },
-      { type: "好用網站", tag: "財經數據", tier: "📊 第三梯隊：總經利率、宏觀突發與市場情緒", title: "英為財情 Investing.com 經濟日曆", url: "https://hk.investing.com/economic-calendar/", note: "全球高影響力總經數據發布排程" },
-      { type: "好用網站", tag: "交易所儲備", tier: "🛠️ 第四梯隊：鏈上導覽、儲備證明與基礎設施", title: "DefiLlama CEX Proof of Reserves", url: "https://defillama.com/cexs", note: "監控各大交易所儲備金，防範黑天鵝" },
-      { type: "好用網站", tag: "鏈上熱度", tier: "🛠️ 第四梯隊：鏈上導覽、儲備證明與基礎設施", title: "DEXTools 去中心化交易圖表", url: "https://www.dextools.io/", note: "新幣與熱門山寨流動性監控" },
-      { type: "好用網站", tag: "區塊瀏覽", tier: "🛠️ 第四梯隊：鏈上導覽、儲備證明與基礎設施", title: "Etherscan 以太坊區塊瀏覽器", url: "https://etherscan.io/", note: "查詢以太坊鏈上轉帳與 Gas 狀況" },
-      { type: "好用網站", tag: "區塊瀏覽", tier: "🛠️ 第四梯隊：鏈上導覽、儲備證明與基礎設施", title: "BscScan 幣安鏈區塊瀏覽器", url: "https://bscscan.com/", note: "BSC 鏈上合約與轉帳查詢" },
-      { type: "好用網站", tag: "區塊瀏覽", tier: "🛠️ 第四梯隊：鏈上導覽、儲備證明與基礎設施", title: "Solscan Solana 區塊瀏覽器", url: "https://solscan.io/", note: "Solana 鏈上合約交易查詢" },
-      { type: "好用網站", tag: "比特幣數據", tier: "🛠️ 第四梯隊：鏈上導覽、儲備證明與基礎設施", title: "Mempool.space BTC 區塊與內存池", url: "https://mempool.space/", note: "比特幣網路擁堵與手續費狀況" },
-      { type: "好用網站", tag: "穩定幣專區", tier: "🛠️ 第四梯隊：鏈上導覽、儲備證明與基礎設施", title: "Tether Transparency USDT 發行與儲備", url: "https://tether.to/en/transparency/", note: "穩定幣增發與動向監控" },
-      { type: "好用網站", tag: "行情總覽", tier: "🛠️ 第四梯隊：鏈上導覽、儲備證明與基礎設施", title: "CoinGecko 幣種市值查詢", url: "https://www.coingecko.com/zh-tw", note: "各大幣種市值與基本行情" },
-      { type: "好用網站", tag: "行情總覽", tier: "🛠️ 第四梯隊：鏈上導覽、儲備證明與基礎設施", title: "CoinMarketCap 虛擬貨幣市值排名", url: "https://coinmarketcap.com/zh-tw/", note: "市場總覽與數據參考" },
-      { type: "好用網站", tag: "跨鏈橋工具", tier: "🌉 第五梯隊：跨鏈、DEX 聚合、解鎖與鏈上安全", title: "Bungee 最佳跨鏈路徑工具", url: "https://www.bungee.exchange/", note: "跨鏈橋手續費優化與資產轉移" },
-      { type: "好用網站", tag: "跨鏈轉帳", tier: "🌉 第五梯隊：跨鏈、DEX 聚合、解鎖與鏈上安全", title: "DeBridge 高效跨鏈協議", url: "https://debridge.finance/", note: "安全跨鏈轉移合約保證金" },
-      { type: "好用網站", tag: "DEX聚合", tier: "🌉 第五梯隊：跨鏈、DEX 聚合、解鎖與鏈上安全", title: "1inch Network 最佳匯率聚合器", url: "https://app.1inch.io/", note: "鏈上交易滑價最低工具" },
-      { type: "好用網站", tag: "去中心化交易", tier: "🌉 第五梯隊：跨鏈、DEX 聚合、解鎖與鏈上安全", title: "Uniswap 最大的 DEX 交易平台", url: "https://app.uniswap.org/", note: "鏈上現貨與無常損失管理" },
-      { type: "好用網站", tag: "SOL生態", tier: "🌉 第五梯隊：跨鏈、DEX 聚合、解鎖與鏈上安全", title: "Raydium Solana 鏈上 AMM 與流動性", url: "https://raydium.io/", note: "Solana 生態交易與挖礦" },
-      { type: "好用網站", tag: "Layer2生態", tier: "🌉 第五梯隊：跨鏈、DEX 聚合、解鎖與鏈上安全", title: "L2BEAT 以太坊 Layer2 擴容數據", url: "https://l2beat.com/", note: "Rollup TVL 與鏈上安全性評估" },
-      { type: "好用網站", tag: "安全工具", tier: "🌉 第五梯隊：跨鏈、DEX 聚合、解鎖與鏈上安全", title: "Revoke.cash 授權管理與防盜工具", url: "https://revoke.cash/", note: "檢查錢包授權，防止合約授權被盜" },
-      { type: "好用網站", tag: "地址審計", tier: "🌉 第五梯隊：跨鏈、DEX 聚合、解鎖與鏈上安全", title: "Token Sniffer 智慧合約安全檢測", url: "https://tokensniffer.com/", note: "檢測合約有無老鼠倉或詐騙風險" },
-      { type: "好用網站", tag: "合約安全", tier: "🌉 第五梯隊：跨鏈、DEX 聚合、解鎖與鏈上安全", title: "RugDoc DeFi 專案安全評級", url: "https://rugdoc.io/", note: "項目審計與合約風險評分" },
-      { type: "好用網站", tag: "融資追蹤", tier: "🌉 第五梯隊：跨鏈、DEX 聚合、解鎖與鏈上安全", title: "CryptoRank 融資與解鎖數據", url: "https://cryptorank.io/", note: "機構融資與代幣解鎖追蹤" },
-      { type: "好用網站", tag: "代幣解鎖", tier: "🌉 第五梯隊：跨鏈、DEX 聚合、解鎖與鏈上安全", title: "DropsTab 代幣經濟與解鎖面板", url: "https://dropstab.com/", note: "代幣釋放與流通量分析" },
-      { type: "好用網站", tag: "專業研究", tier: "🌉 第五梯隊：跨鏈、DEX 聚合、解鎖與鏈上安全", title: "Dune Analytics 鏈上指標儀表板", url: "https://dune.com/", note: "深度鏈上合約數據儀表板" },
-      { type: "好用網站", tag: "實體錢包", tier: "🌉 第五梯隊：跨鏈、DEX 聚合、解鎖與鏈上安全", title: "Glassnode Studio 進階鏈上數據", url: "https://studio.glassnode.com/", note: "機構級鏈上存量與籌碼分佈" },
-      { type: "好用網站", tag: "宏觀經濟", tier: "📰 第六梯隊：新聞快訊、安全預警與宏觀社群", title: "Trading Economics 全球經濟指標", url: "https://tradingeconomics.com/", note: "總經利率與國家級經濟指標" },
-      { type: "好用網站", tag: "美股期指", tier: "📰 第六梯隊：新聞快訊、安全預警與宏觀社群", title: "Investing.com 全球金融與加密指數", url: "https://www.investing.com/", note: "傳統金融與幣圈連動監控" },
-      { type: "好用網站", tag: "新聞快訊", tier: "📰 第六梯隊：新聞快訊、安全預警與宏觀社群", title: "CoinDesk 全球加密貨幣權威新聞", url: "https://www.coindesk.com/", note: "即時幣圈頭條與政策消息" },
-      { type: "好用網站", tag: "即時資訊", tier: "📰 第六梯隊：新聞快訊、安全預警與宏觀社群", title: "WuBlockchain (吳說區塊鏈)", url: "https://www.wublock123.com/", note: "中文深度行業內幕與政策監管新聞" },
-      { type: "好用網站", tag: "區塊網媒", tier: "📰 第六梯隊：新聞快訊、安全預警與宏觀社群", title: "BlockBeats (律動 BlockBeats)", url: "https://www.theblockbeats.info/", note: "Web3 前沿研究、熱點與合約風向" },
-      { type: "好用網站", tag: "安全預警", tier: "📰 第六梯隊：新聞快訊、安全預警與宏觀社群", title: "CertiK 區塊鏈安全與黑客事件通報", url: "https://www.certik.com/", note: "監控合約漏洞與黑客攻擊事件" },
-      { type: "好用網站", tag: "幣種研究", tier: "📰 第六梯隊：新聞快訊、安全預警與宏觀社群", title: "Messari PRO 加密資產研究報告", url: "https://messari.io/", note: "機構級深度研報與基本面數據" },
-      { type: "好用網站", tag: "Launchpad", tier: "📰 第六梯隊：新聞快訊、安全預警與宏觀社群", title: "Binance Launchpad 專案發射台", url: "https://launchpad.binance.com/", note: "新幣挖礦與首發造富效應" },
-      { type: "好用網站", tag: "發起眾籌", tier: "📰 第六梯隊：新聞快訊、安全預警與宏觀社群", title: "CoinList 優質項目首發平台", url: "https://coinlist.co/", note: "一級市場公募與抽籤平台" },
-      { type: "好用網站", tag: "稅務工具", tier: "📰 第六梯隊：新聞快訊、安全預警與宏觀社群", title: "Koinly 加密貨幣稅務計算器", url: "https://koinly.io/", note: "結算與損益計算" },
-      { type: "好用網站", tag: "空投獵人", tier: "📰 第六梯隊：新聞快訊、安全預警與宏觀社群", title: "DefiLlama Airdrops 空投項目追蹤", url: "https://defillama.com/airdrops", note: "潛在空投專案導覽" },
-      { type: "好用網站", tag: "NFT數據", tier: "📰 第六梯隊：新聞快訊、安全預警與宏觀社群", title: "Blur 專業 NFT 交易與地板價", url: "https://blur.io/", note: "NFT 市場流動性與借貸監控" },
-      { type: "好用網站", tag: "NFT行情", tier: "📰 第六梯隊：新聞快訊、安全預警與宏觀社群", title: "CryptoSlam NFT 綜合數據統計", url: "https://www.cryptoslam.io/", note: "各鏈 NFT 交易額與熱度" },
-      { type: "好用網站", tag: "社群論壇", tier: "📰 第六梯隊：新聞快訊、安全預警與宏觀社群", title: "Reddit r/CryptoCurrency", url: "https://www.reddit.com/r/CryptoCurrency/", note: "海外散戶與合約多空風向討論" }
-    ];
-
-    let globalResources = [...DEFAULT_51_RESOURCES];
-    let currentUser = null;
-    let currentRole = "student";
-    let studentTrades = [];
-    let allAdminTrades = [];
-    let allAdminVips = [];
-    let currentInputMode = "manual";
-    let globalRankConfig = { maxVol: 150000, maxPnl: 1200 };
-
-    function escHtml(str) {
-      return String(str || "")
-        .replace(/&/g, "&amp;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#39;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;");
-    }
-
-    function applySavedTheme() {
-      const saved = localStorage.getItem("village_ui_theme") || "dark";
-      document.documentElement.classList.toggle("light", saved === "light");
-      document.documentElement.classList.toggle("dark", saved !== "light");
-      document.querySelectorAll(".theme-toggle-btn").forEach(btn => {
-        btn.textContent = saved === "light" ? "🌙 深色" : "☀️ 亮色";
+  /* ---------- 共用工具 ---------- */
+  function esc(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, c =>
+      ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
+  }
+  function safeUrl(u) {
+    const t = String(u || '').trim();
+    return /^https:\/\//i.test(t) ? t : '';
+  }
+  function errText(code) {
+    return ERR_TEXT[code] || '系統發生錯誤';
+  }
+  function codeError(code) {
+    const e = new Error(code);
+    e.code = code;
+    return e;
+  }
+  async function api(action, data) {
+    let json;
+    try {
+      const res = await fetch(API_URL, {
+        method: 'POST',
+        body: JSON.stringify({ action, data: data || {} })
       });
+      json = await res.json();
+    } catch (e) {
+      throw codeError('NETWORK');
     }
-
-    function toggleThemeMode() {
-      const isLight = document.documentElement.classList.contains("light");
-      const next = isLight ? "dark" : "light";
-      localStorage.setItem("village_ui_theme", next);
-      applySavedTheme();
-    }
-
-    function showToast(msg, isWarning = false) {
-      const toast = document.getElementById("toastMsg");
-      toast.textContent = msg;
-      toast.className = "fixed top-5 z-50 font-bold px-6 py-3 rounded-full shadow-2xl text-sm transition-all " +
-        (isWarning ? "bg-amber-400 text-slate-950" : "bg-emerald-500 text-slate-950");
-      toast.classList.remove("hidden");
-      setTimeout(() => toast.classList.add("hidden"), 3000);
-    }
-
-    function showLoginStatus(msg, isError) {
-      const box = document.getElementById("loginStatusBox");
-      if (!box) return;
-      box.textContent = msg;
-      box.className = "text-xs font-bold p-3 rounded-xl " +
-        (isError ? "bg-rose-500/15 text-rose-500 border border-rose-500/30" : "bg-cyan-500/15 text-cyan-500 border border-cyan-500/30");
-      box.classList.remove("hidden");
-    }
-
-    // 自動計算單筆手續費磨耗（不論盈利或虧損皆自動算出）
-    function computeAutoFee(side, avgEntry, avgExit, totalQty, netPnl) {
-      const ep = parseFloat(avgEntry) || 0;
-      const xp = parseFloat(avgExit) || 0;
-      const qty = parseFloat(totalQty) || 0;
-      const net = parseFloat(netPnl) || 0;
-      if (ep <= 0 || xp <= 0 || qty <= 0) return 0;
-
-      const gross = (side === "SHORT") ? (ep - xp) * qty : (xp - ep) * qty;
-      const diff = Math.abs(gross - net);
-      if (diff >= 0.01) {
-        return Number(diff.toFixed(2));
+    if (!json || !json.ok) throw codeError((json && json.code) || 'INTERNAL_ERROR');
+    return json.data;
+  }
+  async function copyText(text) {
+    try {
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(text);
+        return true;
       }
-      const turnover = (ep * qty) + (xp * qty);
-      return Number((turnover * 0.0005).toFixed(2));
+    } catch (e) {}
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.setAttribute('readonly', '');
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    let ok = false;
+    try { ok = document.execCommand('copy'); } catch (e) {}
+    document.body.removeChild(ta);
+    return ok;
+  }
+  function flash(btn, text) {
+    const orig = btn.dataset.orig || btn.textContent;
+    btn.dataset.orig = orig;
+    btn.textContent = text;
+    clearTimeout(btn._t);
+    btn._t = setTimeout(() => { btn.textContent = orig; }, 1500);
+  }
+
+  /* ---------- 社群連結與交易所 ---------- */
+  function setLink(id, url) {
+    const a = document.getElementById(id);
+    const u = safeUrl(url);
+    if (a && u) a.href = u;
+  }
+
+  function exCardHtml(e) {
+    const base = esc(String(e.code || '').replace(/^link-/, ''));
+    const link = safeUrl(e.inviteLink);
+    const invite = e.inviteCode
+      ? '<div class="invite"><span>邀請碼</span><code>' + esc(e.inviteCode) + '</code>' +
+        '<button class="btn-mini" type="button" data-copy="' + esc(e.inviteCode) + '">複製</button></div>'
+      : '';
+    const btn = link
+      ? '<a class="btn btn-block" href="' + esc(link) + '" target="_blank" rel="noopener noreferrer">' +
+        (e.applyable ? '立即註冊' : '前往官網') + '</a>'
+      : '';
+    return '<div class="ex-card">' +
+      '<div class="ex-head">' +
+        '<img class="ex-icon" src="' + base + '_icon.png" data-alt="' + base + '.png" alt="" onerror="iconFallback(this)">' +
+        '<div class="ex-name">' + esc(e.name) + '</div>' +
+      '</div>' + invite + btn +
+    '</div>';
+  }
+
+  function renderExchanges(list) {
+    const box = document.getElementById('exchangeList');
+    if (!list.length) {
+      box.innerHTML = '<p class="muted">目前沒有推薦項目</p>';
+      return;
     }
+    const groups = {};
+    const order = [];
+    list.forEach(e => {
+      const cat = e.category || '其他推薦';
+      if (!groups[cat]) { groups[cat] = []; order.push(cat); }
+      groups[cat].push(e);
+    });
+    box.innerHTML = order.map(cat =>
+      '<h3>' + esc(cat) + '</h3><div class="ex-grid">' + groups[cat].map(exCardHtml).join('') + '</div>'
+    ).join('');
+  }
 
-    // 匿名遮罩函式
-    function maskUidAnonymous(raw) {
-      const s = String(raw || "").trim();
-      if (!s) return "VIP*****";
-      if (s.indexOf("*") !== -1) return s;
-      if (s.toUpperCase().indexOf("VIP") === 0) return "VIP****" + s.slice(-2);
-      if (s.length <= 4) return s.charAt(0) + "****" + s.slice(-1);
-      return s.slice(0, 2) + "*****" + s.slice(-2);
+  /* ---------- 教學 ---------- */
+  function stepHtml(s, n) {
+    const img = s.img
+      ? '<div class="step-img"><img src="' + esc(s.img) + '" alt="第 ' + n + ' 步截圖" loading="lazy" onerror="this.parentElement.remove()"></div>'
+      : '';
+    return '<div class="step' + (s.warn ? ' warn' : '') + '">' +
+      '<div class="step-no">' + n + '</div>' +
+      '<div class="step-body"><p>' + esc(s.t) + '</p>' + img + '</div>' +
+    '</div>';
+  }
+
+  function renderTutorial() {
+    document.getElementById('tutTabs').innerHTML = TUTORIALS.map((t, i) =>
+      '<button class="tab" role="tab" type="button" data-tut="' + i + '" aria-selected="' + (i === 0) + '">' + esc(t.title) + '</button>'
+    ).join('');
+    document.getElementById('tutPanels').innerHTML = TUTORIALS.map((t, i) =>
+      '<div class="steps" role="tabpanel" data-panel="' + i + '"' + (i === 0 ? '' : ' hidden') + '>' +
+        t.steps.map((s, j) => stepHtml(s, j + 1)).join('') +
+      '</div>'
+    ).join('');
+  }
+
+  /* ---------- VIP 申請 ---------- */
+  function fillContactSelects() {
+    const opts = CONTACT_TYPES.map(c => '<option value="' + c + '">' + c + '</option>').join('');
+    document.getElementById('uidContactType').innerHTML = opts;
+    document.getElementById('subContactType').innerHTML = opts;
+  }
+
+  function fillUidForm(list) {
+    document.getElementById('uidExchange').innerHTML =
+      '<option value="">請選擇交易所</option>' +
+      list.map(e => '<option value="' + esc(e.code) + '">' + esc(e.name) + '</option>').join('');
+  }
+
+  function fillSubForm(plans, payments) {
+    PAYMENTS = payments;
+    document.getElementById('subPlan').innerHTML =
+      '<option value="">請選擇方案</option>' +
+      plans.map(p => '<option value="' + p.days + '">' + esc(p.label) + '</option>').join('');
+
+    const currencies = [...new Set(payments.map(p => p.currency))];
+    const cur = document.getElementById('subCurrency');
+    if (!currencies.length) {
+      cur.innerHTML = '<option value="">目前尚未開放付款</option>';
+      cur.disabled = true;
+    } else {
+      cur.disabled = false;
+      cur.innerHTML = '<option value="">請選擇幣種</option>' +
+        currencies.map(c => '<option value="' + esc(c) + '">' + esc(c) + '</option>').join('');
     }
+    document.getElementById('subSubmit').disabled = !currencies.length;
+    refreshChains();
+  }
 
-    async function handleLogin() {
-      const user = document.getElementById("loginUser").value.trim();
-      const pass = document.getElementById("loginPass").value.trim();
-      const btn = document.getElementById("loginBtn");
+  function refreshChains() {
+    const cur = document.getElementById('subCurrency').value;
+    const chains = PAYMENTS.filter(p => p.currency === cur);
+    document.getElementById('subChain').innerHTML =
+      '<option value="">請選擇主鏈</option>' +
+      chains.map(p => '<option value="' + esc(p.chain) + '">' + esc(p.chain) + '</option>').join('');
+    showAddress();
+  }
 
-      if (!user || !pass) {
-        showLoginStatus("⚠️ 請輸入您的專屬帳號與密碼！", true);
-        return;
-      }
-
-      // 村長預設帳密 0 秒極速直通保障
-      if (user.toLowerCase() === "henry" && pass === "henry29004") {
-        currentUser = user;
-        currentRole = "admin";
-        localStorage.setItem("village_saved_auth", JSON.stringify({ user: user, pass: pass, role: "admin" }));
-        const cached = localStorage.getItem("village_trades_" + currentUser);
-        if (cached) { try { studentTrades = JSON.parse(cached); } catch (e) {} }
-        enterMainSystem("👑 村長管理員", true, null);
-        loadAdminDashboard(false);
-        return;
-      }
-
-      btn.disabled = true;
-      btn.textContent = "⏳ 正在驗證登入...";
-      showLoginStatus("⏳ 正在連線驗證帳號密碼...", false);
-
-      try {
-        const res = await fetch(SCRIPT_API_URL + "?action=verifyLogin&user=" + encodeURIComponent(user) + "&pass=" + encodeURIComponent(pass));
-        const json = await res.json();
-
-        if (json && json.success) {
-          currentUser = json.user || user;
-          currentRole = json.role || "student";
-          if (json.rankConfig) globalRankConfig = json.rankConfig;
-          studentTrades = Array.isArray(json.trades) ? json.trades : [];
-
-          localStorage.setItem("village_saved_auth", JSON.stringify({ user: user, pass: pass, role: currentRole }));
-          localStorage.setItem("village_trades_" + currentUser, JSON.stringify(studentTrades));
-
-          const isUid = json.isUidUser !== undefined ? json.isUidUser : (!json.planTag || String(json.planTag).indexOf("訂閱") === -1);
-          enterMainSystem(json.planTag || (currentRole === "admin" ? "👑 村長管理員" : "💎 VIP 專屬通行證"), isUid, json.daysLeft);
-
-          if (currentRole === "admin") {
-            if (Array.isArray(json.allTrades)) allAdminTrades = json.allTrades;
-            if (Array.isArray(json.vips)) allAdminVips = json.vips;
-            loadAdminDashboard(false);
-          }
-          showToast("✅ 登入成功！");
-        } else {
-          showLoginStatus((json && json.message) || "❌ 帳號或密碼錯誤，或尚未開通！", true);
-        }
-      } catch (e) {
-        showLoginStatus("⚠️ 網路連線異常，請重試：" + e.message, true);
-      } finally {
-        btn.disabled = false;
-        btn.textContent = "🔓 驗證並登入系統";
-      }
+  function showAddress() {
+    const cur = document.getElementById('subCurrency').value;
+    const chain = document.getElementById('subChain').value;
+    const pay = PAYMENTS.find(p => p.currency === cur && p.chain === chain);
+    const wrap = document.getElementById('addrWrap');
+    const qrBox = document.getElementById('qrBox');
+    qrBox.innerHTML = '';
+    if (!pay) {
+      wrap.hidden = true;
+      return;
     }
-
-    function enterMainSystem(planTag, isUidUser, daysLeft) {
-      document.getElementById("loginSection").classList.add("hidden");
-      document.getElementById("studentSection").classList.remove("hidden");
-      document.getElementById("userUidDisplay").textContent = currentUser;
-
-      const pBadge = document.getElementById("studentPlanBadge");
-      const eBadge = document.getElementById("studentExpiryBadge");
-      pBadge.textContent = planTag || "💎 VIP 專屬通行證";
-
-      // UID 註冊用戶不顯示效期；僅訂閱制顯示剩餘天數
-      if (!isUidUser && daysLeft !== null && daysLeft !== undefined && daysLeft !== "") {
-        eBadge.textContent = "⏳ 剩餘 " + daysLeft + " 天";
-        eBadge.classList.remove("hidden");
-      } else {
-        eBadge.classList.add("hidden");
-      }
-
-      // 嚴格權限控制：只有村長才看得到「批改學員倉位」與「村長管理後台」
-      const tabReview = document.getElementById("stuTab-review");
-      const tabAdmin = document.getElementById("stuTab-admin");
-      if (currentRole === "admin") {
-        tabReview.classList.remove("hidden");
-        tabAdmin.classList.remove("hidden");
-      } else {
-        tabReview.classList.add("hidden");
-        tabAdmin.classList.add("hidden");
-        document.getElementById("stuPane-review").classList.add("hidden");
-        document.getElementById("stuPane-admin").classList.add("hidden");
-      }
-
-      setDefaultFormDates();
-      initBatchRows();
-      switchStudentTab("journal");
-      renderStudentTrades();
-      renderStudentResources();
-      loadStudentResources();
+    wrap.hidden = false;
+    document.getElementById('addrText').textContent = pay.address;
+    if (window.QRCode) {
+      new QRCode(qrBox, { text: pay.address, width: 160, height: 160 });
     }
+  }
 
-    function handleLogout() {
-      localStorage.removeItem("village_saved_auth");
-      currentUser = null;
-      currentRole = "student";
-      document.getElementById("stuTab-review").classList.add("hidden");
-      document.getElementById("stuTab-admin").classList.add("hidden");
-      document.getElementById("studentSection").classList.add("hidden");
-      document.getElementById("loginSection").classList.remove("hidden");
-      document.getElementById("loginStatusBox").classList.add("hidden");
-      showToast("🔒 已安全登出");
+  async function submitForm(form, msgEl, payload, okText) {
+    const btn = form.querySelector('button[type="submit"]');
+    const wasDisabled = btn ? btn.disabled : false;
+    msgEl.className = 'msg';
+    msgEl.textContent = '';
+    if (btn) btn.disabled = true;
+    try {
+      await api('applyVip', payload);
+      msgEl.className = 'msg ok';
+      msgEl.textContent = okText;
+      form.reset();
+      return true;
+    } catch (err) {
+      msgEl.className = 'msg err';
+      msgEl.textContent = errText(err.code);
+      return false;
+    } finally {
+      if (btn) btn.disabled = wasDisabled;
     }
+  }
 
-    function switchStudentTab(tab) {
-      if ((tab === "admin" || tab === "review") && currentRole !== "admin") return;
-      ["journal", "rank", "calc", "lectures", "websites", "review", "admin"].forEach(t => {
-        const pane = document.getElementById("stuPane-" + t);
-        if (pane) pane.classList.toggle("hidden", t !== tab);
-        const btn = document.getElementById("stuTab-" + t);
-        if (btn && !btn.classList.contains("hidden")) {
-          btn.className = (t === tab)
-            ? "flex-1 min-w-[110px] tab-nav-btn active py-2.5 px-3 rounded-xl text-xs sm:text-sm"
-            : "flex-1 min-w-[110px] tab-nav-btn inactive py-2.5 px-3 rounded-xl text-xs sm:text-sm";
-        }
-      });
-      if (tab === "rank") renderLeaderboards();
-      if (tab === "review" || tab === "admin") loadAdminDashboard(false);
+  /* ---------- 載入設定 ---------- */
+  async function loadConfig() {
+    try {
+      const cfg = await api('getPublicConfig');
+      const s = cfg.socials || {};
+      setLink('sIg', s.ig);
+      setLink('sThreads', s.threads);
+      setLink('sTgP', s.tgPersonal);
+      setLink('sTgG', s.tgGroup);
+      renderExchanges(cfg.exchanges || []);
+      fillUidForm(cfg.applyExchanges || []);
+      fillSubForm(cfg.plans || [], cfg.payments || []);
+    } catch (err) {
+      document.getElementById('exchangeList').innerHTML =
+        '<p class="msg err">' + esc(errText(err.code)) + '</p>';
+      document.getElementById('subSubmit').disabled = true;
     }
+  }
 
-    function setDefaultFormDates() {
-      const today = new Date().toISOString().split("T")[0];
-      if (!document.getElementById("tradeOpenTime").value) document.getElementById("tradeOpenTime").value = today;
-      if (!document.getElementById("tradeCloseTime").value) document.getElementById("tradeCloseTime").value = today;
-    }
+  /* ---------- 事件 ---------- */
+  // 主題切換
+  document.getElementById('themeBtn').addEventListener('click', () => {
+    const current = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
+    const next = current === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', next);
+    try { localStorage.setItem('theme', next); } catch (e) {}
+  });
 
-    function switchInputMode(mode) {
-      currentInputMode = mode;
-      const btnManual = document.getElementById("btnModeManual");
-      const btnBatch = document.getElementById("btnModeBatch");
-      document.getElementById("manualModeBox").classList.toggle("hidden", mode !== "manual");
-      document.getElementById("batchModeBox").classList.toggle("hidden", mode === "manual");
-      btnManual.className = mode === "manual" ? "px-4 py-2 rounded-xl text-xs font-bold mode-btn-active" : "px-4 py-2 rounded-xl text-xs font-bold form-input text-muted";
-      btnBatch.className = mode !== "manual" ? "px-4 py-2 rounded-xl text-xs font-bold mode-btn-active" : "px-4 py-2 rounded-xl text-xs font-bold form-input text-muted";
-    }
+  // 一鍵複製（交易所邀請碼）
+  document.addEventListener('click', async ev => {
+    const btn = ev.target.closest('[data-copy]');
+    if (!btn) return;
+    const ok = await copyText(btn.dataset.copy);
+    flash(btn, ok ? '已複製' : '複製失敗');
+  });
 
-    function initBatchRows() {
-      document.getElementById("entryBatchesContainer").innerHTML = "";
-      document.getElementById("exitBatchesContainer").innerHTML = "";
-      addBatchRow("entry");
-      addBatchRow("exit");
-    }
+  // 教學分頁切換
+  document.getElementById('tutTabs').addEventListener('click', ev => {
+    const b = ev.target.closest('[data-tut]');
+    if (!b) return;
+    const idx = b.dataset.tut;
+    document.querySelectorAll('#tutTabs [data-tut]').forEach(x => x.setAttribute('aria-selected', String(x === b)));
+    document.querySelectorAll('#tutPanels [data-panel]').forEach(p => { p.hidden = p.dataset.panel !== idx; });
+  });
 
-    function addBatchRow(type, price = "", qty = "") {
-      const container = document.getElementById(type === "entry" ? "entryBatchesContainer" : "exitBatchesContainer");
-      const div = document.createElement("div");
-      div.className = "flex items-center gap-2";
-      div.innerHTML =
-        '<input type="number" step="any" placeholder="價格" value="' + price + '" oninput="calcBatchSummary()" class="' + type + '-price flex-1 min-w-0 form-input rounded-lg p-2 text-xs font-mono" />' +
-        '<input type="number" step="any" placeholder="持倉量" value="' + qty + '" oninput="calcBatchSummary()" class="' + type + '-qty flex-1 min-w-0 form-input rounded-lg p-2 text-xs font-mono" />' +
-        '<button type="button" onclick="this.parentElement.remove(); calcBatchSummary();" class="px-2 py-1.5 text-rose-500 font-bold text-xs shrink-0">✕</button>';
-      container.appendChild(div);
-    }
+  // VIP 通道切換
+  document.querySelectorAll('[data-ch]').forEach(b => {
+    b.addEventListener('click', () => {
+      document.querySelectorAll('[data-ch]').forEach(x => x.setAttribute('aria-selected', String(x === b)));
+      document.getElementById('formUid').hidden = b.dataset.ch !== 'uid';
+      document.getElementById('formSub').hidden = b.dataset.ch !== 'sub';
+    });
+  });
 
-    function calcBatchSummary() {
-      let entryCost = 0, entryQty = 0;
-      document.querySelectorAll("#entryBatchesContainer > div").forEach(row => {
-        const p = parseFloat(row.querySelector(".entry-price").value) || 0;
-        const q = parseFloat(row.querySelector(".entry-qty").value) || 0;
-        if (p > 0 && q > 0) { entryCost += p * q; entryQty += q; }
-      });
-      let exitValue = 0, exitQty = 0;
-      document.querySelectorAll("#exitBatchesContainer > div").forEach(row => {
-        const p = parseFloat(row.querySelector(".exit-price").value) || 0;
-        const q = parseFloat(row.querySelector(".exit-qty").value) || 0;
-        if (p > 0 && q > 0) { exitValue += p * q; exitQty += q; }
-      });
-      const avgEntry = entryQty > 0 ? (entryCost / entryQty) : 0;
-      const avgExit = exitQty > 0 ? (exitValue / exitQty) :
+  // 訂閱：幣種與主鏈連動
+  document.getElementById('subCurrency').addEventListener('change', refreshChains);
+  document.getElementById('subChain').addEventListener('change', showAddress);
+  document.getElementById('copyAddr').addEventListener('click', async function () {
+    const ok = await copyText(document.getElementById('addrText').textContent);
+    flash(this, ok ? '已複製' : '複製失敗');
+  });
+
+  // 送出 UID 申請
+  document.getElementById('formUid').addEventListener('submit', async ev => {
+    ev.preventDefault();
+    await submitForm(ev.target, document.getElementById('msgUid'), {
+      type: 'uid',
+      exchange: document.getElementById('uidExchange').value,
+      uid: document.getElementById('uidValue').value.trim(),
+      contactType: document.getElementById('uidContactType').value,
+      contactId: document.getElementById('uidContactId').value.trim()
+    }, '已收到 UID 申請，村長審核通過後會私訊您登入資料。');
+  });
+
+  // 送出訂閱申請
+  document.getElementById('formSub').addEventListener('submit', async ev => {
+    ev.preventDefault();
+    const ok = await submitForm(ev.target, document.getElementById('msgSub'), {
+      type: 'sub',
+      plan: document.getElementById('subPlan').value,
+      currency: document.getElementById('subCurrency').value,
+      chain: document.getElementById('subChain').value,
+      txid: document.getElementById('subTxid').value.trim(),
+      contactType: document.getElementById('subContactType').value,
+      contactId: document.getElementById('subContactId').value.trim()
+    }, '已收到訂閱申請，村長確認款項後會私訊您登入資料。');
+    if (ok) refreshChains();
+  });
+
+  /* ---------- 初始化 ---------- */
+  renderTutorial();
+  fillContactSelects();
+  loadConfig();
+</script>
+</body>
+</html>
