@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="zh-TW" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>幣圈新手村 PRO｜全交易所傳送門・出入金教學・VIP通行證</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-main: #070b14;
+      --bg-card: rgba(15, 23, 42, 0.88);
+      --bg-sub: #0f172a;
+      --bg-input: #090d16;
+      --border-color: rgba(51, 65, 85, 0.75);
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+    }
+    html.light {
+      --bg-main: #f1f5f9;
+      --bg-card: #ffffff;
+      --bg-sub: #f8fafc;
+      --bg-input: #ffffff;
+      --border-color: #cbd5e1;
+      --text-main: #0f172a;
+      --text-muted: #475569;
+    }
+    body {
+      font-family: 'Inter', 'Noto Sans TC', sans-serif;
+      background-color: var(--bg-main);
+      color: var(--text-main);
+      scroll-behavior: smooth;
+      transition: background-color 0.2s, color 0.2s;
+    }
+    .theme-card {
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-color);
+      backdrop-filter: blur(12px);
+    }
+    .theme-sub {
+      background-color: var(--bg-sub);
+      border: 1px solid var(--border-color);
+    }
+    .theme-input {
+      background-color: var(--bg-input);
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+    }
+    .theme-text-main { color: var(--text-main); }
+    .theme-text-muted { color: var(--text-muted); }
+    html.light header, html.light footer {
+      background-color: rgba(255, 255, 255, 0.95) !important;
+      border-color: #cbd5e1 !important;
+    }
+    html.light .amber-badge-text { color: #b45309 !important; }
+    html.light .cyan-badge-text { color: #0e7490 !important; }
+  </style>
+</head>
+<body class="min-h-screen selection:bg-amber-500 selection:text-slate-950">
+
+  <header class="sticky top-0 z-50 bg-slate-950/90 backdrop-blur-md border-b border-slate-800">
+    <div class="max-w-7xl mx-auto px-3 sm:px-6 h-16 flex items-center justify-between gap-2">
+      <a href="index.html" class="flex items-center gap-2.5 min-w-0 shrink">
+        <img src="avatar.png" alt="村長"
+             onerror="if(!this.dataset.t){this.dataset.t='1';this.src='avatar.jpg';}else{this.src='logo.png';}"
+             class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl object-cover border border-amber-400/60 shrink-0 bg-slate-800" />
+        <div class="min-w-0">
+          <div class="flex items-center gap-1.5 whitespace-nowrap">
+            <span class="font-black text-sm sm:text-lg theme-text-main tracking-tight">幣圈新手村</span>
+            <span class="text-amber-500 text-[10px] sm:text-xs font-extrabold px-1.5 py-0.5 rounded bg-amber-500/15 border border-amber-500/30">PRO</span>
+          </div>
+          <span class="hidden sm:block text-[11px] theme-text-muted truncate">全交易所傳送門・出入金教學・VIP復盤通行證</span>
+        </div>
+      </a>
+
+      <nav class="hidden lg:flex items-center gap-6 text-sm font-bold theme-text-muted">
+        <a href="#exchangesSection" class="hover:text-amber-500 transition-colors">交易所傳送門</a>
+        <a href="#tutorialSection" class="hover:text-amber-500 transition-colors">註冊與出入金教學</a>
+        <a href="#applySection" class="hover:text-amber-500 transition-colors">申請 VIP 通行證</a>
+      </nav>
+
+      <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
+        <button type="button" onclick="toggleTheme()" class="px-2.5 py-2 rounded-xl text-xs font-bold theme-sub theme-text-main hover:opacity-80 whitespace-nowrap">
+          ☀️/🌙
+        </button>
+        <a href="journal.html" class="inline-flex items-center px-3 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-extrabold bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-slate-950 shadow-md whitespace-nowrap">
+          📊 進入復盤系統 ↗
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <section class="relative pt-8 pb-10 sm:pt-14 sm:pb-16 border-b border-slate-800/40 text-center px-4">
+    <div class="max-w-5xl mx-auto">
+      <div class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-500 amber-badge-text text-xs font-bold mb-4">
+        🛡️ 村長帶路・新手安全避坑指南
+      </div>
+      <h1 class="text-2xl sm:text-5xl font-black theme-text-main tracking-tight leading-tight mb-4">
+        幣圈新手村實戰生態系<br />
+        <span class="bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 bg-clip-text text-transparent">安全出入金・實戰教學・PRO 交易復盤系統</span>
+      </h1>
+      <p class="max-w-2xl mx-auto theme-text-muted text-xs sm:text-base leading-relaxed mb-6">
+        使用村長專屬連結註冊交易所，即可免費申請開通「PRO 交易復盤系統」（內含近 50 個虛擬貨幣必備數據網站、核心講義以及眾多功能）。
+      </p>
+
+      <div class="flex flex-wrap items-center justify-center gap-2.5 sm:gap-3 mb-6">
+        <a href="#exchangesSection" class="px-4 sm:px-5 py-2.5 sm:py-3 rounded-2xl font-extrabold text-xs sm:text-sm bg-amber-500 hover:bg-amber-400 text-slate-950 shadow">🏦 查看 18 大交易所連結</a>
+        <a href="#tutorialSection" class="px-4 sm:px-5 py-2.5 sm:py-3 rounded-2xl font-extrabold text-xs sm:text-sm theme-sub theme-text-main hover:opacity-90">📸 圖文教學（註冊/出入金）</a>
+        <a href="#applySection" class="px-4 sm:px-5 py-2.5 sm:py-3 rounded-2xl font-extrabold text-xs sm:text-sm bg-cyan-500/15 text-cyan-500 cyan-badge-text border border-cyan-500/30">🔑 申請 VIP 通行證</a>
+      </div>
+
+      <div class="flex flex-wrap items-center justify-center gap-2 text-xs">
+        <span class="theme-text-muted font-bold">村長聯絡方式：</span>
+        <a id="heroIgLink" href="https://www.instagram.com/help_crypto666?srtk=MTZlbGxsc3VzZTYyaw==" target="_blank" rel="noopener noreferrer" class="px-3 py-1.5 rounded-xl bg-pink-500/15 text-pink-500 border border-pink-500/30 font-bold">📸 Instagram</a>
+        <a id="heroThreadsLink" href="https://www.threads.com/@help_crypto666" target="_blank" rel="noopener noreferrer" class="px-3 py-1.5 rounded-xl bg-purple-500/15 text-purple-500 border border-purple-500/30 font-bold">🧵 Threads</a>
+        <a id="heroTgPersonalLink" href="https://t.me/hijfknbv" target="_blank" rel="noopener noreferrer" class="px-3 py-1.5 rounded-xl bg-sky-500/15 text-sky-500 border border-sky-500/30 font-bold">✈️ 個人 TG (@hijfknbv)</a>
+        <a id="heroTgGroupLink" href="https://t.me/+xyRLxOqigKI5ZWE1" target="_blank" rel="noopener noreferrer" class="px-3 py-1.5 rounded-xl bg-emerald-500/15 text-emerald-500 border border-emerald-500/30 font-bold">👥 TG 群組</a>
+      </div>
+    </div>
+  </section>
+
+  <section id="exchangesSection" class="max-w-7xl mx-auto px-4 sm:px-6 py-10">
+    <div class="mb-6">
+      <h2 class="text-xl sm:text-2xl font-black theme-text-main">🏦 新手村合作交易所與看盤工具傳送門</h2>
+      <p class="theme-text-muted text-xs sm:text-sm mt-1">點擊邀請碼即可一鍵複製，註冊完成後可至下方申請免費開通 VIP 復盤系統。</p>
+    </div>
+    <div id="exchangesGridContainer" class="space-y-8"></div>
+  </section>
+
+  <section id="tutorialSection" class="max-w-6xl mx-auto my-6 px-4 sm:px-6">
+    <div class="theme-card rounded-3xl p-5 sm:p-7 shadow-xl">
+      <div class="text-center mb-5">
+        <h2 class="text-xl sm:text-2xl font-extrabold theme-text-main">📸 註冊與出入金全流程圖文教學</h2>
+        <p class="theme-text-muted text-xs sm:text-sm mt-1">照著村長整理的步驟操作，確認鏈種 (BEP 20) 與地址無誤！</p>
+      </div>
+
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-6">
+        <button type="button" id="tutBtn-bitopro" onclick="switchTutorialTab('bitopro')" class="py-2.5 px-3 rounded-xl font-bold text-xs sm:text-sm border bg-amber-500 text-slate-950 border-amber-400">🟢 1. 註冊幣託 BitoPro</button>
+        <button type="button" id="tutBtn-exchange" onclick="switchTutorialTab('exchange')" class="py-2.5 px-3 rounded-xl font-bold text-xs sm:text-sm theme-sub theme-text-main">🔵 2. 註冊國際交易所</button>
+        <button type="button" id="tutBtn-deposit" onclick="switchTutorialTab('deposit')" class="py-2.5 px-3 rounded-xl font-bold text-xs sm:text-sm theme-sub theme-text-main">📥 3. 台幣入金與轉帳</button>
+        <button type="button" id="tutBtn-withdraw" onclick="switchTutorialTab('withdraw')" class="py-2.5 px-3 rounded-xl font-bold text-xs sm:text-sm theme-sub theme-text-main">📤 4. 國際交易所出金</button>
+      </div>
+
+      <div id="tutPane-bitopro" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+      <div id="tutPane-exchange" class="grid grid-cols-1 md:grid-cols-2 gap-4 hidden"></div>
+      <div id="tutPane-deposit" class="grid grid-cols-1 md:grid-cols-2 gap-4 hidden"></div>
+      <div id="tutPane-withdraw" class="grid grid-cols-1 md:grid-cols-2 gap-4 hidden"></div>
+    </div>
+  </section>
+
+  <section id="applySection" class="max-w-3xl mx-auto px-4 sm:px-6 py-10">
+    <div class="theme-card rounded-3xl p-6 sm:p-8 shadow-xl">
+      <div class="text-center mb-6">
+        <h2 class="text-xl sm:text-2xl font-black theme-text-main">🔑 申請「PRO 復盤系統」VIP 通行證</h2>
+        <p class="theme-text-muted text-xs sm:text-sm mt-1">審核通過後，村長將透過您填寫的 IG / TG / Threads 發送專屬登入帳號與密碼</p>
+      </div>
+
+      <div class="grid grid-cols-2 gap-3 mb-6">
+        <button type="button" id="tabBtnUid" onclick="switchApplyMode('uid')" class="py-3 px-3 rounded-xl font-extrabold text-xs sm:text-sm border bg-amber-500 text-slate-950 border-amber-400">🎁 通道一：交易所 UID 審核</button>
+        <button type="button" id="tabBtnSub" onclick="switchApplyMode('sub')" class="py-3 px-3 rounded-xl font-extrabold text-xs sm:text-sm theme-sub theme-text-main">💎 通道二：訂閱制開通</button>
+      </div>
+
+      <form id="uidForm" onsubmit="submitUid(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-bold theme-text-main mb-1.5">1. 選擇您註冊的交易所 *</label>
+          <select id="uidExchange" required class="w-full px-4 py-3 rounded-xl theme-input text-sm font-semibold">
+            <option value="Binance 幣安">Binance 幣安</option>
+            <option value="Bybit">Bybit</option>
+            <option value="OKX 歐易">OKX 歐易</option>
+            <option value="Bitget">Bitget</option>
+            <option value="BitoPro 幣託">BitoPro 幣託</option>
+            <option value="Pionex 派網">Pionex 派網</option>
+            <option value="TradingView">TradingView</option>
+            <option value="Bitunix">Bitunix</option>
+            <option value="BingX">BingX</option>
+            <option value="Gate.io 芝麻開門">Gate.io 芝麻開門</option>
+            <option value="MEXC 抹茶">MEXC 抹茶</option>
+            <option value="WEEX 唯客">WEEX 唯客</option>
+            <option value="BTCC">BTCC</option>
+            <option value="Bitfinex 綠葉">Bitfinex 綠葉</option>
+            <option value="BitMart">BitMart</option>
+            <option value="LBank">LBank</option>
+            <option value="XT.COM">XT.COM</option>
+            <option value="Nodexx">Nodexx</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold theme-text-main mb-1.5">2. 填寫您的交易所 UID *</label>
+          <input type="text" id="uidNumber" required placeholder="請輸入您的交易所 UID 編號" class="w-full px-4 py-3 rounded-xl theme-input text-sm" />
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold theme-text-main mb-1.5">3. 您的聯絡方式 (IG / TG / Threads) *</label>
+          <div class="grid grid-cols-3 gap-2">
+            <select id="uidContactType" class="col-span-1 px-3 py-3 rounded-xl theme-input text-sm font-bold">
+              <option value="IG">IG</option>
+              <option value="TG">TG</option>
+              <option value="Threads">Threads</option>
+            </select>
+            <input type="text" id="uidContactValue" required placeholder="請輸入您的帳號（例如 @xxx）" class="col-span-2 px-4 py-3 rounded-xl theme-input text-sm" />
+          </div>
+        </div>
+
+        <button type="submit" id="uidSubmitBtn" class="w-full py-3.5 rounded-xl font-extrabold text-sm bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-slate-950 shadow-lg">
+          🚀 送出 UID 審核申請
+        </button>
+      </form>
+
+      <form id="subForm" onsubmit="submitSubscription(event)" class="space-y-4 hidden">
+        <div>
+          <label class="block text-xs font-bold theme-text-main mb-1.5">1. 選擇訂閱方案 *</label>
+          <select id="subPlanSelect" required class="w-full px-4 py-3 rounded-xl theme-input text-sm font-bold">
+            <option value="週費(7天)">週費方案 (7天)</option>
+            <option value="月費(30天)" selected>月費方案 (30天)</option>
+            <option value="季費(90天)">季費方案 (90天)</option>
+            <option value="年費(365天)">年費方案 (365天)</option>
+          </select>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-bold theme-text-main mb-1.5">2. 選擇支付幣種 *</label>
+            <select id="subCoinSelect" onchange="onSubCoinChange()" class="w-full px-4 py-3 rounded-xl theme-input text-sm font-bold"></select>
+          </div>
+          <div>
+            <label class="block text-xs font-bold theme-text-main mb-1.5">3. 選擇轉帳主鏈 *</label>
+            <select id="subChainSelect" onchange="onSubChainChange()" class="w-full px-4 py-3 rounded-xl theme-input text-sm font-bold"></select>
+          </div>
+        </div>
+
+        <div class="p-4 rounded-2xl theme-sub flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div class="flex-1 min-w-0 w-full">
+            <div class="text-[11px] theme-text-muted mb-1">對應收款錢包地址（點擊右側複製）：</div>
+            <div class="flex items-center justify-between gap-2 theme-input p-2.5 rounded-xl">
+              <code id="subWalletAddressText" class="text-xs text-amber-500 amber-badge-text break-all font-mono font-bold">載入中...</code>
+              <button type="button" onclick="copyWalletAddress()" class="shrink-0 px-3 py-1.5 rounded-lg bg-amber-500 text-slate-950 text-xs font-extrabold">複製</button>
+            </div>
+          </div>
+          <div class="shrink-0 flex flex-col items-center">
+            <img id="subWalletQrImg" src="" alt="QR" class="w-28 h-28 rounded-xl bg-white p-1.5 object-contain border border-slate-300" />
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold theme-text-main mb-1.5">4. 填寫轉帳哈希值 (TxID) *</label>
+          <input type="text" id="subTxid" required placeholder="請貼上轉帳後的交易哈希值 (TxID / Hash)" class="w-full px-4 py-3 rounded-xl theme-input text-sm" />
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold theme-text-main mb-1.5">5. 您的聯絡方式 (IG / TG / Threads) *</label>
+          <div class="grid grid-cols-3 gap-2">
+            <select id="subContactType" class="col-span-1 px-3 py-3 rounded-xl theme-input text-sm font-bold">
+              <option value="IG">IG</option>
+              <option value="TG">TG</option>
+              <option value="Threads">Threads</option>
+            </select>
+            <input type="text" id="subContactValue" required placeholder="請輸入您的帳號（例如 @xxx）" class="col-span-2 px-4 py-3 rounded-xl theme-input text-sm" />
+          </div>
+        </div>
+
+        <button type="submit" id="subSubmitBtn" class="w-full py-3.5 rounded-xl font-extrabold text-sm bg-gradient-to-r from-cyan-400 to-blue-500 hover:from-cyan-300 hover:to-blue-400 text-slate-950 shadow-lg">
+          💎 送出訂閱審核申請
+        </button>
+      </form>
+
+      <div id="applyResultMsg" class="mt-4 text-center text-sm font-bold hidden"></div>
+    </div>
+  </section>
+
+  <footer class="border-t border-slate-800/80 bg-slate-950 py-8 mt-10 text-center px-4">
+    <div class="max-w-4xl mx-auto space-y-2">
+      <div class="font-extrabold text-amber-500 amber-badge-text text-xs sm:text-sm">⚠️ 投資理財風險自負聲明</div>
+      <p class="text-xs theme-text-muted leading-relaxed">
+        加密貨幣與衍生品合約交易屬於高波動、高槓桿風險之投資行為，可能導致本金部分或全部損失。本網站提供之所有資訊、圖文教學、數據工具與復盤系統僅供教育學習與個人交易紀錄參考，絕不構成任何投資建議、招攬或代操承諾。投資理財風險自負，請務必審慎評估自身風險承受能力，切勿使用借貸資金參與市場。
+      </p>
+      <div class="text-[11px] theme-text-muted pt-1">© 2026 幣圈新手村 PRO. All Rights Reserved.</div>
+    </div>
+  </footer>
+
+  <script>
+    const SCRIPT_API_URL = "https://script.google.com/macros/s/AKfycby-oIzel0yPK_zLna564GdTHE_EFICkWT5UEghHkh_9kciPpWzhLzycZG-stPyhK8IR/exec";
+
+    function applySavedTheme() {
+      const saved = localStorage.getItem('village_theme') || 'dark';
+      document.documentElement.classList.toggle('light', saved === 'light');
+      document.documentElement.classList.toggle('dark', saved !== 'light');
+    }
+    function toggleTheme() {
+      const isLight = document.documentElement.classList.contains('light');
+      localStorage.setItem('village_theme', isLight ? 'dark' : 'light');
+      applySavedTheme();
+    }
+    applySavedTheme();
+
+    const EXCHANGE_CATEGORIES = [
+      {
+        title: "👑 核心主力交易所",
+        items: [
+          { id: "link-binance", key: "binance", name: "Binance 幣安", desc: "全球最大加密貨幣交易所", badge: "BN", url: "https://www.binance.com/register?ref=HAN66", code: "HAN66" },
+          { id: "link-bybit", key: "bybit", name: "Bybit", desc: "合約流動性頂級・介面絲滑", badge: "BY", url: "https://www.bybit.com/invite?ref=3PE6WWZ&medium=referral&utm_campaign=evergreen", code: "3PE6WWZ" },
+          { id: "link-okx", key: "okx", name: "OKX 歐易", desc: "Web3 錢包與衍生品一線所", badge: "OKX", url: "https://okx.com/join/RF7RUQOY", code: "RF7RUQOY" },
+          { id: "link-bitget", key: "bitget", name: "Bitget", desc: "專業合約與跟單交易平台", badge: "BG", url: "https://www.abcdstable.com/zh-TC/referral/register?clacCode=1YZQ6Q1J&from=%2Fzh-TC%2Fevents%2Freferral-all-program&source=events&utmSource=PremierInviter", code: "1YZQ6Q1J" }
+        ]
+      },
+      {
+        title: "🇹🇼 台灣合規台幣出入金 & 量化看盤",
+        items: [
+          { id: "link-bitopro", key: "bitopro", name: "BitoPro 幣託", desc: "台灣金管會合規新台幣出入金首選", badge: "幣託", url: "https://www.bitopro.com/users/sign_up?referrer=4602172282", code: "4602172282" },
+          { id: "link-pionex", key: "pionex", name: "Pionex 派網", desc: "網格量化機器人首選平台", badge: "派網", url: "https://accounts.pionex.com/zh-TW/signUp?r=0sorWo9j2p4", code: "0sorWo9j2p4" },
+          { id: "link-tradingview", key: "tradingview", name: "TradingView", desc: "全球交易員必備專業 K 線看盤工具", badge: "TV", url: "https://tw.tradingview.com/pricing/?share_your_love=khwnbyq4t2", code: "無" }
+        ]
+      },
+      {
+        title: "🔥 高返還與實戰精選合約交易所",
+        items: [
+          { id: "link-bitunix", key: "bitunix", name: "Bitunix", desc: "內建 TradingView 極速合約所", badge: "BX", url: "https://www.bitunix.site/u-link/referral/invitee?inviteCode=XWqBXf&t_act=-1", code: "XWqBXf" },
+          { id: "link-bingx", key: "bingx", name: "BingX", desc: "多元合約標的與低滑價深度", badge: "Bing", url: "https://bingxzone.com/invite/ZPUBGT/", code: "ZPUBGT" },
+          { id: "link-gate", key: "gate", name: "Gate.io 芝麻開門", desc: "新幣與山寨幣合約最齊全", badge: "GT", url: "https://www.gate.com/zh-tw/referral/earn-together/invite/VFJEU1ENCQ?ref=VFJEU1ENCQ&ref_type=103&utm_cmp=rXJBDjtJ&activity_id=1791876947985", code: "VFJEU1ENCQ" },
+          { id: "link-mexc", key: "mexc", name: "MEXC 抹茶", desc: "極低手續費與熱門小幣首發", badge: "MX", url: "https://s.mexc.com/referral/112q6vawYL", code: "3jKGV" },
+          { id: "link-weex", key: "weex", name: "WEEX 唯客", desc: "專業合約深度與高返傭福利", badge: "WX", url: "https://wjopixx.site/register?vipCode=7kjhe", code: "7kjhe" },
+          { id: "link-btcc", key: "btcc", name: "BTCC", desc: "老牌衍生品合約交易所", badge: "BTCC", url: "https://btcc.com/invite/Uf2u25r", code: "Uf2u25r" },
+          { id: "link-bitfinex", key: "bitfinex", name: "Bitfinex 綠葉", desc: "機構大戶現貨與借貸平台", badge: "BFX", url: "https://www.bitfinex.com/sign-up?refcode=BDfxsNgFp", code: "BDfxsNgFp" },
+          { id: "link-bitmart", key: "bitmart", name: "BitMart", desc: "全球綜合數位資產交易平台", badge: "BM", url: "https://www.bitmart.com/invite/ccm8Kp", code: "ccm8Kp" },
+          { id: "link-lbank", key: "lbank", name: "LBank", desc: "熱門 Meme 與山寨潛力幣種", badge: "LB", url: "https://www.lbk.pub/ref/5WU7P", code: "5WU7P" },
+          { id: "link-xt", key: "xt", name: "XT.COM", desc: "社交化加密貨幣交易平台", badge: "XT", url: "https://www.xtblock.net/pro/ref/9675YP", code: "9675YP" },
+          { id: "link-nodexx", key: "nodexx", name: "Nodexx", desc: "新銳衍生品合約交易平台", badge: "NX", url: "https://www.nodexx-share.live/zh-HK/accounts/register?ref=JU3371", code: "JU3371" }
+        ]
+      }
+    ];
+
+    function handleIconError(imgEl, key) {
+      const step = parseInt(imgEl.dataset.step || "0", 10);
+      const candidates = [
+        `${key}.png`,
+        `${key}_icon.jpg`,
+        `${key}.jpg`,
+        `${key.toUpperCase()}_icon.png`,
+        `${key.toUpperCase()}.png`
+      ];
+      if (step < candidates.length) {
+        imgEl.dataset.step = String(step + 1);
+        imgEl.src = candidates[step];
+      } else {
+        imgEl.style.display = 'none';
+        if (imgEl.nextElementSibling) imgEl.nextElementSibling.classList.remove('hidden');
+      }
+    }
+
+    const TUTORIAL_STEPS_DATA = {
+      bitopro: [
+        { step: "註冊幣託一", text: "選擇一個方式註冊。", img: "reg_bitopro_1.png" },
+        { step: "註冊幣託二", text: "確認有填寫邀請碼後同意使用條款，然後按下一步。", img: "reg_bitopro_2.png" },
+        { step: "註冊幣託三", text: "填寫手機號碼。", img: "reg_bitopro_3.png" },
+        { step: "註冊幣託四", text: "點選身分驗證，送出後等待一兩個工作天。", img: "reg_bitopro_4.png" },
+        { step: "註冊幣託五", text: "到『帳戶』裡面選擇『銀行帳戶』點進去，選擇立即綁定。", img: "reg_bitopro_5.png" },
+        { step: "註冊幣託六", text: "照著上面要求的項目填寫，送出後等待五到七個工作天審核。", img: "reg_bitopro_6.png" }
+      ],
+      exchange: [
+        { step: "註冊交易所一", text: "和村長討論後使用村長的連結和邀請碼註冊，然後去應用商店下載對應的交易所 App。", img: "reg_exchange_1.png" },
+        { step: "註冊交易所二", text: "登入剛剛註冊的帳號密碼。", img: "reg_exchange_2.png" },
+        { step: "註冊交易所三", text: "點擊左上角頭像，會有身分驗證、身分認證或實名認證，照指示完成認證。", img: "reg_exchange_3.png" }
+      ],
+      deposit: [
+        { step: "入金一", text: "身分驗證通過和銀行帳號審核成功後，回到幣託主頁選擇『台幣加值』。", img: "dep_1.png" },
+        { step: "入金二", text: "複製幣託生成的專屬銀行帳號。", img: "dep_2.png" },
+        { step: "入金三", text: "用當初在幣託綁定的銀行帳戶，轉新台幣到幣託生成的銀行帳號。", img: "" },
+        { step: "入金四", text: "台幣到帳後，回到首頁選擇『一鍵買賣』，並點擊中間那個轉換符號確認買賣方向（TWD 換成 USDT）。", img: "dep_4.png" },
+        { step: "入金五", text: "輸入想要購買的金額，勾選同意條款後按下一步。", img: "dep_5.png" },
+        { step: "入金六", text: "到國際交易所的主畫面或是右下角的資產頁面選擇『充值』。", img: "" },
+        { step: "入金七", text: "在充值頁面中選擇幣種『USDT』。", img: "" },
+        { step: "入金八", text: "充值鏈種選擇『BEP 20』，並複製交易所提供的一串地址代碼。", img: "" },
+        { step: "入金九", text: "回到幣託的資產頁面點擊『提領』。", img: "dep_9.png" },
+        { step: "入金十", text: "在提領頁面中選擇幣種『USDT』。", img: "dep_10.png" },
+        { step: "入金十一", text: "在提領網路中選擇鏈種『BEP 20』。", img: "dep_11.png" },
+        { step: "入金十二", text: "將交易所複製的地址貼上至『提領到』，確認幣託和交易所這兩個畫面的提領鏈種（BEP 20）跟錢包地址都要完全一樣（否則資產會遺失），輸入提領金額後按下一步，並按照要求驗證。", img: "dep_12.png" },
+        { step: "入金十三", text: "驗證後 3 到 5 分鐘，交易所就會收到剛剛轉帳的 USDT 了！", img: "" }
+      ],
+      withdraw: [
+        { step: "出金一", text: "到幣託的資產頁面選擇『加值』，選擇幣種 USDT 與鏈種『BEP 20』，並複製幣託提供的一串地址代碼。", img: "with_1.png" },
+        { step: "出金二", text: "到國際交易所右下角的資產頁面點擊『提領』或是『提幣』，選擇幣種『USDT』，提領鏈種選擇『BEP 20』。", img: "" },
+        { step: "出金三", text: "將剛剛從幣託複製的一串地址代碼，貼上至交易所的提領地址欄位，並確認鏈種與地址無誤。", img: "with_3.png" },
+        { step: "出金四", text: "輸入提領金額後按下一步並照著要求驗證，3 到 5 分鐘後幣託就會收到剛剛轉帳的 USDT 了。", img: "" },
+        { step: "出金五", text: "到幣託首頁選擇『一鍵買賣』，點擊中間那個轉換符號，把 USDT 賣出轉換成新台幣（TWD）。", img: "with_5.png" },
+        { step: "出金六", text: "到幣託的資產頁面選擇『提領』。", img: "with_6.png" },
+        { step: "出金七", text: "在提領頁面中選擇『新台幣』。", img: "with_7.png" },
+        { step: "出金八", text: "輸入提款金額然後按下一步。", img: "with_8.png" },
+        { step: "出金九", text: "兩個工作天內就會收到提領的新台幣匯入您的銀行帳戶了！", img: "" }
+      ]
+    };
+
+    let globalWallets = [
+      { coin: "USDT", chain: "BEP20 (BSC)", address: "0x4cbb18c28b7606fafe7f7dc271b29db9a618b070" },
+      { coin: "USDT", chain: "TRC20 (Tron)", address: "請聯繫村長確認TRC20收款地址" },
+      { coin: "USDC", chain: "BEP20 (BSC)", address: "0x4cbb18c28b7606fafe7f7dc271b29db9a618b070" }
+    ];
+
+    function renderExchanges(sheetLinks = {}) {
+      const container = document.getElementById('exchangesGridContainer');
+      container.innerHTML = EXCHANGE_CATEGORIES.map(cat => {
+        const cards = cat.items.map(ex => {
+          const override = sheetLinks[ex.id];
+          const finalUrl = (override && override.url) ? override.url : ex.url;
+          const finalCode = (override && override.code) ? override.code : ex.code;
+          return `
+            <div class="theme-card rounded-2xl p-4 flex flex-col justify-between hover:border-amber-500 transition-all">
+              <div>
+                <div class="flex items-center gap-3 mb-3">
+                  <div class="w-11 h-11 rounded-xl bg-slate-900 border border-slate-700/80 shrink-0 flex items-center justify-center overflow-hidden p-1 shadow">
+                    <img src="${ex.key}_icon.png" alt="${ex.name}"
+                         onerror="handleIconError(this, '${ex.key}')"
+                         class="w-full h-full object-contain rounded-lg" />
+                    <span class="hidden font-black text-xs text-amber-400">${ex.badge}</span>
+                  </div>
+                  <div>
+                    <h4 class="font-extrabold theme-text-main text-sm sm:text-base">${ex.name}</h4>
+                    <p class="text-[11px] theme-text-muted">${ex.desc}</p>
+                  </div>
+                </div>
+                ${finalCode && finalCode !== '無' ? `
+                  <div class="flex items-center justify-between theme-sub px-3 py-1.5 rounded-lg mb-3 text-xs">
+                    <span class="theme-text-muted">邀請碼: <strong class="text-amber-500 amber-badge-text font-mono">${finalCode}</strong></span>
+                    <button type="button" onclick="navigator.clipboard.writeText('${finalCode}'); alert('已複製邀請碼: ${finalCode}');" class="text-[11px] text-cyan-500 cyan-badge-text hover:underline font-bold">複製</button>
+                  </div>
+                ` : '<div class="mb-3"></div>'}
+              </div>
+              <a href="${finalUrl}" target="_blank" rel="noopener noreferrer" class="block w-full text-center py-2 rounded-xl font-bold text-xs bg-amber-500 hover:bg-amber-400 text-slate-950 transition-all">
+                立即註冊 / 前往 ↗
+              </a>
+            </div>
+          `;
+        }).join('');
+
+        return `
+          <div>
+            <h3 class="text-base sm:text-lg font-extrabold text-amber-500 amber-badge-text mb-3">${cat.title}</h3>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">${cards}</div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderAllTutorialPanes() {
+      Object.keys(TUTORIAL_STEPS_DATA).forEach(key => {
+        const pane = document.getElementById(`tutPane-${key}`);
+        if (!pane) return;
+        pane.innerHTML = TUTORIAL_STEPS_DATA[key].map(item => {
+          const hasImg = item.img && item.img.trim() !== "";
+          const imgBlock = hasImg ? `
+            <div class="mt-2.5 rounded-xl overflow-hidden border border-slate-700/60 bg-slate-950/80 max-w-[200px] mx-auto">
+              <img src="${item.img}" alt="${item.step}" loading="lazy"
+                   onerror="this.parentElement.style.display='none'"
+                   class="w-full h-auto object-contain max-h-[260px] mx-auto block" />
+            </div>
+          ` : '';
+
+          return `
+            <div class="p-4 rounded-2xl theme-sub flex flex-col justify-between">
+              <div class="flex items-start gap-3">
+                <span class="shrink-0 px-2.5 py-1 rounded-lg bg-amber-500/20 text-amber-500 amber-badge-text border border-amber-500/30 font-extrabold text-xs">
+                  ${item.step}
+                </span>
+                <p class="theme-text-main text-xs sm:text-sm font-medium leading-relaxed flex-1">${item.text}</p>
+              </div>
+              ${imgBlock}
+            </div>
+          `;
+        }).join('');
+      });
+    }
+
+    function switchTutorialTab(tabKey) {
+      ['bitopro', 'exchange', 'deposit', 'withdraw'].forEach(k => {
+        const pane = document.getElementById(`tutPane-${k}`);
+        const btn = document.getElementById(`tutBtn-${k}`);
+        const active = (k === tabKey);
+        if (pane) pane.classList.toggle('hidden', !active);
+        if (btn) {
+          btn.className = active
+            ? "py-2.5 px-3 rounded-xl font-bold text-xs sm:text-sm border bg-amber-500 text-slate-950 border-amber-400"
+            : "py-2.5 px-3 rounded-xl font-bold text-xs sm:text-sm theme-sub theme-text-main";
+        }
+      });
+    }
+
+    function switchApplyMode(mode) {
+      const uidForm = document.getElementById('uidForm');
+      const subForm = document.getElementById('subForm');
+      const btnUid = document.getElementById('tabBtnUid');
+      const btnSub = document.getElementById('tabBtnSub');
+      document.getElementById('applyResultMsg').classList.add('hidden');
+
+      if (mode === 'uid') {
+        uidForm.classList.remove('hidden');
+        subForm.classList.add('hidden');
+        btnUid.className = "py-3 px-3 rounded-xl font-extrabold text-xs sm:text-sm border bg-amber-500 text-slate-950 border-amber-400";
+        btnSub.className = "py-3 px-3 rounded-xl font-extrabold text-xs sm:text-sm theme-sub theme-text-main";
+      } else {
+        uidForm.classList.add('hidden');
+        subForm.classList.remove('hidden');
+        btnSub.className = "py-3 px-3 rounded-xl font-extrabold text-xs sm:text-sm border bg-cyan-400 text-slate-950 border-cyan-300";
+        btnUid.className = "py-3 px-3 rounded-xl font-extrabold text-xs sm:text-sm theme-sub theme-text-main";
+      }
+    }
+
+    function initSubWalletsUI() {
+      const coinSelect = document.getElementById('subCoinSelect');
+      const coins = [...new Set(globalWallets.map(w => w.coin))];
+      coinSelect.innerHTML = coins.map(c => `<option value="${c}">${c}</option>`).join('');
+      onSubCoinChange();
+    }
+
+    function onSubCoinChange() {
+      const selectedCoin = document.getElementById('subCoinSelect').value;
+      const chainSelect = document.getElementById('subChainSelect');
+      const filtered = globalWallets.filter(w => w.coin === selectedCoin);
+      chainSelect.innerHTML = filtered.map((w, i) => `<option value="${i}">${w.chain}</option>`).join('');
+      onSubChainChange();
+    }
+
+    function onSubChainChange() {
+      const selectedCoin = document.getElementById('subCoinSelect').value;
+      const filtered = globalWallets.filter(w => w.coin === selectedCoin);
+      const idx = parseInt(document.getElementById('subChainSelect').value, 10) || 0;
+      const target = filtered[idx] || filtered[0];
+      const addr = target ? target.address : "";
+      document.getElementById('subWalletAddressText').textContent = addr;
+      document.getElementById('subWalletQrImg').src = `https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${encodeURIComponent(addr)}`;
+    }
+
+    function copyWalletAddress() {
+      const addr = document.getElementById('subWalletAddressText').textContent;
+      navigator.clipboard.writeText(addr);
+      alert("已複製收款地址：" + addr);
+    }
+
+    async function submitUid(e) {
+      e.preventDefault();
+      const btn = document.getElementById('uidSubmitBtn');
+      const msg = document.getElementById('applyResultMsg');
+      btn.disabled = true;
+      btn.textContent = "送出審核中...";
+
+      const contactPlatform = document.getElementById('uidContactType').value;
+      const contactId = document.getElementById('uidContactValue').value.trim();
+
+      const payload = {
+        action: "submitUid",
+        channel: "UID審核",
+        exchange: document.getElementById('uidExchange').value,
+        uid: document.getElementById('uidNumber').value.trim(),
+        contact: `${contactPlatform}:${contactId}`
+      };
+
+      try {
+        await fetch(SCRIPT_API_URL, {
+          method: "POST",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify(payload)
+        });
+        msg.classList.remove('hidden');
+        msg.className = "mt-4 text-center text-xs sm:text-sm font-bold text-emerald-500 p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30";
+        msg.textContent = "✅ 審核申請已成功送出！村長審核通過後將透過您的聯絡方式發送專屬帳號與密碼。";
+        document.getElementById('uidForm').reset();
+      } catch (err) {
+        msg.classList.remove('hidden');
+        msg.className = "mt-4 text-center text-xs sm:text-sm font-bold text-emerald-500 p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30";
+        msg.textContent = "✅ 審核申請已成功送出！請私訊村長加快開通。";
+      } finally {
+        btn.disabled = false;
+        btn.textContent = "🚀 送出 UID 審核申請";
+      }
+    }
+
+    async function submitSubscription(e) {
+      e.preventDefault();
+      const btn = document.getElementById('subSubmitBtn');
+      const msg = document.getElementById('applyResultMsg');
+      btn.disabled = true;
+      btn.textContent = "送出申請中...";
+
+      const selectedCoin = document.getElementById('subCoinSelect').value;
+      const filtered = globalWallets.filter(w => w.coin === selectedCoin);
+      const idx = parseInt(document.getElementById('subChainSelect').value, 10) || 0;
+      const chainName = filtered[idx] ? filtered[idx].chain : "";
+
+      const contactPlatform = document.getElementById('subContactType').value;
+      const contactId = document.getElementById('subContactValue').value.trim();
+
+      const payload = {
+        action: "submitSubscription",
+        channel: "訂閱審核",
+        planLabel: document.getElementById('subPlanSelect').value,
+        coin: selectedCoin,
+        chain: chainName,
+        txid: document.getElementById('subTxid').value.trim(),
+        contact: `${contactPlatform}:${contactId}`
+      };
+
+      try {
+        await fetch(SCRIPT_API_URL, {
+          method: "POST",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify(payload)
+        });
+        msg.classList.remove('hidden');
+        msg.className = "mt-4 text-center text-xs sm:text-sm font-bold text-emerald-500 p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30";
+        msg.textContent = "✅ 訂閱申請已成功送出！村長核對後將透過您的聯絡方式發送專屬帳號與密碼。";
+        document.getElementById('subForm').reset();
+        initSubWalletsUI();
+      } catch (err) {
+        msg.classList.remove('hidden');
+        msg.className = "mt-4 text-center text-xs sm:text-sm font-bold text-emerald-500 p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30";
+        msg.textContent = "✅ 訂閱申請已成功送出！請私訊村長核對。";
+      } finally {
+        btn.disabled = false;
+        btn.textContent = "💎 送出訂閱審核申請";
+      }
+    }
+
+    async function initPage() {
+      renderExchanges();
+      renderAllTutorialPanes();
+      initSubWalletsUI();
+
+      try {
+        const res = await fetch(`${SCRIPT_API_URL}?action=getInitData`);
+        const data = await res.json();
+        if (data && data.success) {
+          if (data.exchangeLinks) renderExchanges(data.exchangeLinks);
+          if (Array.isArray(data.wallets) && data.wallets.length > 0) {
+            globalWallets = data.wallets;
+            initSubWalletsUI();
+          }
+          if (data.socialLinks) {
+            if (data.socialLinks.ig) document.getElementById('heroIgLink').href = data.socialLinks.ig;
+            if (data.socialLinks.threads) document.getElementById('heroThreadsLink').href = data.socialLinks.threads;
+            if (data.socialLinks.tgPersonal) document.getElementById('heroTgPersonalLink').href = data.socialLinks.tgPersonal;
+            if (data.socialLinks.tgGroup) document.getElementById('heroTgGroupLink').href = data.socialLinks.tgGroup;
+          }
+        }
+      } catch (err) {}
+    }
+
+    document.addEventListener('DOMContentLoaded', initPage);
+  </script>
+</body>
+</html>
