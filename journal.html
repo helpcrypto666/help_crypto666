@@ -224,8 +224,11 @@
     </div>
 
     <div id="panelTop" class="card" hidden>
-      <h2>🏆 優秀學員榜</h2>
-      <p class="muted">依村長評分的平均分數排序，名稱已匿名。</p>
+      <div class="tabs" role="tablist" style="margin-top:0">
+        <button class="tab" type="button" role="tab" data-board="score" aria-selected="true">🏆 優秀學員榜</button>
+        <button class="tab" type="button" role="tab" data-board="volume" aria-selected="false">📈 交易量排行榜</button>
+      </div>
+      
       <div id="topBox"></div>
     </div>
 
@@ -458,6 +461,10 @@
   }
 
   function renderTrades() {
+    renderTradesRaw();
+    fixShots($('tradeList'));
+  }
+  function renderTradesRaw() {
     const list = (state && state.trades) || [];
     $('tradeList').innerHTML = list.length
       ? list.map(tradeHtml).join('')
@@ -530,7 +537,7 @@
   function showTab(name) {
     document.querySelectorAll('.tab[data-tab]').forEach(b => b.setAttribute('aria-selected', String(b.dataset.tab === name)));
     Object.keys(PANELS).forEach(k => { $(PANELS[k]).hidden = k !== name; });
-    if (name === 'top') loadTop();
+    if (name === 'top') loadBoard();
     if (name === 'admin') { loadAdminMembers(); loadLotteryAdmin(); }
     if (name === 'review') loadReview();
   }
@@ -615,6 +622,62 @@
     if (cl) return claimLottery(Number(cl.dataset.claim));
   }
 
+  /* ---------- 盤面截圖縮圖與排行榜 ---------- */
+  let currentBoard = 'score';
+  function driveThumb(u) {
+    const m = /[?&]id=([\w-]+)/.exec(u);
+    return m ? 'https://drive.google.com/thumbnail?id=' + m[1] + '&sz=w1000' : u;
+  }
+  function fixShots(root) {
+    root.querySelectorAll('img[alt="盤面截圖"]').forEach(img => {
+      const orig = img.getAttribute('src');
+      const a = document.createElement('a');
+      a.href = orig;
+      a.target = '_blank';
+      a.rel = 'noopener noreferrer';
+      a.textContent = '開啟盤面截圖';
+      a.style.display = 'inline-block';
+      a.style.marginTop = '6px';
+      img.src = driveThumb(orig);
+      img.onerror = () => img.remove();
+      img.parentNode.insertBefore(a, img.nextSibling);
+    });
+  }
+  function tableHtml(heads, rows) {
+    return '<div class="table-wrap"><table><thead><tr>' +
+      heads.map(h => '<th>' + esc(h) + '</th>').join('') +
+      '</tr></thead><tbody>' +
+      rows.map(r => '<tr>' + r.map(c => '<td>' + esc(c) + '</td>').join('') + '</tr>').join('') +
+      '</tbody></table></div>';
+  }
+  async function loadBoard() {
+    const box = $('topBox');
+    document.querySelectorAll('[data-board]').forEach(b => b.setAttribute('aria-selected', String(b.dataset.board === currentBoard)));
+    box.innerHTML = '<p class="muted">載入中…</p>';
+    try {
+      if (currentBoard === 'score') {
+        const d = await api('getTopStudents', {}, token);
+        if (!d.rows || !d.rows.length) {
+          box.innerHTML = '<p class="muted">目前尚無上榜學員（需至少 ' + esc(d.minCount) + ' 筆村長評分才會上榜）。</p>';
+          return;
+        }
+        box.innerHTML = '<p class="muted">依村長評分的平均分數排序，至少 ' + esc(d.minCount) + ' 筆評分才會上榜，名稱已匿名。</p>' +
+          tableHtml(['名次', '學員', '平均分數', '評分筆數'], d.rows.map(r => [r.rank, r.name, r.score, r.count]));
+      } else {
+        const d = await api('getVolumeBoard', {}, token);
+        if (!d.rows || !d.rows.length) {
+          box.innerHTML = '<p class="muted">目前尚無上榜學員。</p>';
+          return;
+        }
+        box.innerHTML = '<p class="muted">' + esc(d.rule) + '，名稱已匿名。</p>' +
+          tableHtml(['名次', '學員', '交易量 (USDT)', '交易筆數'], d.rows.map(r => [r.rank, r.name, money(r.volume), r.count]));
+      }
+    } catch (err) {
+      box.innerHTML = '';
+      handleErr(err);
+    }
+  }
+
   /* ---------- 村長後台：學員管理 ---------- */
   async function loadAdminMembers() {
     $('memberBox').innerHTML = '<p class="muted">載入中…</p>';
@@ -646,6 +709,7 @@
         '<div><label>UID（轉永久用戶用）</label><input class="field" data-f="uid" maxlength="40" value="' + esc(m.uid) + '"></div>' +
       '</div>' +
       '<div class="row-btns">' +
+        '<label style="display:flex;gap:6px;align-items:center;width:100%"><input type="checkbox" data-f="banned"' + (m.banned ? ' checked' : '') + '> 取消上榜資格（不列入優秀學員榜、交易量排行榜與抽獎）</label>' +
         '<button class="btn btn-sm" type="button" data-act="save">儲存修改</button>' +
         '<button class="btn btn-sm btn-ghost" type="button" data-act="copy">複製私訊文案</button>' +
         '<button class="btn btn-sm btn-ghost" type="button" data-act="toUid">🔄 轉為 UID 永久用戶</button>' +
@@ -671,7 +735,7 @@
     const memberId = m.memberId;
     switch (btn.dataset.act) {
       case 'save':
-        return adminRun('adminUpdateMember', { memberId, status: f('status'), account: f('account'), password: f('password'), expiry: f('expiry') }, '✅ 已儲存，私訊文案已更新');
+        return adminRun('adminUpdateMember', { memberId, status: f('status'), account: f('account'), password: f('password'), expiry: f('expiry'), banned: card.querySelector('[data-f="banned"]').checked }, '✅ 已儲存，私訊文案已更新');
       case 'toUid':
         if (!confirm('確定轉為 UID 永久用戶？到期日會被清除。')) return;
         return adminRun('adminConvertType', { memberId, toType: 'uid', uid: f('uid') }, '✅ 已轉為 UID 永久用戶');
@@ -700,6 +764,10 @@
   }
 
   function renderReview() {
+    renderReviewRaw();
+    fixShots($('reviewBox'));
+  }
+  function renderReviewRaw() {
     const q = $('rvSearch').value.trim().toLowerCase();
     const list = reviewTrades.filter(t => !q || (String(t.identity) + ' ' + String(t.coin)).toLowerCase().indexOf(q) >= 0);
     $('reviewBox').innerHTML = list.length
@@ -1010,6 +1078,7 @@
     $('tradeList').addEventListener('click', tradeListClick);
     $('memberBox').addEventListener('click', memberClick);
     $('lotteryBox').addEventListener('click', lotteryClick);
+    document.querySelectorAll('[data-board]').forEach(b => b.addEventListener('click', () => { currentBoard = b.dataset.board; loadBoard(); }));
     $('reviewBox').addEventListener('click', e => {
       const b = e.target.closest('[data-act="review"]');
       if (b) saveReview(b.closest('[data-tid]'));
