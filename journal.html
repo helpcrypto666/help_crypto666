@@ -546,7 +546,7 @@
   function renderWins(p) {
     const wins = (state && state.wins) || [];
     $('winBox').innerHTML = (p && p.role !== 'admin' && wins.length)
-      ? wins.map(w => '<div class="card" style="border-color:var(--ok)"><strong>🎉 恭喜你在「' + esc(w.board) + '」中獎！</strong><div class="muted" style="margin-top:6px">請私訊村長領取獎品。</div></div>').join('')
+      ? wins.map(w => '<div class="card" style="border-color:var(--ok)"><strong>🎉 恭喜你在「' + esc(w.board) + '」中獎！</strong><div class="muted" style="margin-top:6px">請於 ' + esc(w.deadline) + ' 前私訊村長領取獎品，逾期視為放棄。</div></div>').join('')
       : '';
     const L = state && state.lottery;
     $('adminDueBox').innerHTML = (p && p.role === 'admin' && L && L.isDue)
@@ -566,7 +566,7 @@
       else statusText = '下次可抽獎：' + esc(st.dueAt) + '（還有 ' + esc(st.daysLeft) + ' 天）';
       const rows = (d.rows || []).map(r =>
         '<tr><td>' + esc(r.at) + '</td><td>' + esc(r.board) + '</td><td>' + esc(r.identity) + '</td><td>' + esc(r.name) + '</td><td>' +
-        (r.claimed ? '✅ 已領取' : '<button class="btn-mini" type="button" data-claim="' + esc(r.row) + '">標記已領取</button>') +
+        (r.claimed ? '✅ 已領取' : (r.expired ? '⏰ 已逾期（' + esc(r.deadline) + '）' : '待領取，' + esc(r.deadline) + ' 前<br><button class="btn-mini" type="button" data-claim="' + esc(r.row) + '">標記已領取</button>')) +
         '</td></tr>'
       ).join('');
       box.innerHTML =
@@ -682,6 +682,7 @@
   async function loadAdminMembers() {
     $('memberBox').innerHTML = '<p class="muted">載入中…</p>';
     try {
+      adminCfg = await api('getPublicConfig', {}, '');
       adminMembers = (await api('adminListMembers', {}, token)).members || [];
       $('memberBox').innerHTML = adminMembers.length
         ? adminMembers.map(memberHtml).join('')
@@ -692,7 +693,61 @@
     }
   }
 
+  async function loadAdminMembersOld() {
+    $('memberBox').innerHTML = '<p class="muted">載入中…</p>';
+    try {
+      adminMembers = (await api('adminListMembers', {}, token)).members || [];
+      $('memberBox').innerHTML = adminMembers.length
+        ? adminMembers.map(memberHtml).join('')
+        : '<p class="muted">目前沒有學員申請</p>';
+    } catch (err) {
+      $('memberBox').innerHTML = '';
+      handleErr(err, $('adminMsg'));
+    }
+  }
+
+  let adminCfg = null;
+  function cfgOptions() {
+    const cfg = adminCfg || {};
+    return {
+      plans: (cfg.plans || []).map(p => '<option value="' + p.days + '">' + esc(p.label) + '</option>').join(''),
+      pays: (cfg.payments || []).map(p => '<option value="' + esc(p.currency + '|' + p.chain) + '">' + esc(p.currency + '｜' + p.chain) + '</option>').join(''),
+      exs: (cfg.applyExchanges || []).map(e => '<option value="' + esc(e.name) + '">' + esc(e.name) + '</option>').join('')
+    };
+  }
   function memberHtml(m) {
+    const st = m.stats || {};
+    const isSub = m.type === '訂閱制';
+    const isUid = m.type === 'UID審核';
+    const o = cfgOptions();
+    const statusOpts = STATUS_OPTIONS.map(s => '<option' + (s === m.status ? ' selected' : '') + '>' + s + '</option>').join('');
+    const summary = '<div class="trade-head"><span>' + esc(m.identity) + '｜' + esc(m.type || '未設定') + '｜' + esc(m.status) + '</span><span class="muted">' + esc(m.applyAt) + '</span></div>' +
+      '<div class="trade-meta">' + esc(m.exchange) + '｜' + esc(m.contact) + (isSub ? '｜' + esc(m.plan) + '｜' + esc(m.currency) + ' ' + esc(m.chain) + '｜TxID ' + esc(m.txid) : '') + '</div>' +
+      '<div class="trade-meta">交易量 ' + money(st.volume) + '｜筆數 ' + (st.count || 0) + '｜累積淨利 ' + signed(st.pnl) + '｜評分 ' + (st.avgScore == null ? '—' : esc(st.avgScore)) + '（' + (st.scoredCount || 0) + ' 筆）</div>';
+    const edit = '<div class="member-edit" hidden style="margin-top:12px">' +
+      '<div class="grid2">' +
+        '<div><label>審核狀態</label><select class="field" data-f="status">' + statusOpts + '</select></div>' +
+        '<div><label>專屬帳號</label><input class="field" data-f="account" maxlength="20" value="' + esc(m.account) + '"></div>' +
+        '<div><label>專屬密碼</label><input class="field" data-f="password" maxlength="20" value="' + esc(m.password) + '"></div>' +
+        (isSub ? '<div><label>到期日</label><input class="field" type="date" data-f="expiry" value="' + esc(m.expiry) + '"></div>' : '') +
+      '</div>' +
+      '<div class="row-btns"><button class="btn btn-sm" type="button" data-act="save">儲存修改</button><button class="btn btn-sm btn-ghost" type="button" data-act="copy">複製私訊文案</button></div>' +
+      (isUid ? '' : '<div class="step-box" style="margin-top:12px"><h4>🔄 轉為 UID 永久用戶</h4><div class="grid2">' +
+        '<div><label>註冊交易所</label><select class="field" data-f="uidEx">' + o.exs + '</select></div>' +
+        '<div><label>交易所 UID</label><input class="field" data-f="uid" maxlength="40" value="' + esc(m.uid) + '"></div>' +
+        '</div><div class="row-btns"><button class="btn btn-sm btn-ghost" type="button" data-act="toUid">確認轉為 UID</button></div></div>') +
+      (isSub ? '' : '<div class="step-box" style="margin-top:12px"><h4>📅 轉為訂閱制</h4><div class="grid2">' +
+        '<div><label>方案</label><select class="field" data-f="plan">' + o.plans + '</select></div>' +
+        '<div><label>支付幣種與主鏈</label><select class="field" data-f="pay">' + o.pays + '</select></div>' +
+        '<div><label>TxID</label><input class="field" data-f="txid" maxlength="120"></div>' +
+        '<div><label>到期日（留空＝依方案自動計算）</label><input class="field" type="date" data-f="subExpiry"></div>' +
+        '</div><div class="row-btns"><button class="btn btn-sm btn-ghost" type="button" data-act="toSub">確認轉為訂閱</button></div></div>') +
+      '</div>';
+    return '<div class="trade" data-mid="' + esc(m.memberId) + '">' + summary +
+      '<div class="row-btns"><button class="btn btn-sm btn-ghost" type="button" data-act="edit">✏️ 修改</button></div>' + edit + '</div>';
+  }
+
+  function memberHtmlOld(m) {
     const st = m.stats || {};
     const opts = STATUS_OPTIONS.map(s => '<option' + (s === m.status ? ' selected' : '') + '>' + s + '</option>').join('');
     const detail = m.type === '訂閱制' ? '｜' + m.plan + '｜' + m.currency + ' ' + m.chain + '｜TxID ' + m.txid : '';
@@ -726,6 +781,40 @@
   }
 
   async function memberClick(ev) {
+    const btn = ev.target.closest('[data-act]');
+    if (!btn) return;
+    const card = btn.closest('[data-mid]');
+    const m = adminMembers.find(x => x.memberId === card.dataset.mid);
+    if (!m) return;
+    const f = k => { const el = card.querySelector('[data-f="' + k + '"]'); return el ? el.value.trim() : ''; };
+    const memberId = m.memberId;
+    switch (btn.dataset.act) {
+      case 'edit': {
+        const box = card.querySelector('.member-edit');
+        box.hidden = !box.hidden;
+        return;
+      }
+      case 'save':
+        return adminRun('adminUpdateMember', { memberId: memberId, status: f('status'), account: f('account'), password: f('password'), expiry: f('expiry') }, '✅ 已儲存，私訊文案已更新');
+      case 'toUid':
+        if (!f('uidEx') || !f('uid')) { showMsg($('adminMsg'), '請選擇註冊交易所並填寫交易所 UID', 'err'); return; }
+        if (!confirm('確定轉為 UID 永久用戶？到期日會被清除。')) return;
+        return adminRun('adminConvertType', { memberId: memberId, toType: 'uid', uid: f('uid'), exchange: f('uidEx') }, '✅ 已轉為 UID 永久用戶');
+      case 'toSub': {
+        const pair = f('pay').split('|');
+        if (!f('plan') || pair.length < 2 || !pair[0] || !f('txid')) { showMsg($('adminMsg'), '請選擇方案、支付方式並填寫 TxID', 'err'); return; }
+        return adminRun('adminConvertType', { memberId: memberId, toType: 'sub', plan: f('plan'), currency: pair[0], chain: pair[1], txid: f('txid'), expiry: f('subExpiry') }, '✅ 已轉為訂閱制');
+      }
+      case 'copy': {
+        if (!m.message) { showMsg($('adminMsg'), '尚未開通，沒有私訊文案', 'err'); return; }
+        const ok = await copyText(m.message);
+        showMsg($('adminMsg'), ok ? '✅ 私訊文案已複製' : '複製失敗，請手動選取', ok ? 'ok' : 'err');
+        return;
+      }
+    }
+  }
+
+  async function memberClickOld(ev) {
     const btn = ev.target.closest('[data-act]');
     if (!btn) return;
     const card = btn.closest('[data-mid]');
@@ -770,6 +859,20 @@
   function renderReviewRaw() {
     const q = $('rvSearch').value.trim().toLowerCase();
     const list = reviewTrades.filter(t => !q || (String(t.identity) + ' ' + String(t.coin)).toLowerCase().indexOf(q) >= 0);
+    if (!list.length) {
+      $('reviewBox').innerHTML = '<p class="muted" style="margin-top:12px">沒有符合條件的交易</p>';
+      return;
+    }
+    const done = t => t.score != null || !!String(t.comment || '').trim();
+    const todo = list.filter(t => !done(t));
+    const finished = list.filter(done);
+    const group = (title, arr) => '<h3>' + title + '（' + arr.length + '）</h3>' + (arr.length ? arr.map(reviewHtml).join('') : '<p class="muted">沒有資料</p>');
+    $('reviewBox').innerHTML = group('📝 未批改', todo) + group('✅ 已批改', finished);
+  }
+
+  function renderReviewRawOld() {
+    const q = $('rvSearch').value.trim().toLowerCase();
+    const list = reviewTrades.filter(t => !q || (String(t.identity) + ' ' + String(t.coin)).toLowerCase().indexOf(q) >= 0);
     $('reviewBox').innerHTML = list.length
       ? list.map(reviewHtml).join('')
       : '<p class="muted" style="margin-top:12px">沒有符合條件的交易</p>';
@@ -790,6 +893,7 @@
       ).join('') + '</div>' +
       '<div class="trade-meta">總分：<span data-total>' + (t.score == null ? '—' : esc(t.score)) + '</span> / 100</div>' +
       '<div style="margin-top:8px"><label>村長評語（學員可見）</label><textarea class="field" rows="3" maxlength="2000" data-comment>' + esc(t.comment) + '</textarea></div>' +
+      '<label style="display:flex;gap:6px;align-items:center;margin-top:8px"><input type="checkbox" data-include' + (t.excluded ? '' : ' checked') + '> 列入排行榜（取消勾選＝不列入優秀學員榜與交易量排行榜，也不計入抽獎）</label>' +
       '<div class="row-btns"><button class="btn btn-sm" type="button" data-act="review">儲存評分與評語</button></div>' +
       '</div>';
   }
@@ -808,7 +912,8 @@
       await api('adminSaveReview', {
         tradeId: card.dataset.tid,
         scores: { stop: vals[0], position: vals[1], complete: vals[2], depth: vals[3] },
-        comment: card.querySelector('[data-comment]').value
+        comment: card.querySelector('[data-comment]').value,
+        exclude: !card.querySelector('[data-include]').checked
       }, token);
       showMsg($('reviewMsg'), '✅ 評分與評語已儲存', 'ok');
       await loadReview();
