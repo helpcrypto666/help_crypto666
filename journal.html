@@ -21,7 +21,7 @@
   }
 </script>
 <style>
-  :root { --bg:#f4f6fb; --card:#ffffff; --text:#111827; --muted:#4b5563; --border:#cbd5e1; --primary:#2563eb; --link:#1d4ed8; --accent:#b45309; --input-bg:#ffffff; --input-text:#111827; --code-bg:#e5e7eb; --ok:#15803d; --err:#b91c1c; --warn-bg:#fef3c7; --warn-text:#78350f; --shadow:0 1px 3px rgba(15,23,42,.08); color-scheme:light; }
+  :root { --bg:#f4f6fb; --card:#fff; --text:#111827; --muted:#4b5563; --border:#cbd5e1; --primary:#2563eb; --link:#1d4ed8; --accent:#b45309; --input-bg:#fff; --input-text:#111827; --code-bg:#e5e7eb; --ok:#15803d; --err:#b91c1c; --warn-bg:#fef3c7; --warn-text:#78350f; --shadow:0 1px 3px rgba(15,23,42,.08); color-scheme:light; }
   :root[data-theme="dark"] { --bg:#0b1220; --card:#131c31; --text:#e5e7eb; --muted:#a3afc2; --border:#334155; --primary:#2563eb; --link:#93c5fd; --accent:#fbbf24; --input-bg:#0f172a; --input-text:#e5e7eb; --code-bg:#1e293b; --ok:#4ade80; --err:#f87171; --warn-bg:#3b2f0b; --warn-text:#fde68a; --shadow:none; color-scheme:dark; }
   *{box-sizing:border-box}
   [hidden]{display:none!important}
@@ -148,12 +148,12 @@
 
     <div class="card"><div class="grid4" id="statsGrid"></div></div>
 
-    <div id="adminNote" class="card" hidden>🛠️ 村長後台（學員管理、評分與評語、雙計算機）尚未加入這一版，下一版會給完整檔案。</div>
-
     <div class="tabs" role="tablist">
       <button class="tab" type="button" role="tab" data-tab="diary" aria-selected="true">📒 我的交易復盤日誌</button>
       <button class="tab" type="button" role="tab" data-tab="top" aria-selected="false">🏆 優秀學員榜</button>
       <button class="tab" type="button" role="tab" data-tab="lecture" aria-selected="false">⚡ 好用工具與講義</button>
+      <button id="tabAdmin" class="tab" type="button" role="tab" data-tab="admin" aria-selected="false" hidden>⚙️ 村長管理後台</button>
+      <button id="tabReview" class="tab" type="button" role="tab" data-tab="review" aria-selected="false" hidden>✍️ 批改學員倉位</button>
     </div>
 
     <div id="panelDiary">
@@ -163,10 +163,10 @@
         <form id="tradeForm" autocomplete="off" hidden style="margin-top:16px">
           <h3 id="formTitle">新增交易</h3>
           <div class="grid2">
-            <div><label for="tOpen">開倉日期</label><input id="tOpen" class="field" type="date" required></div>
-            <div><label for="tClose">平倉日期</label><input id="tClose" class="field" type="date" required></div>
+            <div><label for="tOpen">開倉日期時間</label><input id="tOpen" class="field" type="datetime-local" required></div>
+            <div><label for="tClose">平倉日期時間</label><input id="tClose" class="field" type="datetime-local" required></div>
             <div><label for="tCoin">交易幣種</label><input id="tCoin" class="field" maxlength="20" placeholder="例如 BTC" required></div>
-            <div><label for="tEx">註冊交易所</label><select id="tEx" class="field"></select></div>
+            
             <div><label for="tSide">多空方向</label>
               <select id="tSide" class="field"><option value="long">做多</option><option value="short">做空</option></select></div>
             <div><label for="tLev">槓桿倍數</label><input id="tLev" class="field" type="number" min="1" max="1000" step="any" required></div>
@@ -230,6 +230,23 @@
     <div id="panelLecture" class="card" hidden>
       <div id="lectureBox"></div>
     </div>
+
+    <div id="panelAdmin" class="card" hidden>
+      <h2>⚙️ 村長管理後台</h2>
+      <p class="muted">修改審核狀態、專屬帳號與密碼、到期日，或轉換會員類型。儲存後私訊文案會自動更新。</p>
+      <div id="adminMsg" class="msg" role="status"></div>
+      <div id="memberBox"></div>
+    </div>
+
+    <div id="panelReview" class="card" hidden>
+      <h2>✍️ 批改學員倉位</h2>
+      <p class="muted">只列學員的交易。四項評分各 0–25 分，總分自動加總，評語學員可見。</p>
+      <div class="row-btns" style="margin-top:0">
+        <input id="rvSearch" class="field" placeholder="搜尋學員或幣種">
+      </div>
+      <div id="reviewMsg" class="msg" role="status"></div>
+      <div id="reviewBox"></div>
+    </div>
   </section>
 
   <footer class="disclaimer">
@@ -244,6 +261,9 @@
   const TOKEN_KEY = 'pro_token', CACHE_KEY = 'pro_cache', CUSTOM_KEY = 'pro_strats';
   const DEFAULT_STRATS = ['趨勢順勢', '突破', '回踩', '支撐壓力', '區間震盪', '反轉'];
   const SESSION_ERRORS = ['SESSION_INVALID', 'PENDING_REVIEW', 'PAUSED', 'EXPIRED', 'NOT_READY'];
+  const PANELS = { diary: 'panelDiary', top: 'panelTop', lecture: 'panelLecture', admin: 'panelAdmin', review: 'panelReview' };
+  const STATUS_OPTIONS = ['待審核', '已開通', '已暫停', '已到期'];
+  const SCORE_LABELS = ['停損設定', '倉位控制', '復盤完整度', '心得深度'];
   const ERR_TEXT = {
     BAD_REQUEST: '系統版本不一致，請重新整理頁面',
     UNKNOWN_ACTION: '系統版本不一致，請重新整理頁面',
@@ -269,6 +289,7 @@
 
   const $ = id => document.getElementById(id);
   let token = '', state = null, editingId = null, exchangeNames = [], customStrats = [], stratSel = new Set();
+  let adminMembers = [], reviewTrades = [];
 
   /* ---------- 共用工具 ---------- */
   function esc(s) {
@@ -291,6 +312,22 @@
   function todayStr() {
     const d = new Date();
     return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+  }
+  async function copyText(text) {
+    try {
+      if (navigator.clipboard && window.isSecureContext) { await navigator.clipboard.writeText(text); return true; }
+    } catch (e) {}
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.setAttribute('readonly', '');
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    let ok = false;
+    try { ok = document.execCommand('copy'); } catch (e) {}
+    document.body.removeChild(ta);
+    return ok;
   }
 
   async function api(action, data, tk) {
@@ -328,6 +365,7 @@
     $('syncBtn').hidden = false;
     $('logoutBtn').hidden = false;
     render();
+    showTab('diary');
   }
 
   /* ---------- 登入 / 同步 / 登出 ---------- */
@@ -395,6 +433,8 @@
       ? '💎 訂閱制｜到期日 ' + (p.expiry || '—') + '｜剩餘 ' + (p.remainingDays == null ? '—' : p.remainingDays) + ' 天'
       : '💎 VIP 專屬通行證');
     $('capBox').hidden = isAdmin;
+    $('tabAdmin').hidden = !isAdmin;
+    $('tabReview').hidden = !isAdmin;
     if (!isAdmin && document.activeElement !== $('capInput')) $('capInput').value = p.capital || '';
     const items = [
       ['目前總資產 (USDT)', s.totalAssets == null ? '—' : money(s.totalAssets), ''],
@@ -407,7 +447,6 @@
     $('statsGrid').innerHTML = items.map(i =>
       '<div class="stat"><div class="k">' + i[0] + '</div><div class="v ' + i[2] + '">' + esc(i[1]) + '</div></div>'
     ).join('');
-    $('adminNote').hidden = !isAdmin;
     renderTrades();
     renderLecture();
   }
@@ -484,10 +523,142 @@
 
   function showTab(name) {
     document.querySelectorAll('.tab[data-tab]').forEach(b => b.setAttribute('aria-selected', String(b.dataset.tab === name)));
-    $('panelDiary').hidden = name !== 'diary';
-    $('panelTop').hidden = name !== 'top';
-    $('panelLecture').hidden = name !== 'lecture';
+    Object.keys(PANELS).forEach(k => { $(PANELS[k]).hidden = k !== name; });
     if (name === 'top') loadTop();
+    if (name === 'admin') loadAdminMembers();
+    if (name === 'review') loadReview();
+  }
+
+  /* ---------- 村長後台：學員管理 ---------- */
+  async function loadAdminMembers() {
+    $('memberBox').innerHTML = '<p class="muted">載入中…</p>';
+    try {
+      adminMembers = (await api('adminListMembers', {}, token)).members || [];
+      $('memberBox').innerHTML = adminMembers.length
+        ? adminMembers.map(memberHtml).join('')
+        : '<p class="muted">目前沒有學員申請</p>';
+    } catch (err) {
+      $('memberBox').innerHTML = '';
+      handleErr(err, $('adminMsg'));
+    }
+  }
+
+  function memberHtml(m) {
+    const st = m.stats || {};
+    const opts = STATUS_OPTIONS.map(s => '<option' + (s === m.status ? ' selected' : '') + '>' + s + '</option>').join('');
+    const detail = m.type === '訂閱制' ? '｜' + m.plan + '｜' + m.currency + ' ' + m.chain + '｜TxID ' + m.txid : '';
+    return '<div class="trade" data-mid="' + esc(m.memberId) + '">' +
+      '<div class="trade-head"><span>' + esc(m.identity) + '｜' + esc(m.type || '未設定') + '</span><span class="muted">' + esc(m.applyAt) + '</span></div>' +
+      '<div class="trade-meta">' + esc(m.exchange) + '｜' + esc(m.contact) + esc(detail) + '</div>' +
+      '<div class="trade-meta">交易量 ' + money(st.volume) + '｜筆數 ' + (st.count || 0) + '｜累積淨利 ' + signed(st.pnl) +
+        '｜評分 ' + (st.avgScore == null ? '—' : esc(st.avgScore)) + '（' + (st.scoredCount || 0) + ' 筆）</div>' +
+      '<div class="grid2" style="margin-top:10px">' +
+        '<div><label>審核狀態</label><select class="field" data-f="status">' + opts + '</select></div>' +
+        '<div><label>到期日（訂閱制用）</label><input class="field" type="date" data-f="expiry" value="' + esc(m.expiry) + '"></div>' +
+        '<div><label>專屬帳號</label><input class="field" data-f="account" maxlength="20" value="' + esc(m.account) + '"></div>' +
+        '<div><label>專屬密碼</label><input class="field" data-f="password" maxlength="20" value="' + esc(m.password) + '"></div>' +
+        '<div><label>UID（轉永久用戶用）</label><input class="field" data-f="uid" maxlength="40" value="' + esc(m.uid) + '"></div>' +
+      '</div>' +
+      '<div class="row-btns">' +
+        '<button class="btn btn-sm" type="button" data-act="save">儲存修改</button>' +
+        '<button class="btn btn-sm btn-ghost" type="button" data-act="copy">複製私訊文案</button>' +
+        '<button class="btn btn-sm btn-ghost" type="button" data-act="toUid">🔄 轉為 UID 永久用戶</button>' +
+        '<button class="btn btn-sm btn-ghost" type="button" data-act="toSub">📅 轉為訂閱（依到期日）</button>' +
+      '</div></div>';
+  }
+
+  async function adminRun(action, data, okText) {
+    try {
+      await api(action, data, token);
+      showMsg($('adminMsg'), okText, 'ok');
+      await loadAdminMembers();
+    } catch (err) { handleErr(err, $('adminMsg')); }
+  }
+
+  async function memberClick(ev) {
+    const btn = ev.target.closest('[data-act]');
+    if (!btn) return;
+    const card = btn.closest('[data-mid]');
+    const m = adminMembers.find(x => x.memberId === card.dataset.mid);
+    if (!m) return;
+    const f = k => card.querySelector('[data-f="' + k + '"]').value.trim();
+    const memberId = m.memberId;
+    switch (btn.dataset.act) {
+      case 'save':
+        return adminRun('adminUpdateMember', { memberId, status: f('status'), account: f('account'), password: f('password'), expiry: f('expiry') }, '✅ 已儲存，私訊文案已更新');
+      case 'toUid':
+        if (!confirm('確定轉為 UID 永久用戶？到期日會被清除。')) return;
+        return adminRun('adminConvertType', { memberId, toType: 'uid', uid: f('uid') }, '✅ 已轉為 UID 永久用戶');
+      case 'toSub':
+        if (!f('expiry')) { showMsg($('adminMsg'), '請先選擇到期日', 'err'); return; }
+        return adminRun('adminConvertType', { memberId, toType: 'sub', expiry: f('expiry') }, '✅ 已轉為訂閱制');
+      case 'copy': {
+        if (!m.message) { showMsg($('adminMsg'), '尚未開通，沒有私訊文案', 'err'); return; }
+        const ok = await copyText(m.message);
+        showMsg($('adminMsg'), ok ? '✅ 私訊文案已複製' : '複製失敗，請手動選取', ok ? 'ok' : 'err');
+        return;
+      }
+    }
+  }
+
+  /* ---------- 村長後台：批改學員倉位 ---------- */
+  async function loadReview() {
+    $('reviewBox').innerHTML = '<p class="muted">載入中…</p>';
+    try {
+      reviewTrades = (await api('adminListTrades', {}, token)).trades || [];
+      renderReview();
+    } catch (err) {
+      $('reviewBox').innerHTML = '';
+      handleErr(err, $('reviewMsg'));
+    }
+  }
+
+  function renderReview() {
+    const q = $('rvSearch').value.trim().toLowerCase();
+    const list = reviewTrades.filter(t => !q || (String(t.identity) + ' ' + String(t.coin)).toLowerCase().indexOf(q) >= 0);
+    $('reviewBox').innerHTML = list.length
+      ? list.map(reviewHtml).join('')
+      : '<p class="muted" style="margin-top:12px">沒有符合條件的交易</p>';
+  }
+
+  function reviewHtml(t) {
+    const items = t.scoreItems || [null, null, null, null];
+    const shot = safeUrl(t.screenshot);
+    return '<div class="trade" data-tid="' + esc(t.tradeId) + '">' +
+      '<div class="trade-head"><span>' + esc(t.identity) + '｜' + esc(t.coin) + '｜' + (t.side === 'short' ? '做空' : '做多') + '｜' + esc(t.leverage) + 'x</span>' +
+      '<span class="' + cls(t.net) + '">' + signed(t.net) + ' USDT</span></div>' +
+      '<div class="trade-meta">' + esc(t.openDate) + ' → ' + esc(t.closeDate) + '｜' + (t.mode === 'batch' ? '分批' : '單筆') + '｜' + esc(t.exchange) + '</div>' +
+      '<div class="trade-meta">開倉 ' + fnum(t.entryAvg) + '｜平倉 ' + fnum(t.exitAvg) + '｜持倉量 ' + fnum(t.qty) + '｜交易量 ' + money(t.volume) + '</div>' +
+      (t.notes ? '<div class="pre">學員心得：' + esc(t.notes) + '</div>' : '') +
+      (shot ? '<img src="' + esc(shot) + '" alt="盤面截圖" loading="lazy">' : '') +
+      '<div class="grid2" style="margin-top:10px">' + SCORE_LABELS.map((l, i) =>
+        '<div><label>' + l + '（0–25）</label><input class="field" type="number" min="0" max="25" step="1" data-sc="' + i + '" value="' + (items[i] == null ? '' : esc(items[i])) + '"></div>'
+      ).join('') + '</div>' +
+      '<div class="trade-meta">總分：<span data-total>' + (t.score == null ? '—' : esc(t.score)) + '</span> / 100</div>' +
+      '<div style="margin-top:8px"><label>村長評語（學員可見）</label><textarea class="field" rows="3" maxlength="2000" data-comment>' + esc(t.comment) + '</textarea></div>' +
+      '<div class="row-btns"><button class="btn btn-sm" type="button" data-act="review">儲存評分與評語</button></div>' +
+      '</div>';
+  }
+
+  function updateTotal(card) {
+    const vals = [...card.querySelectorAll('[data-sc]')].map(i => i.value.trim());
+    const ok = vals.every(v => v !== '');
+    card.querySelector('[data-total]').textContent = ok ? String(vals.reduce((a, v) => a + Number(v), 0)) : '—';
+  }
+
+  async function saveReview(card) {
+    const vals = [...card.querySelectorAll('[data-sc]')].map(i => i.value.trim());
+    const filled = vals.filter(v => v !== '').length;
+    if (filled !== 0 && filled !== 4) { showMsg($('reviewMsg'), '四項評分要全部填寫，或全部留空', 'err'); return; }
+    try {
+      await api('adminSaveReview', {
+        tradeId: card.dataset.tid,
+        scores: { stop: vals[0], position: vals[1], complete: vals[2], depth: vals[3] },
+        comment: card.querySelector('[data-comment]').value
+      }, token);
+      showMsg($('reviewMsg'), '✅ 評分與評語已儲存', 'ok');
+      await loadReview();
+    } catch (err) { handleErr(err, $('reviewMsg')); }
   }
 
   /* ---------- 交易表單 ---------- */
@@ -495,10 +666,9 @@
     editingId = t ? t.tradeId : null;
     $('formTitle').textContent = t ? '編輯交易' : '新增交易';
     $('tradeForm').reset();
-    $('tOpen').value = t ? t.openDate : todayStr();
-    $('tClose').value = t ? t.closeDate : todayStr();
+    $('tOpen').value = t ? String(t.openDate).replace(' ', 'T') : nowStr();
+    $('tClose').value = t ? String(t.closeDate).replace(' ', 'T') : nowStr();
     $('tCoin').value = t ? t.coin : '';
-    setExOption(t ? t.exchange : '');
     $('tSide').value = t && t.side === 'short' ? 'short' : 'long';
     $('tLev').value = t ? t.leverage : 1;
     $('tRR1').value = t && t.expectedRR != null ? t.expectedRR : '';
@@ -535,10 +705,9 @@
     $('tradeForm').scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
-  function setExOption(name) {
-    const sel = $('tEx');
-    if (name && !Array.prototype.some.call(sel.options, o => o.value === name)) sel.add(new Option(name, name));
-    sel.value = name || '';
+  function nowStr() {
+    const d = new Date();
+    return todayStr() + 'T' + String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
   }
 
   function addLeg(kind, price, qty) {
@@ -567,7 +736,6 @@
     return { entries: [{ price: Number($('sEntry').value), qty: q }], exits: [{ price: Number($('sExit').value), qty: q }] };
   }
 
-  /* 與後端相同的計算：加權均價、理論毛損益、交易量 */
   function calcPreview() {
     const L = legsForSave();
     const en = L.entries.filter(l => l.price > 0 && l.qty > 0);
@@ -610,7 +778,6 @@
     if (f) { $('shotPrev').src = URL.createObjectURL(f); $('shotPrev').hidden = false; }
   }
 
-  /* 壓縮截圖：最長邊 1600px，轉 JPEG，避免超過後端大小上限 */
   function compressImage(file) {
     return new Promise((resolve, reject) => {
       if (!/^image\/(png|jpeg|webp)$/.test(file.type)) return reject(codeError('INVALID_INPUT'));
@@ -654,7 +821,6 @@
       const rr1 = $('tRR1').value, rr2 = $('tRR2').value;
       await api('saveTrade', {
         tradeId: editingId || '',
-        exchange: $('tEx').value,
         coin: $('tCoin').value.trim(),
         side: $('tSide').value,
         leverage: Number($('tLev').value),
@@ -716,16 +882,7 @@
     renderStrats();
   }
 
-  /* ---------- 交易所選單（讀取公開設定） ---------- */
-  async function loadExchangeOptions() {
-    try {
-      const cfg = await api('getPublicConfig', {}, '');
-      exchangeNames = (cfg.exchanges || []).map(e => e.name);
-    } catch (e) { exchangeNames = []; }
-    $('tEx').innerHTML = '<option value="">請選擇</option>' +
-      exchangeNames.map(n => '<option value="' + esc(n) + '">' + esc(n) + '</option>').join('') +
-      '<option value="其他">其他</option>';
-  }
+
 
   /* ---------- 主題 ---------- */
   function toggleTheme() {
@@ -765,6 +922,15 @@
       if (e.target.checked) stratSel.add(e.target.value); else stratSel.delete(e.target.value);
     });
     $('tradeList').addEventListener('click', tradeListClick);
+    $('memberBox').addEventListener('click', memberClick);
+    $('reviewBox').addEventListener('click', e => {
+      const b = e.target.closest('[data-act="review"]');
+      if (b) saveReview(b.closest('[data-tid]'));
+    });
+    $('reviewBox').addEventListener('input', e => {
+      if (e.target.matches('[data-sc]')) updateTotal(e.target.closest('[data-tid]'));
+    });
+    $('rvSearch').addEventListener('input', renderReview);
   }
 
   function init() {
@@ -772,7 +938,6 @@
     loadCustom();
     renderStrats();
     toggleMode();
-    loadExchangeOptions();
     token = lsGet(TOKEN_KEY) || '';
     if (!token) { showLogin(); return; }
     try { state = JSON.parse(lsGet(CACHE_KEY) || 'null'); } catch (e) { state = null; }
