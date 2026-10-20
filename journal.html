@@ -146,6 +146,8 @@
       <div id="statusMsg" class="msg" role="status"></div>
     </div>
 
+    <div id="winBox"></div>
+    <div id="adminDueBox"></div>
     <div class="card"><div class="grid4" id="statsGrid"></div></div>
 
     <div class="tabs" role="tablist">
@@ -235,6 +237,7 @@
       <h2>⚙️ 村長管理後台</h2>
       <p class="muted">修改審核狀態、專屬帳號與密碼、到期日，或轉換會員類型。儲存後私訊文案會自動更新。</p>
       <div id="adminMsg" class="msg" role="status"></div>
+      <div id="lotteryBox" class="trade"></div>
       <div id="memberBox"></div>
     </div>
 
@@ -284,7 +287,9 @@
     DB_WRITE_FAILED: '儲存失敗，請稍後再試',
     SYSTEM_NOT_READY: '系統維護中，請稍後再試',
     INTERNAL_ERROR: '系統維護中，請稍後再試',
-    NETWORK: '網路連線異常，請稍後再試'
+    NETWORK: '網路連線異常，請稍後再試',
+    LOTTERY_TOO_SOON: '距離上次抽獎還不到兩週，請等到時間再抽',
+    NO_CANDIDATE: '目前沒有符合資格的學員可以抽獎'
   };
 
   const $ = id => document.getElementById(id);
@@ -447,6 +452,7 @@
     $('statsGrid').innerHTML = items.map(i =>
       '<div class="stat"><div class="k">' + i[0] + '</div><div class="v ' + i[2] + '">' + esc(i[1]) + '</div></div>'
     ).join('');
+    renderWins(p);
     renderTrades();
     renderLecture();
   }
@@ -525,8 +531,88 @@
     document.querySelectorAll('.tab[data-tab]').forEach(b => b.setAttribute('aria-selected', String(b.dataset.tab === name)));
     Object.keys(PANELS).forEach(k => { $(PANELS[k]).hidden = k !== name; });
     if (name === 'top') loadTop();
-    if (name === 'admin') loadAdminMembers();
+    if (name === 'admin') { loadAdminMembers(); loadLotteryAdmin(); }
     if (name === 'review') loadReview();
+  }
+
+  /* ---------- 紅包抽獎：中獎提示與村長抽獎 ---------- */
+  function renderWins(p) {
+    const wins = (state && state.wins) || [];
+    $('winBox').innerHTML = (p && p.role !== 'admin' && wins.length)
+      ? wins.map(w => '<div class="card" style="border-color:var(--ok)"><strong>🎉 恭喜你在「' + esc(w.board) + '」中獎！</strong><div class="muted" style="margin-top:6px">請私訊村長領取獎品。</div></div>').join('')
+      : '';
+    const L = state && state.lottery;
+    $('adminDueBox').innerHTML = (p && p.role === 'admin' && L && L.isDue)
+      ? '<div class="card" style="border-color:var(--accent)"><strong>🎁 該抽獎了！</strong><div class="muted" style="margin-top:6px">距離上次抽獎已滿兩週，請到「⚙️ 村長管理後台」的「紅包抽獎」開始抽獎。</div></div>'
+      : '';
+  }
+
+  async function loadLotteryAdmin() {
+    const box = $('lotteryBox');
+    box.innerHTML = '<p class="muted">載入中…</p>';
+    try {
+      const d = await api('adminLotteryHistory', {}, token);
+      const st = d.status || {};
+      let statusText;
+      if (!st.hasDrawn) statusText = '尚未抽過獎，可以開始抽獎。';
+      else if (st.isDue) statusText = '🎁 該抽獎了（上次抽獎：' + esc(st.lastAt) + '）';
+      else statusText = '下次可抽獎：' + esc(st.dueAt) + '（還有 ' + esc(st.daysLeft) + ' 天）';
+      const rows = (d.rows || []).map(r =>
+        '<tr><td>' + esc(r.at) + '</td><td>' + esc(r.board) + '</td><td>' + esc(r.identity) + '</td><td>' + esc(r.name) + '</td><td>' +
+        (r.claimed ? '✅ 已領取' : '<button class="btn-mini" type="button" data-claim="' + esc(r.row) + '">標記已領取</button>') +
+        '</td></tr>'
+      ).join('');
+      box.innerHTML =
+        '<h3 style="margin-top:0">🎁 紅包抽獎</h3>' +
+        '<p>' + statusText + '</p>' +
+        '<p class="muted">規則：優秀學員榜前 10 名抽 3 位，交易量排行榜前 10 名抽 3 位，同一人只會中一次。兩次抽獎間隔兩週。</p>' +
+        '<div class="row-btns"><button class="btn btn-sm" type="button" data-act="draw">開始抽獎</button></div>' +
+        '<h4 style="margin-top:14px">最近抽獎紀錄</h4>' +
+        (rows
+          ? '<div class="table-wrap"><table><thead><tr><th>時間</th><th>榜單</th><th>學員</th><th>遮罩名稱</th><th>領取</th></tr></thead><tbody>' + rows + '</tbody></table></div>'
+          : '<p class="muted">尚無紀錄</p>');
+    } catch (err) {
+      box.innerHTML = '';
+      handleErr(err, $('adminMsg'));
+    }
+  }
+
+  async function drawLottery() {
+    if (!confirm('確定要現在抽獎嗎？抽出的結果會寫入紀錄，無法撤銷。')) return;
+    try {
+      let res;
+      try {
+        res = await api('adminRunLottery', { force: false }, token);
+      } catch (err) {
+        if (err.code !== 'LOTTERY_TOO_SOON') throw err;
+        if (!confirm('距離上次抽獎還不到兩週，確定要提前抽獎嗎？')) return;
+        res = await api('adminRunLottery', { force: true }, token);
+      }
+      const names = arr => arr.length ? arr.map(w => w.name).join('、') : '（無符合資格者）';
+      showMsg($('adminMsg'), '✅ 抽獎完成　優秀學員榜：' + names(res.score) + '｜交易量排行榜：' + names(res.volume), 'ok');
+      await loadLotteryAdmin();
+      await syncNow();
+    } catch (err) {
+      handleErr(err, $('adminMsg'));
+    }
+  }
+
+  async function claimLottery(row) {
+    if (!confirm('確認這位學員已經私訊領取完成？')) return;
+    try {
+      await api('adminClaimLottery', { row: row }, token);
+      showMsg($('adminMsg'), '✅ 已標記為已領取，學員的中獎提示已隱藏', 'ok');
+      await loadLotteryAdmin();
+      await syncNow();
+    } catch (err) {
+      handleErr(err, $('adminMsg'));
+    }
+  }
+
+  function lotteryClick(ev) {
+    if (ev.target.closest('[data-act="draw"]')) return drawLottery();
+    const cl = ev.target.closest('[data-claim]');
+    if (cl) return claimLottery(Number(cl.dataset.claim));
   }
 
   /* ---------- 村長後台：學員管理 ---------- */
@@ -923,6 +1009,7 @@
     });
     $('tradeList').addEventListener('click', tradeListClick);
     $('memberBox').addEventListener('click', memberClick);
+    $('lotteryBox').addEventListener('click', lotteryClick);
     $('reviewBox').addEventListener('click', e => {
       const b = e.target.closest('[data-act="review"]');
       if (b) saveReview(b.closest('[data-tid]'));
