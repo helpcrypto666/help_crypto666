@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>幣圈新手村 PRO</title>
+<link rel="icon" href="avatar.png">
+<script>
+  (function () {
+    var t = null;
+    try { t = localStorage.getItem('theme'); } catch (e) {}
+    if (t !== 'dark' && t !== 'light') {
+      t = (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
+    }
+    document.documentElement.setAttribute('data-theme', t);
+  })();
+
+  function iconFallback(img) {
+    if (img.dataset.tried) { img.style.display = 'none'; return; }
+    img.dataset.tried = '1';
+    img.src = img.dataset.alt;
+  }
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+  :root {
+    --bg: #f4f6fb; --card: #ffffff; --text: #111827; --muted: #4b5563; --border: #cbd5e1;
+    --primary: #2563eb; --primary-text: #ffffff; --link: #1d4ed8; --accent: #b45309;
+    --input-bg: #ffffff; --input-text: #111827; --code-bg: #e5e7eb;
+    --warn-bg: #fef3c7; --warn-text: #78350f; --ok: #15803d; --err: #b91c1c;
+    --shadow: 0 1px 3px rgba(15, 23, 42, .08);
+  }
+  :root[data-theme="dark"] {
+    --bg: #0b1220; --card: #131c31; --text: #e5e7eb; --muted: #a3afc2; --border: #334155;
+    --primary: #2563eb; --primary-text: #ffffff; --link: #93c5fd; --accent: #fbbf24;
+    --input-bg: #0f172a; --input-text: #e5e7eb; --code-bg: #1e293b;
+    --warn-bg: #3b2f0b; --warn-text: #fde68a; --ok: #4ade80; --err: #f87171;
+    --shadow: none;
+  }
+
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang TC", "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+    font-size: 16px;
+    line-height: 1.7;
+  }
+  a { color: var(--link); }
+  img { max-width: 100%; }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+  :focus-visible { outline: 3px solid var(--link); outline-offset: 2px; }
+  .wrap { max-width: 1100px; margin: 0 auto; padding: 0 16px; }
+  .muted { color: var(--muted); }
+  h1 { font-size: clamp(1.45rem, 4.5vw, 2.1rem); line-height: 1.3; margin: 0 0 12px; }
+  h2 { font-size: 1.3rem; margin: 0 0 10px; }
+  h3 { font-size: 1.1rem; color: var(--accent); margin: 22px 0 10px; }
+  h4 { font-size: 1rem; margin: 0 0 10px; }
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 20px; margin: 18px 0; box-shadow: var(--shadow); }
+  .card[id] { scroll-margin-top: 84px; }
+
+  /* 導覽列 */
+  .nav { position: sticky; top: 0; z-index: 10; background: var(--card); border-bottom: 1px solid var(--border); }
+  .nav-inner { max-width: 1100px; margin: 0 auto; padding: 10px 16px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; }
+  .brand { display: flex; align-items: center; gap: 10px; min-width: 0; color: var(--text); text-decoration: none; }
+  .brand img { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
+  .brand-title { font-weight: 700; font-size: 1.05rem; white-space: nowrap; }
+  .nav-links { display: flex; gap: 4px; }
+  .nav-links a { color: var(--text); text-decoration: none; padding: 6px 10px; border-radius: 8px; }
+  .nav-links a:hover { background: var(--bg); }
+  .nav-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; justify-content: flex-end; }
+  @media (max-width: 720px) {
+    .nav-links { display: none; }
+    .brand-title { font-size: .95rem; }
+  }
+
+  /* 按鈕 */
+  .btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; background: var(--primary); color: var(--primary-text); border: 1px solid var(--primary); border-radius: 10px; padding: 10px 16px; font: inherit; font-size: .95rem; font-weight: 600; text-decoration: none; cursor: pointer; white-space: nowrap; text-align: center; }
+  .btn:hover { filter: brightness(1.08); }
+  .btn:disabled { opacity: .55; cursor: not-allowed; filter: none; }
+  .btn-sm { padding: 6px 12px; font-size: .88rem; }
+  .btn-outline { background: transparent; color: var(--link); border-color: var(--link); }
+  .btn-ghost { background: var(--card); color: var(--text); border: 1px solid var(--border); }
+  .btn-block { width: 100%; }
+  .btn-mini { font: inherit; font-size: .8rem; padding: 4px 10px; border-radius: 8px; border: 1px solid var(--border); background: var(--card); color: var(--text); cursor: pointer; }
+
+  /* 首屏 */
+  .hero { text-align: center; padding: 36px 0 8px; }
+  .hero-avatar { width: 96px; height: 96px; border-radius: 50%; object-fit: cover; border: 3px solid var(--primary); }
+  .hero .sub { color: var(--muted); max-width: 720px; margin: 0 auto 18px; }
+  .hero-btns { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+  .socials { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px; }
+
+  /* 交易所卡片 */
+  .ex-grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
+  @media (min-width: 640px) { .ex-grid { grid-template-columns: 1fr 1fr; } }
+  @media (min-width: 960px) { .ex-grid { grid-template-columns: 1fr 1fr 1fr; } }
+  .ex-pair { display: grid; grid-template-columns: 1fr; gap: 0 16px; }
+  @media (min-width: 960px) { .ex-pair { grid-template-columns: 1fr 1fr; } }
+  .ex-pair .ex-grid { grid-template-columns: 1fr; }
+  .ex-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 14px; display: flex; flex-direction: column; gap: 10px; }
+  .ex-head { display: flex; align-items: center; gap: 10px; }
+  .ex-icon { width: 40px; height: 40px; object-fit: contain; border-radius: 8px; flex-shrink: 0; }
+  .ex-name { font-weight: 700; }
+  .invite { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; font-size: .9rem; color: var(--muted); }
+  .invite code { background: var(--code-bg); color: var(--text); padding: 2px 8px; border-radius: 6px; font-size: .95rem; }
+
+  /* 教學 */
+  .tabs { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 16px; }
+  .tab { font: inherit; font-size: .92rem; background: var(--card); color: var(--text); border: 1px solid var(--border); border-radius: 999px; padding: 8px 14px; cursor: pointer; }
+  .tab[aria-selected="true"] { background: var(--primary); border-color: var(--primary); color: var(--primary-text); }
+  .steps { display: grid; grid-template-columns: 1fr; gap: 14px; }
+  @media (min-width: 768px) { .steps { grid-template-columns: 1fr 1fr; } }
+  .step { display: flex; gap: 12px; align-items: flex-start; background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 14px; }
+  .step.warn { background: var(--warn-bg); color: var(--warn-text); border-color: var(--accent); }
+  .step-no { width: 30px; height: 30px; border-radius: 50%; background: var(--primary); color: var(--primary-text); display: flex; align-items: center; justify-content: center; font-weight: 700; flex-shrink: 0; }
+  .step-body { flex: 1; min-width: 0; }
+  .step-body p { margin: 0 0 8px; }
+  .step-img img { display: block; max-width: 200px; max-height: 260px; width: auto; height: auto; border-radius: 8px; border: 1px solid var(--border); margin-top: 8px; }
+  .step-imgs { display: flex; flex-direction: column; gap: 8px; }
+  @media (min-width: 768px) { .step-imgs { flex-direction: row; flex-wrap: wrap; align-items: flex-start; } }
+
+  /* 表單 */
+  label { display: block; font-weight: 600; margin-bottom: 6px; }
+  .form-row { margin-bottom: 14px; }
+  .field { width: 100%; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--border); background: var(--input-bg); color: var(--input-text); font: inherit; }
+  .field::placeholder { color: var(--muted); opacity: 1; }
+  select.field option { background: var(--input-bg); color: var(--input-text); }
+  .inline { display: flex; gap: 8px; }
+  .inline select.field { flex: 0 0 130px; width: auto; }
+  .inline input.field { flex: 1; min-width: 0; }
+  .step-box { border: 1px dashed var(--border); border-radius: 12px; padding: 14px; margin-bottom: 14px; }
+  .addr { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; background: var(--code-bg); border-radius: 10px; padding: 10px; margin: 8px 0; }
+  .addr code { flex: 1; min-width: 0; word-break: break-all; color: var(--text); font-size: .9rem; }
+  .qr-box { display: inline-block; background: #ffffff; padding: 8px; border-radius: 10px; margin-top: 10px; }
+  .msg { margin-top: 12px; padding: 10px 12px; border-radius: 10px; font-size: .95rem; }
+  .msg:empty { display: none; }
+  .msg.ok { color: var(--ok); border: 1px solid var(--ok); }
+  .msg.err { color: var(--err); border: 1px solid var(--err); }
+
+  /* 免責聲明 */
+  .disclaimer { border-top: 1px solid var(--border); margin-top: 28px; padding: 18px 0 32px; font-size: .86rem; color: var(--muted); }
+  .disclaimer strong { color: var(--accent); }
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="nav-inner">
+    <a class="brand" href="#top">
+      <img src="avatar.png" data-alt="avatar.jpg" alt="村長" onerror="iconFallback(this)">
+      <span class="brand-title">幣圈新手村 PRO</span>
+    </a>
+    <nav class="nav-links">
+      <a href="#exchanges">交易所</a>
+      <a href="#tutorial">新手教學</a>
+      <a href="#apply">VIP 申請</a>
+    </nav>
+    <div class="nav-actions">
+      <a class="btn btn-sm" href="journal.html">PRO 復盤系統</a>
+      <button id="themeBtn" class="btn btn-ghost btn-sm" type="button" aria-label="切換亮色或暗色模式">☀️ 亮色 / 🌙 暗色</button>
+    </div>
+  </div>
+</header>
+
+<main class="wrap" id="top">
+
+  <section class="hero">
+    <img class="hero-avatar" src="avatar.png" data-alt="avatar.jpg" alt="村長大頭照" onerror="iconFallback(this)">
+    <h1>安全出入金・實戰教學・PRO 交易復盤系統</h1>
+    <p class="sub">使用村長專屬連結註冊交易所，即可免費申請開通「PRO 交易復盤系統」（內含核心講義以及眾多功能）。</p>
+    <div class="hero-btns">
+      <a class="btn" href="#exchanges">交易所</a>
+      <a class="btn btn-outline" href="#tutorial">新手教學</a>
+      <a class="btn btn-outline" href="#apply">VIP 申請</a>
+    </div>
+  </section>
+
+  <section class="card" id="about">
+    <h2>👑 村長介紹</h2>
+    <!-- 這段是範例文字，請換成你自己的介紹 -->
+    <p>歡迎來到幣圈新手村。這裡會帶你從交易所註冊、台幣出入金開始，一步一步學會如何安全地進入加密貨幣市場，並用復盤養成自己的交易紀律。</p>
+    <div class="socials">
+      <a class="btn btn-outline btn-sm" id="sIg" href="https://www.instagram.com/help_crypto666?srtk=MTZlbGxsc3VzZTYyaw==" target="_blank" rel="noopener noreferrer">Instagram</a>
+      <a class="btn btn-outline btn-sm" id="sThreads" href="https://www.threads.com/@help_crypto666" target="_blank" rel="noopener noreferrer">Threads</a>
+      <a class="btn btn-outline btn-sm" id="sTgP" href="https://t.me/hijfknbv" target="_blank" rel="noopener noreferrer">@hijfknbv</a>
+      <a class="btn btn-outline btn-sm" id="sTgG" href="https://t.me/+xyRLxOqigKI5ZWE1" target="_blank" rel="noopener noreferrer">Telegram 群組</a>
+    </div>
+  </section>
+
+  <section class="card" id="exchanges">
+    <h2>🔗 交易所與工具推薦</h2>
+    <p class="muted">點選「立即註冊」前往官網，邀請碼可一鍵複製。</p>
+    <div id="exchangeList"><p class="muted">載入中…</p></div>
+  </section>
+
+  <section class="card" id="tutorial">
+    <h2>📚 四大圖文教學</h2>
+    <p class="muted">請依序完成。截圖僅供參考，實際畫面以各平台為準。</p>
+    <div class="tabs" role="tablist" id="tutTabs"></div>
+    <div id="tutPanels"></div>
+  </section>
+
+  <section class="card" id="apply">
+    <h2>🎫 VIP 通行證申請</h2>
+    <p class="muted">送出申請後，村長審核通過會私訊您專屬帳號與密碼。</p>
+
+    <div class="tabs" role="tablist">
+      <button class="tab" role="tab" type="button" data-ch="uid" aria-selected="true">通道一：交易所 UID 審核</button>
+      <button class="tab" role="tab" type="button" data-ch="sub" aria-selected="false">通道二：訂閱制開通</button>
+    </div>
+
+    <form id="formUid" autocomplete="off">
+      <div class="form-row">
+        <label for="uidExchange">選擇註冊的交易所</label>
+        <select id="uidExchange" class="field" required></select>
+      </div>
+      <div class="form-row">
+        <label for="uidValue">交易所 UID</label>
+        <input id="uidValue" class="field" type="text" maxlength="40" placeholder="請輸入交易所 UID" required>
+      </div>
+      <div class="form-row">
+        <label>聯絡方式</label>
+        <div class="inline">
+          <select id="uidContactType" class="field" required></select>
+          <input id="uidContactId" class="field" type="text" maxlength="100" placeholder="請輸入帳號" required>
+        </div>
+      </div>
+      <button class="btn btn-block" type="submit">送出 UID 申請</button>
+      <div class="msg" id="msgUid" role="status"></div>
+    </form>
+
+    <form id="formSub" autocomplete="off" hidden>
+      <div class="step-box">
+        <h4>步驟 1：選擇訂閱方案</h4>
+        <select id="subPlan" class="field" required></select>
+        <p id="planPrice" class="muted" style="margin:10px 0 0"></p>
+      </div>
+      <div class="step-box">
+        <h4>步驟 2：選擇支付幣種</h4>
+        <select id="subCurrency" class="field" required></select>
+      </div>
+      <div class="step-box">
+        <h4>步驟 3：選擇轉帳網路，並向下方地址付款</h4>
+        <select id="subChain" class="field" required></select>
+        <div id="addrWrap" hidden>
+          <p class="muted" style="margin:10px 0 0">請將款項轉至以下地址：</p>
+          <div class="addr">
+            <code id="addrText"></code>
+            <button id="copyAddr" class="btn-mini" type="button">複製地址</button>
+          </div>
+          <div id="qrBox" class="qr-box"></div>
+        </div>
+      </div>
+      <div class="step-box">
+        <h4>步驟 4：填寫轉帳哈希值 (TxID)</h4>
+        <input id="subTxid" class="field" type="text" maxlength="120" placeholder="請貼上交易哈希值" required>
+      </div>
+      <div class="step-box">
+        <h4>步驟 5：填寫聯絡方式</h4>
+        <div class="inline">
+          <select id="subContactType" class="field" required></select>
+          <input id="subContactId" class="field" type="text" maxlength="100" placeholder="請輸入帳號" required>
+        </div>
+      </div>
+      <button id="subSubmit" class="btn btn-block" type="submit">送出訂閱申請</button>
+      <div class="msg" id="msgSub" role="status"></div>
+    </form>
+  </section>
+
+  <footer class="disclaimer">
+    <p><strong>⚠️ 投資理財風險自負聲明</strong></p>
+    <p>本網站所有內容（包含村長的教學、講義、復盤紀錄與工具推薦）僅供學習與經驗分享，不構成任何投資建議、買賣推薦或財務建議。加密貨幣與衍生品價格波動劇烈，可能導致本金全部損失，請依自身風險承受能力審慎評估。所有交易與投資決策均由使用者自行判斷，並自負盈虧。</p>
+    <p>各交易所之服務條款、活動規則與可用地區，請以各平台官方公告為準。</p>
+    <p>© 幣圈新手村 PRO</p>
+    <p class="muted" id="verText"></p>
+  </footer>
+</main>
+
+<script>
+  const API_URL = 'https://script.google.com/macros/s/AKfycby-oIzel0yPK_zLna564GdTHE_EFICkWT5UEghHkh_9kciPpWzhLzycZG-stPyhK8IR/exec';
+  const CONTACT_TYPES = ['IG', 'TG', 'Threads'];
+  let PAYMENTS = [];
+  let PLANS_CFG = [];
+
+  const TUTORIALS = [
+    { title: '🟢 註冊幣託 BitoPro', steps: [
+      { t: '選擇一種方式註冊。', imgs: ['reg_bitopro_1.png'] },
+      { t: '確認已填寫邀請碼，並同意使用條款後，點選「下一步」。', imgs: ['reg_bitopro_2.png'] },
+      { t: '填寫手機號碼。', imgs: ['reg_bitopro_3.png'] },
+      { t: '點選「身分驗證」，送出後等待一到兩個工作天。', imgs: ['reg_bitopro_4.png'] },
+      { t: '到「帳戶」中選擇「銀行帳戶」。', imgs: ['reg_bitopro_5.png'] },
+      { t: '依照畫面要求填寫資料，提交後等待兩到三個工作天審核。', imgs: ['reg_bitopro_6.png'] }
+    ]},
+    { title: '🔵 註冊國際交易所', steps: [
+      { t: '與村長討論後，使用村長的連結與邀請碼註冊，再到應用商店下載對應的交易所 App。', imgs: ['reg_exchange_1.png'] },
+      { t: '登入剛剛註冊的帳號與密碼。', imgs: ['reg_exchange_2.png'] },
+      { t: '點選左上角的頭像，依照指示完成「身分驗證」、「身分認證」或「實名認證」。', imgs: ['reg_exchange_3.png'] }
+    ]},
+    { title: '📥 台幣入金與轉帳', steps: [
+      { t: '身分驗證通過、銀行帳號審核成功後，回到幣託首頁，選擇「台幣加值」。', imgs: ['dep_1.png'] },
+      { t: '複製幣託生成的專屬銀行帳號，再用當初在幣託綁定的銀行帳戶，轉新台幣到這個帳號。', imgs: ['dep_2.png'] },
+      { t: '台幣到帳後，回到首頁選擇「一鍵買賣」，點選中間的轉換符號，確認買賣方向為 TWD 換成 USDT。', imgs: ['dep_4.png'] },
+      { t: '輸入想要買入的金額，勾選同意條款後，點選「下一步」。', imgs: ['dep_5.png'] },
+      { t: '回到幣託的資產頁面，點選「提領」。', imgs: ['dep_9.png'] },
+      { t: '選擇 USDT，提領網路選擇「BEP20」。', imgs: ['dep_6.1.png', 'dep_6.2.png'] },
+      { t: '到交易所的主畫面或右下角的資產頁面，選擇「充值」。' },
+      { t: '選擇 USDT，充值網路選擇「BEP20」。' },
+      { t: '複製交易所提供的地址，回到幣託的提領頁面，貼上到「提領到」。' },
+      { t: '請確認幣託與交易所的提領網路、錢包地址完全一致，否則資產會遺失。', imgs: ['dep_12.png'], warn: true },
+      { t: '輸入提領金額後點選「下一步」，並依照畫面要求完成驗證。' },
+      { t: '依照金管會的要求，驗證時請輸入補充資訊。', imgs: ['dep_12b.png'] },
+      { t: '驗證後 3 到 5 分鐘，交易所就會收到剛剛轉帳的 USDT。' }
+    ]},
+    { title: '📤 國際交易所出金', steps: [
+      { t: '到交易所右下角的資產頁面，點選「提領」或「提幣」。' },
+      { t: '選擇 USDT，提領網路選擇「BEP20」。' },
+      { t: '到幣託的資產頁面，選擇「加值」。', imgs: ['with_1.png'] },
+      { t: '選擇 USDT，網路選擇「BEP20」。' },
+      { t: '複製幣託提供的地址，回到交易所貼上到提領地址欄位，並確認網路與地址無誤。', imgs: ['with_3.png'] },
+      { t: '輸入提領金額後點選「下一步」，並依照畫面要求完成驗證。' },
+      { t: '3 到 5 分鐘後，幣託就會收到剛剛轉帳的 USDT。' },
+      { t: '到幣託首頁，選擇「一鍵買賣」，點選中間的轉換符號，把 USDT 賣出換成新台幣（TWD）。', imgs: ['with_5.png'] },
+      { t: '輸入要賣出的 USDT 數量，勾選同意條款後，點選「下一步」。' },
+      { t: '到幣託的資產頁面，選擇「提領」。', imgs: ['with_6.png'] },
+      { t: '選擇「新台幣」，輸入提款金額後，點選「下一步」。', imgs: ['with_7.png', 'with_8.png'] },
+      { t: '輸入提領金額後按下一步，兩個工作天內提領的新台幣就要匯入指定的銀行帳戶。' }
+    ]}
+  ];
+
+  const ERR_TEXT = {
+    BAD_REQUEST: '系統版本不一致，請重新整理頁面',
+    UNKNOWN_ACTION: '系統版本不一致，請重新整理頁面',
+    INVALID_INPUT: '資料格式有誤，請檢查欄位',
+    TXID_INVALID: '交易哈希值格式不正確，請貼上完整的 TxID',
+    PLAN_UNAVAILABLE: '此方案目前未開放，請聯繫村長',
+    DUPLICATE_UID: '此 UID 已申請過，如有疑問請私訊村長',
+    DUPLICATE_TXID: '此轉帳紀錄已提交過，請勿重複申請',
+    DUPLICATE_ACCOUNT: '此專屬帳號已被使用，請換一個',
+    AUTH_FAILED: '帳號或密碼錯誤',
+    TOO_MANY_ATTEMPTS: '嘗試次數過多，請 10 分鐘後再試',
+    PENDING_REVIEW: '申請審核中，審核通過後即可登入',
+    PAUSED: '您的帳號目前已暫停使用，請聯繫村長恢復權限',
+    EXPIRED: '您的訂閱已到期，請續費後再登入',
+    NOT_READY: '帳號設定尚未完成，請聯繫村長',
+    SESSION_INVALID: '登入已過期，請重新登入',
+    FORBIDDEN: '沒有權限執行此操作',
+    NOT_FOUND: '找不到這筆資料，請重新整理',
+    SYSTEM_BUSY: '系統忙碌，請稍後再試',
+    DB_WRITE_FAILED: '儲存失敗，請稍後再試',
+    SYSTEM_NOT_READY: '系統維護中，請稍後再試',
+    INTERNAL_ERROR: '系統維護中，請稍後再試',
+    NETWORK: '網路連線異常，請稍後再試'
+  };
+
+  /* ---------- 共用工具 ---------- */
+  function esc(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, c =>
+      ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
+  }
+  function safeUrl(u) {
+    const t = String(u || '').trim();
+    return /^https:\/\//i.test(t) ? t : '';
+  }
+  function errText(code) {
+    return ERR_TEXT[code] || '系統發生錯誤';
+  }
+  function codeError(code) {
+    const e = new Error(code);
+    e.code = code;
+    return e;
+  }
+  async function api(action, data) {
+    let json;
+    try {
+      const res = await fetch(API_URL, {
+        method: 'POST',
+        body: JSON.stringify({ action, data: data || {} })
+      });
+      json = await res.json();
+    } catch (e) {
+      throw codeError('NETWORK');
+    }
+    if (!json || !json.ok) throw codeError((json && json.code) || 'INTERNAL_ERROR');
+    return json.data;
+  }
+  async function copyText(text) {
+    try {
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(text);
+        return true;
+      }
+    } catch (e) {}
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.setAttribute('readonly', '');
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    let ok = false;
+    try { ok = document.execCommand('copy'); } catch (e) {}
+    document.body.removeChild(ta);
+    return ok;
+  }
+  function flash(btn, text) {
+    const orig = btn.dataset.orig || btn.textContent;
+    btn.dataset.orig = orig;
+    btn.textContent = text;
+    clearTimeout(btn._t);
+    btn._t = setTimeout(() => { btn.textContent = orig; }, 1500);
+  }
+
+  /* ---------- 社群連結與交易所 ---------- */
+  function setLink(id, url) {
+    const a = document.getElementById(id);
+    const u = safeUrl(url);
+    if (a && u) a.href = u;
+  }
+
+  function exCardHtml(e) {
+    const base = esc(String(e.code || '').replace(/^link-/, ''));
+    const link = safeUrl(e.inviteLink);
+    const showInvite = e.applyable && e.inviteCode;
+    const invite = showInvite
+      ? '<div class="invite"><span>邀請碼</span><code>' + esc(e.inviteCode) + '</code>' +
+        '<button class="btn-mini" type="button" data-copy="' + esc(e.inviteCode) + '">複製</button></div>'
+      : '';
+    const btn = link
+      ? '<a class="btn btn-block" href="' + esc(link) + '" target="_blank" rel="noopener noreferrer">' +
+        (e.applyable ? '立即註冊' : '前往官網') + '</a>'
+      : '';
+    return '<div class="ex-card">' +
+      '<div class="ex-head">' +
+        '<img class="ex-icon" src="' + base + '_icon.png" data-alt="' + base + '.png" alt="" onerror="iconFallback(this)">' +
+        '<div class="ex-name">' + esc(e.name) + '</div>' +
+      '</div>' + invite + btn +
+    '</div>';
+  }
+
+  function renderExchanges(list) {
+    const box = document.getElementById('exchangeList');
+    if (!list.length) {
+      box.innerHTML = '<p class="muted">目前沒有推薦項目</p>';
+      return;
+    }
+    const groups = {};
+    const order = [];
+    list.forEach(e => {
+      const cat = e.category || '其他推薦';
+      if (!groups[cat]) { groups[cat] = []; order.push(cat); }
+      groups[cat].push(e);
+    });
+    const block = cat => '<div><h3>' + esc(cat) + '</h3><div class="ex-grid">' + groups[cat].map(exCardHtml).join('') + '</div></div>';
+    const pairCats = order.filter(c => /台灣合規|專業看盤/.test(c));
+    let html = '';
+    order.forEach(cat => {
+      if (pairCats.length === 2 && pairCats.indexOf(cat) >= 0) {
+        if (cat === pairCats[0]) html += '<div class="ex-pair">' + pairCats.map(block).join('') + '</div>';
+        return;
+      }
+      html += block(cat);
+    });
+    box.innerHTML = html;
+  }
+
+  /* ---------- 教學 ---------- */
+  const IMG_EXTS = ['.png', '.PNG', '.jpg', '.JPG', '.jpeg', '.webp'];
+  function imgNext(img) {
+    const i = Number(img.dataset.try || 0) + 1;
+    if (i < IMG_EXTS.length) {
+      img.dataset.try = String(i);
+      img.src = img.dataset.base + IMG_EXTS[i];
+    } else {
+      img.parentElement.remove();
+    }
+  }
+  function stepHtml(s, n) {
+    const imgs = (s.imgs || []).map(src => {
+      const base = src.replace(/\.[^.]+$/, '');
+      return '<div class="step-img"><img src="' + esc(src) + '" data-base="' + esc(base) + '" data-try="0" alt="第 ' + n + ' 步截圖" loading="lazy" onerror="imgNext(this)"></div>';
+    }).join('');
+    const wrap = imgs ? '<div class="step-imgs">' + imgs + '</div>' : '';
+    return '<div class="step' + (s.warn ? ' warn' : '') + '">' +
+      '<div class="step-no">' + n + '</div>' +
+      '<div class="step-body"><p>' + esc(s.t) + '</p>' + wrap + '</div>' +
+    '</div>';
+  }
+
+  function stepHtmlOld(s, n) {
+    const imgs = (s.imgs || []).map(src =>
+      '<div class="step-img"><img src="' + esc(src) + '" alt="第 ' + n + ' 步截圖" loading="lazy" onerror="this.parentElement.remove()"></div>'
+    ).join('');
+    return '<div class="step' + (s.warn ? ' warn' : '') + '">' +
+      '<div class="step-no">' + n + '</div>' +
+      '<div class="step-body"><p>' + esc(s.t) + '</p>' + imgs + '</div>' +
+    '</div>';
+  }
+
+  function renderTutorial() {
+    document.getElementById('tutTabs').innerHTML = TUTORIALS.map((t, i) =>
+      '<button class="tab" role="tab" type="button" data-tut="' + i + '" aria-selected="' + (i === 0) + '">' + esc(t.title) + '</button>'
+    ).join('');
+    document.getElementById('tutPanels').innerHTML = TUTORIALS.map((t, i) =>
+      '<div class="steps" role="tabpanel" data-panel="' + i + '"' + (i === 0 ? '' : ' hidden') + '>' +
+        t.steps.map((s, j) => stepHtml(s, j + 1)).join('') +
+      '</div>'
+    ).join('');
+  }
+
+  /* ---------- VIP 申請 ---------- */
+  function fillContactSelects() {
+    const opts = CONTACT_TYPES.map(c => '<option value="' + c + '">' + c + '</option>').join('');
+    document.getElementById('uidContactType').innerHTML = opts;
+    document.getElementById('subContactType').innerHTML = opts;
+  }
+
+  function fillUidForm(list) {
+    document.getElementById('uidExchange').innerHTML =
+      '<option value="">請選擇交易所</option>' +
+      list.map(e => '<option value="' + esc(e.code) + '">' + esc(e.name) + '</option>').join('');
+  }
+
+  function fillSubForm(plans, payments) {
+    PAYMENTS = payments;
+    document.getElementById('subPlan').innerHTML =
+      '<option value="">請選擇方案</option>' +
+      plans.map(p => '<option value="' + p.days + '"' + (p.price ? '' : ' disabled') + '>' + esc(p.label) + (p.price ? '｜' + p.price + ' USDT' : '｜尚未開放') + '</option>').join('');
+    PLANS_CFG = plans;
+    refreshPlanPrice();
+
+    const currencies = [...new Set(payments.map(p => p.currency))];
+    const cur = document.getElementById('subCurrency');
+    if (!currencies.length) {
+      cur.innerHTML = '<option value="">目前尚未開放付款</option>';
+      cur.disabled = true;
+    } else {
+      cur.disabled = false;
+      cur.innerHTML = '<option value="">請選擇幣種</option>' +
+        currencies.map(c => '<option value="' + esc(c) + '">' + esc(c) + '</option>').join('');
+    }
+    document.getElementById('subSubmit').disabled = !currencies.length;
+    refreshChains();
+  }
+
+  function refreshPlanPrice() {
+    const days = document.getElementById('subPlan').value;
+    const p = PLANS_CFG.find(x => String(x.days) === days);
+    document.getElementById('planPrice').textContent = p && p.price
+      ? '應付金額：' + p.price + ' USDT'
+      : (days ? '此方案目前未開放，請選擇其他方案' : '');
+  }
+
+  function refreshChains() {
+    const cur = document.getElementById('subCurrency').value;
+    const chains = PAYMENTS.filter(p => p.currency === cur);
+    document.getElementById('subChain').innerHTML =
+      '<option value="">請選擇網路</option>' +
+      chains.map(p => '<option value="' + esc(p.chain) + '">' + esc(p.chain) + '</option>').join('');
+    showAddress();
+  }
+
+  function showAddress() {
+    const cur = document.getElementById('subCurrency').value;
+    const chain = document.getElementById('subChain').value;
+    const pay = PAYMENTS.find(p => p.currency === cur && p.chain === chain);
+    const wrap = document.getElementById('addrWrap');
+    const qrBox = document.getElementById('qrBox');
+    qrBox.innerHTML = '';
+    if (!pay) {
+      wrap.hidden = true;
+      return;
+    }
+    wrap.hidden = false;
+    document.getElementById('addrText').textContent = pay.address;
+    if (window.QRCode) {
+      new QRCode(qrBox, { text: pay.address, width: 160, height: 160 });
+    }
+  }
+
+  async function submitForm(form, msgEl, payload, okText) {
+    const btn = form.querySelector('button[type="submit"]');
+    const wasDisabled = btn ? btn.disabled : false;
+    msgEl.className = 'msg';
+    msgEl.textContent = '';
+    if (btn) btn.disabled = true;
+    try {
+      await api('applyVip', payload);
+      msgEl.className = 'msg ok';
+      msgEl.textContent = okText;
+      form.reset();
+      return true;
+    } catch (err) {
+      msgEl.className = 'msg err';
+      msgEl.textContent = errText(err.code);
+      return false;
+    } finally {
+      if (btn) btn.disabled = wasDisabled;
+    }
+  }
+
+  /* ---------- 載入設定 ---------- */
+  async function loadConfig() {
+    try {
+      const cfg = await api('getPublicConfig');
+      const s = cfg.socials || {};
+      setLink('sIg', s.ig);
+      setLink('sThreads', s.threads);
+      setLink('sTgP', s.tgPersonal);
+      setLink('sTgG', s.tgGroup);
+      renderExchanges(cfg.exchanges || []);
+      document.getElementById('verText').textContent = cfg.version ? '版本 ' + cfg.version : '';
+      fillUidForm(cfg.applyExchanges || []);
+      fillSubForm(cfg.plans || [], cfg.payments || []);
+    } catch (err) {
+      document.getElementById('exchangeList').innerHTML =
+        '<p class="msg err">' + esc(errText(err.code)) + '</p>';
+      document.getElementById('subSubmit').disabled = true;
+    }
+  }
+
+  /* ---------- 事件 ---------- */
+  document.getElementById('themeBtn').addEventListener('click', () => {
+    const current = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
+    const next = current === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', next);
+    try { localStorage.setItem('theme', next); } catch (e) {}
+  });
+
+  document.addEventListener('click', async ev => {
+    const btn = ev.target.closest('[data-copy]');
+    if (!btn) return;
+    const ok = await copyText(btn.dataset.copy);
+    flash(btn, ok ? '已複製' : '複製失敗');
+  });
+
+  document.getElementById('tutTabs').addEventListener('click', ev => {
+    const b = ev.target.closest('[data-tut]');
+    if (!b) return;
+    const idx = b.dataset.tut;
+    document.querySelectorAll('#tutTabs [data-tut]').forEach(x => x.setAttribute('aria-selected', String(x === b)));
+    document.querySelectorAll('#tutPanels [data-panel]').forEach(p => { p.hidden = p.dataset.panel !== idx; });
+  });
+
+  document.querySelectorAll('[data-ch]').forEach(b => {
+    b.addEventListener('click', () => {
+      document.querySelectorAll('[data-ch]').forEach(x => x.setAttribute('aria-selected', String(x === b)));
+      document.getElementById('formUid').hidden = b.dataset.ch !== 'uid';
+      document.getElementById('formSub').hidden = b.dataset.ch !== 'sub';
+    });
+  });
+
+  document.getElementById('subPlan').addEventListener('change', refreshPlanPrice);
+  document.getElementById('subCurrency').addEventListener('change', refreshChains);
+  document.getElementById('subChain').addEventListener('change', showAddress);
+  document.getElementById('copyAddr').addEventListener('click', async function () {
+    const ok = await copyText(document.getElementById('addrText').textContent);
+    flash(this, ok ? '已複製' : '複製失敗');
+  });
+
+  document.getElementById('formUid').addEventListener('submit', async ev => {
+    ev.preventDefault();
+    await submitForm(ev.target, document.getElementById('msgUid'), {
+      type: 'uid',
+      exchange: document.getElementById('uidExchange').value,
+      uid: document.getElementById('uidValue').value.trim(),
+      contactType: document.getElementById('uidContactType').value,
+      contactId: document.getElementById('uidContactId').value.trim()
+    }, '已收到 UID 申請，村長審核通過後會私訊您登入資料。');
+  });
+
+  document.getElementById('formSub').addEventListener('submit', async ev => {
+    ev.preventDefault();
+    const ok = await submitForm(ev.target, document.getElementById('msgSub'), {
+      type: 'sub',
+      plan: document.getElementById('subPlan').value,
+      currency: document.getElementById('subCurrency').value,
+      chain: document.getElementById('subChain').value,
+      txid: document.getElementById('subTxid').value.trim(),
+      contactType: document.getElementById('subContactType').value,
+      contactId: document.getElementById('subContactId').value.trim()
+    }, '已收到訂閱申請，村長確認款項後會私訊您登入資料。');
+    if (ok) { refreshChains(); refreshPlanPrice(); }
+  });
+
+  /* ---------- 初始化 ---------- */
+  renderTutorial();
+  fillContactSelects();
+  loadConfig();
+</script>
+</body>
+</html>
