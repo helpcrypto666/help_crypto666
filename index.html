@@ -120,6 +120,8 @@
   .step-body { flex: 1; min-width: 0; }
   .step-body p { margin: 0 0 8px; }
   .step-img img { display: block; max-width: 200px; max-height: 260px; width: auto; height: auto; border-radius: 8px; border: 1px solid var(--border); margin-top: 8px; }
+  .step-imgs { display: flex; flex-direction: column; gap: 8px; }
+  @media (min-width: 768px) { .step-imgs { flex-direction: row; flex-wrap: wrap; align-items: flex-start; } }
 
   /* 表單 */
   label { display: block; font-weight: 600; margin-bottom: 6px; }
@@ -171,8 +173,9 @@
     <h1>安全出入金・實戰教學・PRO 交易復盤系統</h1>
     <p class="sub">使用村長專屬連結註冊交易所，即可免費申請開通「PRO 交易復盤系統」（內含核心講義以及眾多功能）。</p>
     <div class="hero-btns">
-      <a class="btn" href="#exchanges">看交易所推薦</a>
-      <a class="btn btn-outline" href="#apply">申請 VIP 通行證</a>
+      <a class="btn" href="#exchanges">交易所</a>
+      <a class="btn btn-outline" href="#tutorial">新手教學</a>
+      <a class="btn btn-outline" href="#apply">VIP 申請</a>
     </div>
   </section>
 
@@ -289,8 +292,8 @@
       { t: '確認已填寫邀請碼，並同意使用條款後，點選「下一步」。', imgs: ['reg_bitopro_2.png'] },
       { t: '填寫手機號碼。', imgs: ['reg_bitopro_3.png'] },
       { t: '點選「身分驗證」，送出後等待一到兩個工作天。', imgs: ['reg_bitopro_4.png'] },
-      { t: '到「帳戶」中選擇「銀行帳戶」，點進去後選擇「立即綁定」。', imgs: ['reg_bitopro_5.png'] },
-      { t: '依照畫面要求填寫資料，送出後等待兩到三個工作天審核。', imgs: ['reg_bitopro_6.png'] }
+      { t: '到「帳戶」中選擇「銀行帳戶」。', imgs: ['reg_bitopro_5.png'] },
+      { t: '依照畫面要求填寫資料，提交後等待兩到三個工作天審核。', imgs: ['reg_bitopro_6.png'] }
     ]},
     { title: '🔵 註冊國際交易所', steps: [
       { t: '與村長討論後，使用村長的連結與邀請碼註冊，再到應用商店下載對應的交易所 App。', imgs: ['reg_exchange_1.png'] },
@@ -303,7 +306,7 @@
       { t: '台幣到帳後，回到首頁選擇「一鍵買賣」，點選中間的轉換符號，確認買賣方向為 TWD 換成 USDT。', imgs: ['dep_4.png'] },
       { t: '輸入想要買入的金額，勾選同意條款後，點選「下一步」。', imgs: ['dep_5.png'] },
       { t: '回到幣託的資產頁面，點選「提領」。', imgs: ['dep_9.png'] },
-      { t: '選擇 USDT，提領網路選擇「BEP20」。', imgs: ['dep_10.png', 'dep_11.png'] },
+      { t: '選擇 USDT，提領網路選擇「BEP20」。', imgs: ['dep_6.1.png', 'dep_6.2.png'] },
       { t: '到交易所的主畫面或右下角的資產頁面，選擇「充值」。' },
       { t: '選擇 USDT，充值網路選擇「BEP20」。' },
       { t: '複製交易所提供的地址，回到幣託的提領頁面，貼上到「提領到」。' },
@@ -324,7 +327,7 @@
       { t: '輸入要賣出的 USDT 數量，勾選同意條款後，點選「下一步」。' },
       { t: '到幣託的資產頁面，選擇「提領」。', imgs: ['with_6.png'] },
       { t: '選擇「新台幣」，輸入提款金額後，點選「下一步」。', imgs: ['with_7.png', 'with_8.png'] },
-      { t: '兩個工作天內，提領的新台幣就會匯入你的銀行帳戶。' }
+      { t: '輸入提領金額後按下一步，兩個工作天內提領的新台幣就要匯入指定的銀行帳戶。' }
     ]}
   ];
 
@@ -465,7 +468,29 @@
   }
 
   /* ---------- 教學 ---------- */
+  const IMG_EXTS = ['.png', '.PNG', '.jpg', '.JPG', '.jpeg', '.webp'];
+  function imgNext(img) {
+    const i = Number(img.dataset.try || 0) + 1;
+    if (i < IMG_EXTS.length) {
+      img.dataset.try = String(i);
+      img.src = img.dataset.base + IMG_EXTS[i];
+    } else {
+      img.parentElement.remove();
+    }
+  }
   function stepHtml(s, n) {
+    const imgs = (s.imgs || []).map(src => {
+      const base = src.replace(/\.[^.]+$/, '');
+      return '<div class="step-img"><img src="' + esc(src) + '" data-base="' + esc(base) + '" data-try="0" alt="第 ' + n + ' 步截圖" loading="lazy" onerror="imgNext(this)"></div>';
+    }).join('');
+    const wrap = imgs ? '<div class="step-imgs">' + imgs + '</div>' : '';
+    return '<div class="step' + (s.warn ? ' warn' : '') + '">' +
+      '<div class="step-no">' + n + '</div>' +
+      '<div class="step-body"><p>' + esc(s.t) + '</p>' + wrap + '</div>' +
+    '</div>';
+  }
+
+  function stepHtmlOld(s, n) {
     const imgs = (s.imgs || []).map(src =>
       '<div class="step-img"><img src="' + esc(src) + '" alt="第 ' + n + ' 步截圖" loading="lazy" onerror="this.parentElement.remove()"></div>'
     ).join('');
