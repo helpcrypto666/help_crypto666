@@ -98,6 +98,9 @@
 
   /* 交易所卡片 */
   .ex-grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
+  .ex-pair { display: grid; grid-template-columns: 1fr; gap: 0 16px; }
+  @media (min-width: 960px) { .ex-pair { grid-template-columns: 1fr 1fr; } }
+  .ex-pair .ex-grid { grid-template-columns: 1fr; }
   @media (min-width: 640px) { .ex-grid { grid-template-columns: 1fr 1fr; } }
   @media (min-width: 960px) { .ex-grid { grid-template-columns: 1fr 1fr 1fr; } }
   .ex-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 14px; display: flex; flex-direction: column; gap: 10px; }
@@ -270,8 +273,9 @@
   <footer class="disclaimer">
     <p><strong>⚠️ 投資理財風險自負聲明</strong></p>
     <p>本網站所有內容（包含村長的教學、講義、復盤紀錄與工具推薦）僅供學習與經驗分享，不構成任何投資建議、買賣推薦或財務建議。加密貨幣與衍生品價格波動劇烈，可能導致本金全部損失，請依自身風險承受能力審慎評估。所有交易與投資決策均由使用者自行判斷，並自負盈虧。</p>
-    <p>本站部分連結為推薦連結，透過連結註冊時，村長可能獲得推薦獎勵。各交易所之服務條款、活動規則與可用地區，請以各平台官方公告為準。</p>
+    <p>各交易所之服務條款、活動規則與可用地區，請以各平台官方公告為準。</p>
     <p>© 幣圈新手村 PRO</p>
+    <p class="muted" id="verText"></p>
   </footer>
 </main>
 
@@ -297,8 +301,8 @@
     ]},
     { title: '📥 台幣入金與轉帳', steps: [
       { t: '身分驗證通過和銀行帳號審核成功後，回到幣託主頁選擇『台幣加值』。', img: 'dep_1.png' },
-      { t: '複製幣託生成的專屬銀行帳號。', img: 'dep_2.png' },
-      { t: '用當初在幣託綁定的銀行帳戶，轉新台幣到幣託生成的銀行帳號。' },
+      { t: '複製幣託生成的專屬銀行帳號，再用當初在幣託綁定的銀行帳戶，轉新台幣到這個帳號。', img: 'dep_2.png' },
+      
       { t: '台幣到帳後，回到首頁選擇『一鍵買賣』，並點擊中間那個轉換符號確認買賣方向（TWD 換成 USDT）。', img: 'dep_4.png' },
       { t: '輸入想要購買的金額，勾選同意條款後按下一步。', img: 'dep_5.png' },
       { t: '到國際交易所的主畫面或是右下角的資產頁面選擇『充值』。' },
@@ -308,6 +312,7 @@
       { t: '在提領頁面中選擇幣種『USDT』。', img: 'dep_10.png' },
       { t: '在提領網路中選擇鏈種『BEP 20』。', img: 'dep_11.png' },
       { t: '將交易所複製的地址貼上至『提領到』，確認幣託和交易所這兩個畫面的提領鏈種（BEP 20）跟錢包地址都要完全一樣（否則資產會遺失），輸入提領金額後按下一步，並按照要求驗證。', img: 'dep_12.png', warn: true },
+      { t: '依照金管會的要求，驗證時請輸入補充資訊。', img: 'dep_12b.png' },
       { t: '驗證後 3 到 5 分鐘，交易所就會收到剛剛轉帳的 USDT 了！' }
     ]},
     { title: '📤 國際交易所出金', steps: [
@@ -433,6 +438,32 @@
   }
 
   function renderExchanges(list) {
+    const box = document.getElementById('exchangeList');
+    if (!list.length) {
+      box.innerHTML = '<p class="muted">目前沒有推薦項目</p>';
+      return;
+    }
+    const groups = {};
+    const order = [];
+    list.forEach(e => {
+      const cat = e.category || '其他推薦';
+      if (!groups[cat]) { groups[cat] = []; order.push(cat); }
+      groups[cat].push(e);
+    });
+    const block = cat => '<div><h3>' + esc(cat) + '</h3><div class="ex-grid">' + groups[cat].map(exCardHtml).join('') + '</div></div>';
+    const pairCats = order.filter(c => /台灣合規|專業看盤/.test(c));
+    let html = '';
+    order.forEach(cat => {
+      if (pairCats.length === 2 && pairCats.indexOf(cat) >= 0) {
+        if (cat === pairCats[0]) html += '<div class="ex-pair">' + pairCats.map(block).join('') + '</div>';
+        return;
+      }
+      html += block(cat);
+    });
+    box.innerHTML = html;
+  }
+
+  function renderExchangesOld(list) {
     const box = document.getElementById('exchangeList');
     if (!list.length) {
       box.innerHTML = '<p class="muted">目前沒有推薦項目</p>';
@@ -573,6 +604,7 @@
       setLink('sTgP', s.tgPersonal);
       setLink('sTgG', s.tgGroup);
       renderExchanges(cfg.exchanges || []);
+      document.getElementById('verText').textContent = cfg.version ? '版本 ' + cfg.version : '';
       fillUidForm(cfg.applyExchanges || []);
       fillSubForm(cfg.plans || [], cfg.payments || []);
     } catch (err) {
