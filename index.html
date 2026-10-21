@@ -6,7 +6,6 @@
 <title>幣圈新手村 PRO</title>
 <link rel="icon" href="avatar.png">
 <script>
-  // 先套用上次選的主題，避免畫面閃爍
   (function () {
     var t = null;
     try { t = localStorage.getItem('theme'); } catch (e) {}
@@ -16,7 +15,6 @@
     document.documentElement.setAttribute('data-theme', t);
   })();
 
-  // 圖片備援：先換 data-alt 的檔名，再失敗就隱藏
   function iconFallback(img) {
     if (img.dataset.tried) { img.style.display = 'none'; return; }
     img.dataset.tried = '1';
@@ -98,11 +96,11 @@
 
   /* 交易所卡片 */
   .ex-grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
+  @media (min-width: 640px) { .ex-grid { grid-template-columns: 1fr 1fr; } }
+  @media (min-width: 960px) { .ex-grid { grid-template-columns: 1fr 1fr 1fr; } }
   .ex-pair { display: grid; grid-template-columns: 1fr; gap: 0 16px; }
   @media (min-width: 960px) { .ex-pair { grid-template-columns: 1fr 1fr; } }
   .ex-pair .ex-grid { grid-template-columns: 1fr; }
-  @media (min-width: 640px) { .ex-grid { grid-template-columns: 1fr 1fr; } }
-  @media (min-width: 960px) { .ex-grid { grid-template-columns: 1fr 1fr 1fr; } }
   .ex-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 14px; display: flex; flex-direction: column; gap: 10px; }
   .ex-head { display: flex; align-items: center; gap: 10px; }
   .ex-icon { width: 40px; height: 40px; object-fit: contain; border-radius: 8px; flex-shrink: 0; }
@@ -121,7 +119,7 @@
   .step-no { width: 30px; height: 30px; border-radius: 50%; background: var(--primary); color: var(--primary-text); display: flex; align-items: center; justify-content: center; font-weight: 700; flex-shrink: 0; }
   .step-body { flex: 1; min-width: 0; }
   .step-body p { margin: 0 0 8px; }
-  .step-img img { display: block; max-width: 200px; max-height: 260px; width: auto; height: auto; border-radius: 8px; border: 1px solid var(--border); }
+  .step-img img { display: block; max-width: 200px; max-height: 260px; width: auto; height: auto; border-radius: 8px; border: 1px solid var(--border); margin-top: 8px; }
 
   /* 表單 */
   label { display: block; font-weight: 600; margin-bottom: 6px; }
@@ -171,7 +169,7 @@
   <section class="hero">
     <img class="hero-avatar" src="avatar.png" data-alt="avatar.jpg" alt="村長大頭照" onerror="iconFallback(this)">
     <h1>安全出入金・實戰教學・PRO 交易復盤系統</h1>
-    <p class="sub">使用村長專屬連結註冊交易所，即可免費申請開通『PRO 交易復盤系統』（內含核心講義以及眾多功能）。</p>
+    <p class="sub">使用村長專屬連結註冊交易所，即可免費申請開通「PRO 交易復盤系統」（內含核心講義以及眾多功能）。</p>
     <div class="hero-btns">
       <a class="btn" href="#exchanges">看交易所推薦</a>
       <a class="btn btn-outline" href="#apply">申請 VIP 通行證</a>
@@ -192,7 +190,7 @@
 
   <section class="card" id="exchanges">
     <h2>🔗 交易所與工具推薦</h2>
-    <p class="muted">點擊「立即註冊」前往官網，邀請碼可一鍵複製。</p>
+    <p class="muted">點選「立即註冊」前往官網，邀請碼可一鍵複製。</p>
     <div id="exchangeList"><p class="muted">載入中…</p></div>
   </section>
 
@@ -243,7 +241,7 @@
         <select id="subCurrency" class="field" required></select>
       </div>
       <div class="step-box">
-        <h4>步驟 3：選擇轉帳主鏈，並向下方地址付款</h4>
+        <h4>步驟 3：選擇轉帳網路，並向下方地址付款</h4>
         <select id="subChain" class="field" required></select>
         <div id="addrWrap" hidden>
           <p class="muted" style="margin:10px 0 0">請將款項轉至以下地址：</p>
@@ -287,44 +285,46 @@
 
   const TUTORIALS = [
     { title: '🟢 註冊幣託 BitoPro', steps: [
-      { t: '選擇一個方式註冊。', img: 'reg_bitopro_1.png' },
-      { t: '確認有填寫邀請碼後同意使用條款，然後按下一步。', img: 'reg_bitopro_2.png' },
-      { t: '填寫手機號碼。', img: 'reg_bitopro_3.png' },
-      { t: '點選身分驗證，送出後等待一兩個工作天。', img: 'reg_bitopro_4.png' },
-      { t: '到『帳戶』裡面選擇『銀行帳戶』點進去，選擇立即綁定。', img: 'reg_bitopro_5.png' },
-      { t: '照著上面要求的項目填寫，送出後等待五到七個工作天審核。', img: 'reg_bitopro_6.png' }
+      { t: '選擇一種方式註冊。', imgs: ['reg_bitopro_1.png'] },
+      { t: '確認已填寫邀請碼，並同意使用條款後，點選「下一步」。', imgs: ['reg_bitopro_2.png'] },
+      { t: '填寫手機號碼。', imgs: ['reg_bitopro_3.png'] },
+      { t: '點選「身分驗證」，送出後等待一到兩個工作天。', imgs: ['reg_bitopro_4.png'] },
+      { t: '到「帳戶」中選擇「銀行帳戶」，點進去後選擇「立即綁定」。', imgs: ['reg_bitopro_5.png'] },
+      { t: '依照畫面要求填寫資料，送出後等待兩到三個工作天審核。', imgs: ['reg_bitopro_6.png'] }
     ]},
     { title: '🔵 註冊國際交易所', steps: [
-      { t: '和村長討論後使用村長的連結和邀請碼註冊，然後去應用商店下載對應的交易所 App。', img: 'reg_exchange_1.png' },
-      { t: '登入剛剛註冊的帳號密碼。', img: 'reg_exchange_2.png' },
-      { t: '點擊左上角頭像，會有身分驗證、身分認證或實名認證，照指示完成認證。', img: 'reg_exchange_3.png' }
+      { t: '與村長討論後，使用村長的連結與邀請碼註冊，再到應用商店下載對應的交易所 App。', imgs: ['reg_exchange_1.png'] },
+      { t: '登入剛剛註冊的帳號與密碼。', imgs: ['reg_exchange_2.png'] },
+      { t: '點選左上角的頭像，依照指示完成「身分驗證」、「身分認證」或「實名認證」。', imgs: ['reg_exchange_3.png'] }
     ]},
     { title: '📥 台幣入金與轉帳', steps: [
-      { t: '身分驗證通過和銀行帳號審核成功後，回到幣託主頁選擇『台幣加值』。', img: 'dep_1.png' },
-      { t: '複製幣託生成的專屬銀行帳號，再用當初在幣託綁定的銀行帳戶，轉新台幣到這個帳號。', img: 'dep_2.png' },
-      
-      { t: '台幣到帳後，回到首頁選擇『一鍵買賣』，並點擊中間那個轉換符號確認買賣方向（TWD 換成 USDT）。', img: 'dep_4.png' },
-      { t: '輸入想要購買的金額，勾選同意條款後按下一步。', img: 'dep_5.png' },
-      { t: '到國際交易所的主畫面或是右下角的資產頁面選擇『充值』。' },
-      { t: '在充值頁面中選擇幣種『USDT』。' },
-      { t: '充值鏈種選擇『BEP 20』，並複製交易所提供的一串地址代碼。' },
-      { t: '回到幣託的資產頁面點擊『提領』。', img: 'dep_9.png' },
-      { t: '在提領頁面中選擇幣種『USDT』。', img: 'dep_10.png' },
-      { t: '在提領網路中選擇鏈種『BEP 20』。', img: 'dep_11.png' },
-      { t: '將交易所複製的地址貼上至『提領到』，確認幣託和交易所這兩個畫面的提領鏈種（BEP 20）跟錢包地址都要完全一樣（否則資產會遺失），輸入提領金額後按下一步，並按照要求驗證。', img: 'dep_12.png', warn: true },
-      { t: '依照金管會的要求，驗證時請輸入補充資訊。', img: 'dep_12b.png' },
-      { t: '驗證後 3 到 5 分鐘，交易所就會收到剛剛轉帳的 USDT 了！' }
+      { t: '身分驗證通過、銀行帳號審核成功後，回到幣託首頁，選擇「台幣加值」。', imgs: ['dep_1.png'] },
+      { t: '複製幣託生成的專屬銀行帳號，再用當初在幣託綁定的銀行帳戶，轉新台幣到這個帳號。', imgs: ['dep_2.png'] },
+      { t: '台幣到帳後，回到首頁選擇「一鍵買賣」，點選中間的轉換符號，確認買賣方向為 TWD 換成 USDT。', imgs: ['dep_4.png'] },
+      { t: '輸入想要買入的金額，勾選同意條款後，點選「下一步」。', imgs: ['dep_5.png'] },
+      { t: '回到幣託的資產頁面，點選「提領」。', imgs: ['dep_9.png'] },
+      { t: '選擇 USDT，提領網路選擇「BEP20」。', imgs: ['dep_10.png', 'dep_11.png'] },
+      { t: '到交易所的主畫面或右下角的資產頁面，選擇「充值」。' },
+      { t: '選擇 USDT，充值網路選擇「BEP20」。' },
+      { t: '複製交易所提供的地址，回到幣託的提領頁面，貼上到「提領到」。' },
+      { t: '請確認幣託與交易所的提領網路、錢包地址完全一致，否則資產會遺失。', imgs: ['dep_12.png'], warn: true },
+      { t: '輸入提領金額後點選「下一步」，並依照畫面要求完成驗證。' },
+      { t: '依照金管會的要求，驗證時請輸入補充資訊。', imgs: ['dep_12b.png'] },
+      { t: '驗證後 3 到 5 分鐘，交易所就會收到剛剛轉帳的 USDT。' }
     ]},
     { title: '📤 國際交易所出金', steps: [
-      { t: '到幣託的資產頁面選擇『加值』，選擇幣種 USDT 與鏈種『BEP 20』，並複製幣託提供的一串地址代碼。', img: 'with_1.png' },
-      { t: '到國際交易所右下角的資產頁面點擊『提領』或是『提幣』，選擇幣種『USDT』，提領鏈種選擇『BEP 20』。' },
-      { t: '將剛剛從幣託複製的一串地址代碼，貼上至交易所的提領地址欄位，並確認鏈種與地址無誤。', img: 'with_3.png' },
-      { t: '輸入提領金額後按下一步並照著要求驗證，3 到 5 分鐘後幣託就會收到剛剛轉帳的 USDT 了。' },
-      { t: '到幣託首頁選擇『一鍵買賣』，點擊中間那個轉換符號，把 USDT 賣出轉換成新台幣（TWD）。', img: 'with_5.png' },
-      { t: '到幣託的資產頁面選擇『提領』。', img: 'with_6.png' },
-      { t: '在提領頁面中選擇『新台幣』。', img: 'with_7.png' },
-      { t: '輸入提款金額然後按下一步。', img: 'with_8.png' },
-      { t: '兩個工作天內就會收到提領的新台幣匯入您的銀行帳戶了！' }
+      { t: '到交易所右下角的資產頁面，點選「提領」或「提幣」。' },
+      { t: '選擇 USDT，提領網路選擇「BEP20」。' },
+      { t: '到幣託的資產頁面，選擇「加值」。', imgs: ['with_1.png'] },
+      { t: '選擇 USDT，網路選擇「BEP20」。' },
+      { t: '複製幣託提供的地址，回到交易所貼上到提領地址欄位，並確認網路與地址無誤。', imgs: ['with_3.png'] },
+      { t: '輸入提領金額後點選「下一步」，並依照畫面要求完成驗證。' },
+      { t: '3 到 5 分鐘後，幣託就會收到剛剛轉帳的 USDT。' },
+      { t: '到幣託首頁，選擇「一鍵買賣」，點選中間的轉換符號，把 USDT 賣出換成新台幣（TWD）。', imgs: ['with_5.png'] },
+      { t: '輸入要賣出的 USDT 數量，勾選同意條款後，點選「下一步」。' },
+      { t: '到幣託的資產頁面，選擇「提領」。', imgs: ['with_6.png'] },
+      { t: '選擇「新台幣」，輸入提款金額後，點選「下一步」。', imgs: ['with_7.png', 'with_8.png'] },
+      { t: '兩個工作天內，提領的新台幣就會匯入你的銀行帳戶。' }
     ]}
   ];
 
@@ -332,6 +332,8 @@
     BAD_REQUEST: '系統版本不一致，請重新整理頁面',
     UNKNOWN_ACTION: '系統版本不一致，請重新整理頁面',
     INVALID_INPUT: '資料格式有誤，請檢查欄位',
+    TXID_INVALID: '交易哈希值格式不正確，請貼上完整的 TxID',
+    PLAN_UNAVAILABLE: '此方案目前未開放，請聯繫村長',
     DUPLICATE_UID: '此 UID 已申請過，如有疑問請私訊村長',
     DUPLICATE_TXID: '此轉帳紀錄已提交過，請勿重複申請',
     DUPLICATE_ACCOUNT: '此專屬帳號已被使用，請換一個',
@@ -348,9 +350,7 @@
     DB_WRITE_FAILED: '儲存失敗，請稍後再試',
     SYSTEM_NOT_READY: '系統維護中，請稍後再試',
     INTERNAL_ERROR: '系統維護中，請稍後再試',
-    NETWORK: '網路連線異常，請稍後再試',
-    TXID_INVALID: '交易哈希值格式不正確，請貼上完整的 TxID',
-    PLAN_UNAVAILABLE: '此方案目前未開放，請聯繫村長'
+    NETWORK: '網路連線異常，請稍後再試'
   };
 
   /* ---------- 共用工具 ---------- */
@@ -421,7 +421,8 @@
   function exCardHtml(e) {
     const base = esc(String(e.code || '').replace(/^link-/, ''));
     const link = safeUrl(e.inviteLink);
-    const invite = e.inviteCode
+    const showInvite = e.applyable && e.inviteCode;
+    const invite = showInvite
       ? '<div class="invite"><span>邀請碼</span><code>' + esc(e.inviteCode) + '</code>' +
         '<button class="btn-mini" type="button" data-copy="' + esc(e.inviteCode) + '">複製</button></div>'
       : '';
@@ -463,32 +464,14 @@
     box.innerHTML = html;
   }
 
-  function renderExchangesOld(list) {
-    const box = document.getElementById('exchangeList');
-    if (!list.length) {
-      box.innerHTML = '<p class="muted">目前沒有推薦項目</p>';
-      return;
-    }
-    const groups = {};
-    const order = [];
-    list.forEach(e => {
-      const cat = e.category || '其他推薦';
-      if (!groups[cat]) { groups[cat] = []; order.push(cat); }
-      groups[cat].push(e);
-    });
-    box.innerHTML = order.map(cat =>
-      '<h3>' + esc(cat) + '</h3><div class="ex-grid">' + groups[cat].map(exCardHtml).join('') + '</div>'
-    ).join('');
-  }
-
   /* ---------- 教學 ---------- */
   function stepHtml(s, n) {
-    const img = s.img
-      ? '<div class="step-img"><img src="' + esc(s.img) + '" alt="第 ' + n + ' 步截圖" loading="lazy" onerror="this.parentElement.remove()"></div>'
-      : '';
+    const imgs = (s.imgs || []).map(src =>
+      '<div class="step-img"><img src="' + esc(src) + '" alt="第 ' + n + ' 步截圖" loading="lazy" onerror="this.parentElement.remove()"></div>'
+    ).join('');
     return '<div class="step' + (s.warn ? ' warn' : '') + '">' +
       '<div class="step-no">' + n + '</div>' +
-      '<div class="step-body"><p>' + esc(s.t) + '</p>' + img + '</div>' +
+      '<div class="step-body"><p>' + esc(s.t) + '</p>' + imgs + '</div>' +
     '</div>';
   }
 
@@ -550,7 +533,7 @@
     const cur = document.getElementById('subCurrency').value;
     const chains = PAYMENTS.filter(p => p.currency === cur);
     document.getElementById('subChain').innerHTML =
-      '<option value="">請選擇主鏈</option>' +
+      '<option value="">請選擇網路</option>' +
       chains.map(p => '<option value="' + esc(p.chain) + '">' + esc(p.chain) + '</option>').join('');
     showAddress();
   }
@@ -615,7 +598,6 @@
   }
 
   /* ---------- 事件 ---------- */
-  // 主題切換
   document.getElementById('themeBtn').addEventListener('click', () => {
     const current = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
     const next = current === 'dark' ? 'light' : 'dark';
@@ -623,7 +605,6 @@
     try { localStorage.setItem('theme', next); } catch (e) {}
   });
 
-  // 一鍵複製（交易所邀請碼）
   document.addEventListener('click', async ev => {
     const btn = ev.target.closest('[data-copy]');
     if (!btn) return;
@@ -631,7 +612,6 @@
     flash(btn, ok ? '已複製' : '複製失敗');
   });
 
-  // 教學分頁切換
   document.getElementById('tutTabs').addEventListener('click', ev => {
     const b = ev.target.closest('[data-tut]');
     if (!b) return;
@@ -640,7 +620,6 @@
     document.querySelectorAll('#tutPanels [data-panel]').forEach(p => { p.hidden = p.dataset.panel !== idx; });
   });
 
-  // VIP 通道切換
   document.querySelectorAll('[data-ch]').forEach(b => {
     b.addEventListener('click', () => {
       document.querySelectorAll('[data-ch]').forEach(x => x.setAttribute('aria-selected', String(x === b)));
@@ -649,16 +628,14 @@
     });
   });
 
-  // 訂閱：幣種與主鏈連動
-  document.getElementById('subCurrency').addEventListener('change', refreshChains);
   document.getElementById('subPlan').addEventListener('change', refreshPlanPrice);
+  document.getElementById('subCurrency').addEventListener('change', refreshChains);
   document.getElementById('subChain').addEventListener('change', showAddress);
   document.getElementById('copyAddr').addEventListener('click', async function () {
     const ok = await copyText(document.getElementById('addrText').textContent);
     flash(this, ok ? '已複製' : '複製失敗');
   });
 
-  // 送出 UID 申請
   document.getElementById('formUid').addEventListener('submit', async ev => {
     ev.preventDefault();
     await submitForm(ev.target, document.getElementById('msgUid'), {
@@ -670,7 +647,6 @@
     }, '已收到 UID 申請，村長審核通過後會私訊您登入資料。');
   });
 
-  // 送出訂閱申請
   document.getElementById('formSub').addEventListener('submit', async ev => {
     ev.preventDefault();
     const ok = await submitForm(ev.target, document.getElementById('msgSub'), {
