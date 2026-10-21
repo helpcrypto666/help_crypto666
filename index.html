@@ -21,7 +21,7 @@
     img.src = img.dataset.alt;
   }
 </script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <style>
   :root {
     --bg: #f4f6fb; --card: #ffffff; --text: #111827; --muted: #4b5563; --border: #cbd5e1;
@@ -287,7 +287,7 @@
   let PLANS_CFG = [];
 
   const TUTORIALS = [
-    { title: '🟢 註冊幣託 BitoPro', steps: [
+    { title: '🟢 註冊幣託 BitoPro', prefix: 'reg_bitopro', steps: [
       { t: '選擇一種方式註冊。', imgs: ['reg_bitopro_1.png'] },
       { t: '確認已填寫邀請碼，並同意使用條款後，點選「下一步」。', imgs: ['reg_bitopro_2.png'] },
       { t: '填寫手機號碼。', imgs: ['reg_bitopro_3.png'] },
@@ -295,12 +295,12 @@
       { t: '到「帳戶」中選擇「銀行帳戶」。', imgs: ['reg_bitopro_5.png'] },
       { t: '依照畫面要求填寫資料，提交後等待兩到三個工作天審核。', imgs: ['reg_bitopro_6.png'] }
     ]},
-    { title: '🔵 註冊國際交易所', steps: [
+    { title: '🔵 註冊國際交易所', prefix: 'reg_exchange', steps: [
       { t: '與村長討論後，使用村長的連結與邀請碼註冊，再到應用商店下載對應的交易所 App。', imgs: ['reg_exchange_1.png'] },
       { t: '登入剛剛註冊的帳號與密碼。', imgs: ['reg_exchange_2.png'] },
       { t: '點選左上角的頭像，依照指示完成「身分驗證」、「身分認證」或「實名認證」。', imgs: ['reg_exchange_3.png'] }
     ]},
-    { title: '📥 台幣入金與轉帳', steps: [
+    { title: '📥 台幣入金與轉帳', prefix: 'dep', steps: [
       { t: '身分驗證通過、銀行帳號審核成功後，回到幣託首頁，選擇「台幣加值」。', imgs: ['dep_1.png'] },
       { t: '複製幣託生成的專屬銀行帳號，再用當初在幣託綁定的銀行帳戶，轉新台幣到這個帳號。', imgs: ['dep_2.png'] },
       { t: '台幣到帳後，回到首頁選擇「一鍵買賣」，點選中間的轉換符號，確認買賣方向為 TWD 換成 USDT。', imgs: ['dep_4.png'] },
@@ -315,7 +315,7 @@
       { t: '依照金管會的要求，驗證時請輸入補充資訊。', imgs: ['dep_12b.png'] },
       { t: '驗證後 3 到 5 分鐘，交易所就會收到剛剛轉帳的 USDT。' }
     ]},
-    { title: '📤 國際交易所出金', steps: [
+    { title: '📤 國際交易所出金', prefix: 'with', steps: [
       { t: '到交易所右下角的資產頁面，點選「提領」或「提幣」。' },
       { t: '選擇 USDT，提領網路選擇「BEP20」。' },
       { t: '到幣託的資產頁面，選擇「加值」。', imgs: ['with_1.png'] },
@@ -478,7 +478,21 @@
       img.parentElement.remove();
     }
   }
-  function stepHtml(s, n) {
+  function stepHtml(s, n, prefix) {
+    const names = (s.imgs && s.imgs.length > 1)
+      ? [prefix + '_' + n + '.1.png', prefix + '_' + n + '.2.png']
+      : [prefix + '_' + n + '.png'];
+    const imgs = names.map(src => {
+      const base = src.replace(/\.[^.]+$/, '');
+      return '<div class="step-img"><img src="' + esc(src) + '" data-base="' + esc(base) + '" data-try="0" alt="第 ' + n + ' 步截圖" loading="lazy" onerror="imgNext(this)"></div>';
+    }).join('');
+    return '<div class="step' + (s.warn ? ' warn' : '') + '">' +
+      '<div class="step-no">' + n + '</div>' +
+      '<div class="step-body"><p>' + esc(s.t) + '</p><div class="step-imgs">' + imgs + '</div></div>' +
+    '</div>';
+  }
+
+  function stepHtmlPrev(s, n) {
     const imgs = (s.imgs || []).map(src => {
       const base = src.replace(/\.[^.]+$/, '');
       return '<div class="step-img"><img src="' + esc(src) + '" data-base="' + esc(base) + '" data-try="0" alt="第 ' + n + ' 步截圖" loading="lazy" onerror="imgNext(this)"></div>';
@@ -506,7 +520,7 @@
     ).join('');
     document.getElementById('tutPanels').innerHTML = TUTORIALS.map((t, i) =>
       '<div class="steps" role="tabpanel" data-panel="' + i + '"' + (i === 0 ? '' : ' hidden') + '>' +
-        t.steps.map((s, j) => stepHtml(s, j + 1)).join('') +
+        t.steps.map((s, j) => stepHtml(s, j + 1, t.prefix)).join('') +
       '</div>'
     ).join('');
   }
@@ -621,6 +635,37 @@
       document.getElementById('subSubmit').disabled = true;
     }
   }
+
+  /* ---------- 設定快取與載入 ---------- */
+  const CFG_KEY = 'pro_cfg_cache';
+  function applyConfig(cfg) {
+    const s = cfg.socials || {};
+    setLink('sIg', s.ig);
+    setLink('sThreads', s.threads);
+    setLink('sTgP', s.tgPersonal);
+    setLink('sTgG', s.tgGroup);
+    renderExchanges(cfg.exchanges || []);
+    document.getElementById('verText').textContent = cfg.version ? '版本 ' + cfg.version : '';
+    fillUidForm(cfg.applyExchanges || []);
+    fillSubForm(cfg.plans || [], cfg.payments || []);
+  }
+  async function loadConfig() {
+    let cached = null;
+    try { cached = JSON.parse(localStorage.getItem(CFG_KEY) || 'null'); } catch (e) {}
+    if (cached) applyConfig(cached);
+    try {
+      const cfg = await api('getPublicConfig');
+      try { localStorage.setItem(CFG_KEY, JSON.stringify(cfg)); } catch (e) {}
+      applyConfig(cfg);
+    } catch (err) {
+      if (!cached) {
+        document.getElementById('exchangeList').innerHTML = '<p class="msg err">' + esc(errText(err.code)) + '</p>';
+        document.getElementById('subSubmit').disabled = true;
+      }
+    }
+  }
+
+
 
   /* ---------- 事件 ---------- */
   document.getElementById('themeBtn').addEventListener('click', () => {
