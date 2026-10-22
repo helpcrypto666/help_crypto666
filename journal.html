@@ -244,7 +244,10 @@
     <div id="panelAdmin" class="card" hidden>
       <h2>⚙️ 村長管理後台</h2>
       <p class="muted">修改審核狀態、專屬帳號與密碼、到期日，或轉換會員類型。儲存後私訊文案會自動更新。</p>
-      <div id="adminTotal" class="stat" style="margin:10px 0"></div>
+      <div class="grid2" style="margin:10px 0">
+        <div id="adminTotalVol" class="stat"></div>
+        <div id="adminTotalFee" class="stat"></div>
+      </div>
       <input id="memberSearch" class="field" placeholder="搜尋學員：UID、專屬帳號、會員ID、交易所、聯絡方式、TxID、方案、狀態" style="margin-bottom:10px">
       <div id="adminMsg" class="msg" role="status"></div>
       
@@ -300,7 +303,9 @@
     INTERNAL_ERROR: '系統維護中，請稍後再試',
     NETWORK: '網路連線異常，請稍後再試',
     LOTTERY_TOO_SOON: '距離上次抽獎還不到兩週，請等到時間再抽',
-    NO_CANDIDATE: '目前沒有符合資格的學員可以抽獎'
+    NO_CANDIDATE: '目前沒有符合資格的學員可以抽獎',
+    ACCOUNT_INVALID: '專屬帳號格式不正確，只能用英文、數字、底線，長度 4 到 20 字',
+    PASSWORD_INVALID: '專屬密碼格式不正確，只能用英文和數字，長度 6 到 20 字'
   };
 
   const $ = id => document.getElementById(id);
@@ -804,7 +809,8 @@
       adminCfg = await api('getPublicConfig', {}, '');
       const d = await api('adminListMembers', {}, token);
       adminMembers = d.members || [];
-      $('adminTotal').innerHTML = '<div class="k">學員總交易量 (USDT)</div><div class="v">' + esc(money(d.totalVolume)) + '</div>';
+      $('adminTotalVol').innerHTML = '<div class="k">學員總交易量 (USDT)</div><div class="v">' + esc(money(d.totalVolume)) + '</div>';
+      $('adminTotalFee').innerHTML = '<div class="k">學員總手續費磨耗 (USDT)</div><div class="v">' + esc(money(d.totalFee, 4)) + '</div>';
       renderMemberList();
     } catch (err) {
       $('memberBox').innerHTML = '';
