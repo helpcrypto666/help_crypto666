@@ -776,7 +776,7 @@
         '<div><label>專屬密碼</label><input class="field" data-f="password" maxlength="20" value="' + esc(m.password) + '"></div>' +
         (isSub ? '<div><label>到期日</label><input class="field" type="date" data-f="expiry" value="' + esc(m.expiry) + '"></div>' : '') +
       '</div>' +
-      '<div class="row-btns"><button class="btn btn-sm" type="button" data-act="save">儲存修改</button><button class="btn btn-sm btn-ghost" type="button" data-act="copy">複製私訊文案</button></div>' +
+      '<div class="row-btns"><button class="btn btn-sm" type="button" data-act="save">儲存修改</button><button class="btn btn-sm btn-ghost" type="button" data-act="copy">複製私訊文案</button><button class="btn btn-sm btn-ghost" type="button" data-act="delete" style="color:var(--err);border-color:var(--err)">🗑 刪除學員</button></div>' +
       (isUid ? '' : '<div class="step-box" style="margin-top:12px"><h4>🔄 轉為 UID 永久用戶</h4><div class="grid2">' +
         '<div><label>註冊交易所</label><select class="field" data-f="uidEx">' + o.exs + '</select></div>' +
         '<div><label>交易所 UID</label><input class="field" data-f="uid" maxlength="40" value="' + esc(m.uid) + '"></div>' +
@@ -799,7 +799,12 @@
     const list = adminMembers
       .filter(m => m.memberId && (m.uid || m.account || m.status))
       .filter(m => !q || [m.identity, m.uid, m.account, m.memberId, m.exchange, m.contact, m.txid, m.plan, m.status, m.type, m.currency, m.chain].join(' ').toLowerCase().indexOf(q) >= 0);
-    $('memberBox').innerHTML = list.length ? list.map(memberCard).join('') : '<p class="muted">沒有符合條件的學員</p>';
+    const pending = list.filter(m => m.status === '待審核');
+    const others = list.filter(m => m.status !== '待審核');
+    const group = (title, arr) => '<h3>' + title + '（' + arr.length + '）</h3>' + (arr.length ? arr.map(memberCard).join('') : '<p class="muted">沒有資料</p>');
+    $('memberBox').innerHTML = list.length
+      ? group('⏳ 待審核', pending) + group('📋 其他學員', others)
+      : '<p class="muted">沒有符合條件的學員</p>';
   }
 
   /* ---------- 村長後台：學員管理 ---------- */
@@ -950,6 +955,9 @@
         showMsg($('adminMsg'), ok ? '✅ 私訊文案已複製' : '複製失敗，請手動選取', ok ? 'ok' : 'err');
         return;
       }
+      case 'delete':
+        if (!confirm('確定要刪除「' + m.identity + '」嗎？此操作無法復原，學員的交易紀錄不會一併刪除。')) return;
+        return adminRun('adminDeleteMember', { memberId: memberId }, '✅ 已刪除該學員');
     }
   }
 
