@@ -155,6 +155,7 @@
       <button class="tab" type="button" role="tab" data-tab="top" aria-selected="false">🏆 優秀學員榜</button>
       <button class="tab" type="button" role="tab" data-tab="lecture" aria-selected="false">📘 講義</button>
       <button class="tab" type="button" role="tab" data-tab="tools" aria-selected="false">🧰 好用工具</button>
+      <button class="tab" type="button" role="tab" data-tab="calc" aria-selected="false">🧮 倉位計算機</button>
       <button id="tabAdmin" class="tab" type="button" role="tab" data-tab="admin" aria-selected="false" hidden>⚙️ 村長管理後台</button>
       <button id="tabReview" class="tab" type="button" role="tab" data-tab="review" aria-selected="false" hidden>✍️ 批改學員倉位</button>
     </div>
@@ -242,6 +243,38 @@
       <div id="toolsBox"></div>
     </div>
 
+    <div id="panelCalc" class="card" hidden>
+      <h2>🛡️ 以損定量・開倉風險計算機</h2>
+      <p class="muted">輸入本金與停損設定，自動算出可開倉的數量與保證金。</p>
+      <div class="grid2">
+        <div><label>總本金 (USDT)</label><input id="rkCap" class="field" type="number" step="any" min="0" inputmode="decimal"></div>
+        <div><label>單筆允許虧損 (%)</label><input id="rkPct" class="field" type="number" step="any" min="0" inputmode="decimal" placeholder="例如 1"></div>
+        <div><label>預計進場價</label><input id="rkEntry" class="field" type="number" step="any" min="0" inputmode="decimal"></div>
+        <div><label>止損價 (SL)</label><input id="rkStop" class="field" type="number" step="any" min="0" inputmode="decimal"></div>
+        <div><label>止盈價 (TP)</label><input id="rkTp" class="field" type="number" step="any" min="0" inputmode="decimal"></div>
+        <div><label>槓桿倍數</label><input id="rkLev" class="field" type="number" step="any" min="1" inputmode="decimal" placeholder="例如 10"></div>
+      </div>
+      <div class="grid4" style="margin-top:12px">
+        <div class="stat"><div class="k">最大虧損金額 (USDT)</div><div class="v" id="rkMaxLoss">—</div></div>
+        <div class="stat"><div class="k">建議開倉總價值 (USDT)</div><div class="v" id="rkPosValue">—</div></div>
+        <div class="stat"><div class="k">應投入保證金 (USDT)</div><div class="v" id="rkMargin">—</div></div>
+        <div class="stat"><div class="k">預估盈虧比 (RR)</div><div class="v" id="rkRR">—</div></div>
+      </div>
+      <p class="muted" id="rkQty" style="margin-top:8px"></p>
+
+      <hr style="border:none;border-top:1px solid var(--border);margin:24px 0">
+
+      <h2>➕ 加倉均價計算機</h2>
+      <p class="muted">每次加倉輸入價格與數量，自動算出最新均價與累積倉位。</p>
+      <div id="avgLegs"></div>
+      <div class="row-btns"><button id="avgAdd" class="btn btn-sm btn-ghost" type="button">＋ 新增一筆加倉</button></div>
+      <div class="grid4" style="margin-top:12px">
+        <div class="stat"><div class="k">最新均價</div><div class="v" id="avgPrice">—</div></div>
+        <div class="stat"><div class="k">累積持倉量</div><div class="v" id="avgQty">—</div></div>
+        <div class="stat"><div class="k">累積倉位價值 (USDT)</div><div class="v" id="avgValue">—</div></div>
+      </div>
+    </div>
+
     <div id="panelAdmin" class="card" hidden>
       <h2>⚙️ 村長管理後台</h2>
       <p class="muted">修改審核狀態、專屬帳號與密碼、到期日，或轉換會員類型。儲存後私訊文案會自動更新。</p>
@@ -279,7 +312,7 @@
   const TOKEN_KEY = 'pro_token', CACHE_KEY = 'pro_cache', CUSTOM_KEY = 'pro_strats';
   const DEFAULT_STRATS = ['趨勢順勢', '突破', '回踩', '支撐壓力', '區間震盪', '反轉'];
   const SESSION_ERRORS = ['SESSION_INVALID', 'PENDING_REVIEW', 'PAUSED', 'EXPIRED', 'NOT_READY'];
-  const PANELS = { diary: 'panelDiary', top: 'panelTop', lecture: 'panelLecture', tools: 'panelTools', admin: 'panelAdmin', review: 'panelReview' };
+  const PANELS = { diary: 'panelDiary', top: 'panelTop', lecture: 'panelLecture', tools: 'panelTools', calc: 'panelCalc', admin: 'panelAdmin', review: 'panelReview' };
   const STATUS_OPTIONS = ['待審核', '已開通', '已暫停', '已到期'];
   const SCORE_LABELS = ['停損設定', '倉位控制', '復盤完整度', '心得深度'];
   const ERR_TEXT = {
@@ -719,6 +752,85 @@
       handleErr(err);
     }
   }
+
+  /* ---------- 倉位計算機（純前端） ---------- */
+  function fmtNum(n, d) {
+    if (!isFinite(n)) return '—';
+    return n.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: d == null ? 4 : d });
+  }
+  function riskCalc() {
+    const cap = Number($('rkCap').value);
+    const pct = Number($('rkPct').value);
+    const entry = Number($('rkEntry').value);
+    const stop = Number($('rkStop').value);
+    const tp = Number($('rkTp').value);
+    const lev = Number($('rkLev').value) || 1;
+    const ok = cap > 0 && pct > 0 && entry > 0 && stop > 0 && entry !== stop;
+    if (!ok) {
+      ['rkMaxLoss', 'rkPosValue', 'rkMargin', 'rkRR'].forEach(id => { $(id).textContent = '—'; });
+      $('rkQty').textContent = '';
+      return;
+    }
+    const maxLoss = cap * pct / 100;
+    const riskPerUnit = Math.abs(entry - stop);
+    const qty = maxLoss / riskPerUnit;
+    const posValue = qty * entry;
+    const margin = posValue / lev;
+    const rr = (tp > 0 && tp !== entry) ? Math.abs(tp - entry) / riskPerUnit : null;
+    $('rkMaxLoss').textContent = fmtNum(maxLoss, 2);
+    $('rkPosValue').textContent = fmtNum(posValue, 2);
+    $('rkMargin').textContent = fmtNum(margin, 2);
+    $('rkRR').textContent = rr == null ? '—' : ('1 : ' + fmtNum(rr, 2));
+    $('rkQty').textContent = '可開倉數量：約 ' + fmtNum(qty, 6) + ' 顆（槓桿 ' + lev + 'x 下，約需保證金 ' + fmtNum(margin, 2) + ' USDT）';
+  }
+  let avgLegRows = [{ price: '', qty: '' }, { price: '', qty: '' }];
+  function renderAvgLegs() {
+    $('avgLegs').innerHTML = avgLegRows.map((l, i) =>
+      '<div class="grid2" data-i="' + i + '" style="margin-bottom:8px">' +
+        '<div><label>第 ' + (i + 1) + ' 筆價格</label><input class="field avg-price" type="number" step="any" min="0" inputmode="decimal" value="' + esc(l.price) + '"></div>' +
+        '<div><label>第 ' + (i + 1) + ' 筆數量' + (avgLegRows.length > 1 ? ' <button class="btn-mini avg-del" type="button" style="float:right">刪除</button>' : '') + '</label><input class="field avg-qty" type="number" step="any" min="0" inputmode="decimal" value="' + esc(l.qty) + '"></div>' +
+      '</div>'
+    ).join('');
+  }
+  function avgCalc() {
+    const rows = [...$('avgLegs').querySelectorAll('[data-i]')];
+    avgLegRows = rows.map(r => ({
+      price: r.querySelector('.avg-price').value,
+      qty: r.querySelector('.avg-qty').value
+    }));
+    const legs = avgLegRows
+      .map(l => ({ price: Number(l.price), qty: Number(l.qty) }))
+      .filter(l => l.price > 0 && l.qty > 0);
+    if (!legs.length) {
+      $('avgPrice').textContent = '—';
+      $('avgQty').textContent = '—';
+      $('avgValue').textContent = '—';
+      return;
+    }
+    const totalQty = legs.reduce((s, l) => s + l.qty, 0);
+    const totalValue = legs.reduce((s, l) => s + l.price * l.qty, 0);
+    $('avgPrice').textContent = fmtNum(totalValue / totalQty, 6);
+    $('avgQty').textContent = fmtNum(totalQty, 6);
+    $('avgValue').textContent = fmtNum(totalValue, 2);
+  }
+  ['rkCap', 'rkPct', 'rkEntry', 'rkStop', 'rkTp', 'rkLev'].forEach(id => {
+    $(id).addEventListener('input', riskCalc);
+  });
+  $('avgLegs').addEventListener('input', avgCalc);
+  $('avgLegs').addEventListener('click', ev => {
+    const btn = ev.target.closest('.avg-del');
+    if (!btn) return;
+    const i = Number(btn.closest('[data-i]').dataset.i);
+    avgLegRows.splice(i, 1);
+    renderAvgLegs();
+    avgCalc();
+  });
+  $('avgAdd').addEventListener('click', () => {
+    avgCalc();
+    avgLegRows.push({ price: '', qty: '' });
+    renderAvgLegs();
+  });
+  renderAvgLegs();
 
   /* ---------- 版本、自動登出、搜尋 ---------- */
   let lastActive = Date.now();
