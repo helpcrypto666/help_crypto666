@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>幣圈新手村 PRO</title>
 <link rel="icon" href="avatar.png">
+<link rel="apple-touch-icon" href="avatar.png">
 <script>
   (function () {
     var t = null;
@@ -474,7 +475,7 @@
 
   /* ---------- 教學 ---------- */
   const IMG_EXTS = ['.png', '.PNG', '.jpg', '.JPG', '.jpeg', '.webp'];
-  const IMG_BUST = Date.now();
+  const IMG_BUST = Math.floor(Date.now() / (7 * 24 * 60 * 60 * 1000));
   function imgNext(img) {
     const i = Number(img.dataset.try || 0) + 1;
     if (i < IMG_EXTS.length) {
