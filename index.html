@@ -474,11 +474,12 @@
 
   /* ---------- 教學 ---------- */
   const IMG_EXTS = ['.png', '.PNG', '.jpg', '.JPG', '.jpeg', '.webp'];
+  const IMG_BUST = Date.now();
   function imgNext(img) {
     const i = Number(img.dataset.try || 0) + 1;
     if (i < IMG_EXTS.length) {
       img.dataset.try = String(i);
-      img.src = img.dataset.base + IMG_EXTS[i];
+      img.src = img.dataset.base + IMG_EXTS[i] + '?v=' + IMG_BUST;
     } else {
       img.parentElement.remove();
     }
@@ -489,7 +490,7 @@
       : [prefix + '_' + n + '.png'];
     const imgs = names.map(src => {
       const base = src.replace(/\.[^.]+$/, '');
-      return '<div class="step-img"><img src="' + esc(src) + '" data-base="' + esc(base) + '" data-try="0" alt="第 ' + n + ' 步截圖" loading="lazy" onerror="imgNext(this)"></div>';
+      return '<div class="step-img"><img src="' + esc(src) + '?v=' + IMG_BUST + '" data-base="' + esc(base) + '" data-try="0" alt="第 ' + n + ' 步截圖" loading="lazy" onerror="imgNext(this)"></div>';
     }).join('');
     return '<div class="step' + (s.warn ? ' warn' : '') + '">' +
       '<div class="step-no">' + n + '</div>' +
