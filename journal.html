@@ -1,0 +1,1490 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PRO 交易復盤系統｜幣圈新手村</title>
+<link rel="icon" href="avatar.png">
+<script>
+  (function () {
+    var t = null;
+    try { t = localStorage.getItem('theme'); } catch (e) {}
+    if (t !== 'dark' && t !== 'light') {
+      t = (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
+    }
+    document.documentElement.setAttribute('data-theme', t);
+  })();
+  function iconFallback(img) {
+    if (img.dataset.tried) { img.style.display = 'none'; return; }
+    img.dataset.tried = '1';
+    img.src = img.dataset.alt;
+  }
+</script>
+<style>
+  :root { --bg:#f4f6fb; --card:#fff; --text:#111827; --muted:#4b5563; --border:#cbd5e1; --primary:#2563eb; --link:#1d4ed8; --accent:#b45309; --input-bg:#fff; --input-text:#111827; --code-bg:#e5e7eb; --ok:#15803d; --err:#b91c1c; --warn-bg:#fef3c7; --warn-text:#78350f; --shadow:0 1px 3px rgba(15,23,42,.08); color-scheme:light; }
+  :root[data-theme="dark"] { --bg:#0b1220; --card:#131c31; --text:#e5e7eb; --muted:#a3afc2; --border:#334155; --primary:#2563eb; --link:#93c5fd; --accent:#fbbf24; --input-bg:#0f172a; --input-text:#e5e7eb; --code-bg:#1e293b; --ok:#4ade80; --err:#f87171; --warn-bg:#3b2f0b; --warn-text:#fde68a; --shadow:none; color-scheme:dark; }
+  *{box-sizing:border-box}
+  [hidden]{display:none!important}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang TC","Noto Sans TC","Microsoft JhengHei",sans-serif;font-size:16px;line-height:1.6}
+  a{color:var(--link)}
+  :focus-visible{outline:3px solid var(--link);outline-offset:2px}
+  .wrap{max-width:1100px;margin:0 auto;padding:0 16px 8px}
+  .muted{color:var(--muted)}
+  .center{text-align:center}
+  h2{font-size:1.2rem;margin:0 0 10px}
+  h3{font-size:1rem;color:var(--accent);margin:18px 0 8px}
+  h4{font-size:.95rem;margin:0 0 8px}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px;margin:16px 0;box-shadow:var(--shadow)}
+  .narrow{max-width:440px;margin:32px auto}
+  .nav{position:sticky;top:0;z-index:10;background:var(--card);border-bottom:1px solid var(--border)}
+  .nav-inner{max-width:1100px;margin:0 auto;padding:10px 16px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px}
+  .brand{display:flex;align-items:center;gap:10px;min-width:0}
+  .brand img{width:40px;height:40px;border-radius:50%;object-fit:cover;flex-shrink:0}
+  .brand-title{font-weight:700;white-space:nowrap}
+  .nav-actions{display:flex;flex-wrap:wrap;gap:6px;justify-content:flex-end;align-items:center}
+  @media (max-width:480px){.brand-title{font-size:.95rem}.nav-actions{gap:4px}}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;background:var(--primary);color:#fff;border:1px solid var(--primary);border-radius:10px;padding:9px 14px;font:inherit;font-size:.95rem;font-weight:600;cursor:pointer;white-space:nowrap}
+  .btn:hover{filter:brightness(1.08)}
+  .btn:disabled{opacity:.55;cursor:not-allowed;filter:none}
+  .btn-sm{padding:6px 10px;font-size:.86rem}
+  .btn-block{width:100%}
+  .btn-ghost{background:var(--card);color:var(--text);border:1px solid var(--border)}
+  .btn-mini{font:inherit;font-size:.8rem;padding:4px 10px;border-radius:8px;border:1px solid var(--border);background:var(--card);color:var(--text);cursor:pointer}
+  .field{width:100%;min-width:0;padding:9px 11px;border-radius:10px;border:1px solid var(--border);background:var(--input-bg);color:var(--input-text);font:inherit;font-size:16px}
+  .field::placeholder{color:var(--muted);opacity:1}
+  select.field option{background:var(--input-bg);color:var(--input-text)}
+  label{display:block;font-weight:600;margin:0 0 5px;font-size:.92rem}
+  .grid2{display:grid;grid-template-columns:1fr;gap:12px}
+  @media (min-width:640px){.grid2{grid-template-columns:1fr 1fr}}
+  .grid4{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+  @media (min-width:720px){.grid4{grid-template-columns:repeat(3,1fr)}}
+  @media (min-width:980px){.grid4{grid-template-columns:repeat(6,1fr)}}
+  .stat{background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:12px}
+  .stat .k{font-size:.82rem;color:var(--muted)}
+  .stat .v{font-size:1.1rem;font-weight:700;word-break:break-all}
+  .pos{color:var(--ok)}
+  .neg{color:var(--err)}
+  .tabs{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0 0}
+  .tab{font:inherit;font-size:.92rem;background:var(--card);color:var(--text);border:1px solid var(--border);border-radius:999px;padding:7px 14px;cursor:pointer}
+  .tab[aria-selected="true"]{background:var(--primary);border-color:var(--primary);color:#fff}
+  .msg{margin-top:10px;padding:9px 12px;border-radius:10px;font-size:.92rem;border:1px solid transparent}
+  .msg:empty{display:none}
+  .msg.ok{color:var(--ok);border-color:var(--ok)}
+  .msg.err{color:var(--err);border-color:var(--err)}
+  .msg.info{color:var(--text);border-color:var(--border)}
+  .row-btns{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:8px}
+  .row-btns .field{flex:1;min-width:160px}
+  .legs{display:grid;gap:8px}
+  .leg{display:grid;grid-template-columns:1fr 1fr auto;gap:8px;align-items:center}
+  .chips{display:flex;flex-wrap:wrap;gap:8px}
+  .chip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--border);border-radius:999px;padding:5px 12px;font-size:.9rem;cursor:pointer;background:var(--card);color:var(--text)}
+  .preview{background:var(--code-bg);color:var(--text);border-radius:10px;padding:10px 12px;font-size:.9rem;white-space:pre-line}
+  .trade{border:1px solid var(--border);border-radius:12px;padding:12px;margin-top:10px;background:var(--card)}
+  .trade-head{display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px;font-weight:700}
+  .trade-meta{font-size:.88rem;color:var(--muted);margin-top:4px}
+  .trade img{display:block;max-width:100%;max-height:260px;border-radius:8px;border:1px solid var(--border);margin-top:8px}
+  .review{background:var(--warn-bg);color:var(--warn-text);border-radius:10px;padding:8px 10px;margin-top:8px;font-size:.92rem;white-space:pre-wrap}
+  .pre{white-space:pre-wrap;margin-top:6px;font-size:.95rem}
+  .list{padding-left:20px;margin:0}
+  .list li{margin:6px 0}
+  .table-wrap{overflow-x:auto}
+  table{width:100%;border-collapse:collapse;font-size:.95rem;margin-top:8px}
+  th,td{padding:8px;border-bottom:1px solid var(--border);text-align:left;white-space:nowrap}
+  .disclaimer{border-top:1px solid var(--border);margin-top:26px;padding:16px 0 30px;font-size:.86rem;color:var(--muted)}
+  .disclaimer strong{color:var(--accent)}
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="nav-inner">
+    <div class="brand">
+      <img src="avatar.png" data-alt="avatar.jpg" alt="村長" onerror="iconFallback(this)">
+      <span class="brand-title">幣圈新手村 PRO</span>
+    </div>
+    <div class="nav-actions">
+      <button id="syncBtn" class="btn btn-sm btn-ghost" type="button" hidden>🔄 雲端同步</button>
+      <button id="themeBtn" class="btn btn-sm btn-ghost" type="button" aria-label="切換亮色或暗色模式">☀️ 亮色 / 🌙 暗色</button>
+      <button id="logoutBtn" class="btn btn-sm btn-ghost" type="button" hidden>登出</button>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <section id="loginView" class="card narrow" hidden>
+    <h2 class="center">💎 PRO 交易復盤系統</h2>
+    <p class="muted center">請輸入專屬帳號（或 UID）與專屬密碼</p>
+    <form id="loginForm" autocomplete="off">
+      <label for="lAcc">帳號 / UID</label>
+      <input id="lAcc" class="field" type="text" maxlength="60" required>
+      <div style="height:12px"></div>
+      <label for="lPwd">密碼</label>
+      <div style="position:relative"><input id="lPwd" class="field" type="password" maxlength="60" required style="padding-right:48px"><button id="pwdEye" class="btn-mini" type="button" aria-label="顯示或隱藏密碼" style="position:absolute;right:6px;top:50%;transform:translateY(-50%)">👁</button></div>
+      <div style="height:16px"></div>
+      <button id="loginBtn" class="btn btn-block" type="submit">登入</button>
+      <div id="loginMsg" class="msg" role="status"></div>
+    </form>
+    <p class="center" style="margin:16px 0 0"><a href="index.html">← 回新手村首頁</a></p>
+  </section>
+
+  <section id="mainView" hidden>
+    <div class="card">
+      <div class="grid2" style="align-items:end">
+        <div>
+          <div id="whoLine" style="font-weight:700;font-size:1.05rem"></div>
+          <div id="vipLine" class="muted"></div>
+        </div>
+        <div id="capBox">
+          <label for="capInput">起始本金 (USDT)</label>
+          <div class="row-btns" style="margin-top:0">
+            <input id="capInput" class="field" type="number" min="0" step="any" inputmode="decimal">
+            <button id="capSave" class="btn btn-sm" type="button">儲存</button>
+          </div>
+        </div>
+      </div>
+      <div id="statusMsg" class="msg" role="status"></div>
+    </div>
+
+    <div id="winBox"></div>
+    <div id="adminDueBox"></div>
+    <div class="card"><div class="grid4" id="statsGrid"></div></div>
+
+    <div class="tabs" role="tablist">
+      <button class="tab" type="button" role="tab" data-tab="diary" aria-selected="true">📒 我的交易復盤日誌</button>
+      <button class="tab" type="button" role="tab" data-tab="top" aria-selected="false">🏆 優秀學員榜</button>
+      <button class="tab" type="button" role="tab" data-tab="lecture" aria-selected="false">📘 講義</button>
+      <button class="tab" type="button" role="tab" data-tab="tools" aria-selected="false">🧰 好用工具</button>
+      <button class="tab" type="button" role="tab" data-tab="calc" aria-selected="false">🧮 倉位計算機</button>
+      <button id="tabAdmin" class="tab" type="button" role="tab" data-tab="admin" aria-selected="false" hidden>⚙️ 村長管理後台</button>
+      <button id="tabReview" class="tab" type="button" role="tab" data-tab="review" aria-selected="false" hidden>✍️ 批改學員倉位</button>
+    </div>
+
+    <div id="panelDiary">
+      <div class="card">
+        <button id="newTradeBtn" class="btn" type="button">＋ 新增交易</button>
+
+        <form id="tradeForm" autocomplete="off" hidden style="margin-top:16px">
+          <h3 id="formTitle">新增交易</h3>
+          <div class="grid2">
+            <div><label for="tOpen">開倉日期時間</label><input id="tOpen" class="field" type="datetime-local" required></div>
+            <div><label for="tClose">平倉日期時間</label><input id="tClose" class="field" type="datetime-local" required></div>
+            <div><label for="tCoin">交易幣種</label><input id="tCoin" class="field" maxlength="20" placeholder="例如 BTC" required></div>
+            
+            <div><label for="tSide">多空方向</label>
+              <select id="tSide" class="field"><option value="long">做多</option><option value="short">做空</option></select></div>
+            <div><label for="tLev">槓桿倍數</label><input id="tLev" class="field" type="number" min="1" max="1000" step="any" required></div>
+          </div>
+
+          <h3>交易模式</h3>
+          <select id="tMode" class="field"><option value="single">單筆模式</option><option value="batch">分批進場 &amp; 分批出場</option></select>
+          <div id="singleBox" class="grid2" style="margin-top:12px">
+            <div><label for="sEntry">開倉均價</label><input id="sEntry" class="field" type="number" min="0" step="any"></div>
+            <div><label for="sExit">平倉均價</label><input id="sExit" class="field" type="number" min="0" step="any"></div>
+            <div><label for="sQty">持倉量</label><input id="sQty" class="field" type="number" min="0" step="any"></div>
+          </div>
+          <div id="batchBox" hidden style="margin-top:12px">
+            <h4>分批進場</h4>
+            <div id="entryLegs" class="legs"></div>
+            <button type="button" class="btn-mini" data-add="entry" style="margin-top:8px">＋ 新增進場</button>
+            <h4 style="margin-top:14px">分批出場</h4>
+            <div id="exitLegs" class="legs"></div>
+            <button type="button" class="btn-mini" data-add="exit" style="margin-top:8px">＋ 新增出場</button>
+          </div>
+
+          <h3>績效</h3>
+          <div class="grid2">
+            <div><label for="tRR1">預期 RR</label><input id="tRR1" class="field" type="number" step="any"></div>
+            <div><label for="tRR2">實際 RR</label><input id="tRR2" class="field" type="number" step="any"></div>
+            <div><label for="tNet">實際淨利 (USDT)</label><input id="tNet" class="field" type="number" step="any"></div>
+          </div>
+          <div id="preview" class="preview" style="margin-top:12px"></div>
+
+          <h3>進場策略</h3>
+          <div id="stratBox" class="chips"></div>
+          <div class="row-btns">
+            <input id="customStrat" class="field" maxlength="30" placeholder="輸入自訂策略名稱">
+            <button id="addStrat" class="btn btn-sm btn-ghost" type="button">新增</button>
+          </div>
+
+          <h3>盤面截圖（可不上傳）</h3>
+          <input id="tShot" type="file" accept="image/png,image/jpeg,image/webp">
+          <img id="shotPrev" alt="" hidden style="display:block;max-width:100%;max-height:220px;margin-top:8px;border-radius:8px">
+
+          <h3>復盤心得筆記</h3>
+          <textarea id="tNote" class="field" rows="5" maxlength="2000"></textarea>
+
+          <div class="row-btns" style="margin-top:16px">
+            <button id="saveTradeBtn" class="btn" type="submit">儲存交易</button>
+            <button id="cancelTradeBtn" class="btn btn-ghost" type="button">取消</button>
+          </div>
+          <div id="tradeMsg" class="msg" role="status"></div>
+        </form>
+
+        <div id="tradeList"></div>
+      </div>
+    </div>
+
+    <div id="panelTop" class="card" hidden>
+      <div class="msg info" style="margin-top:0">🎁 每兩週抽一次紅包，優秀學員榜與交易量排行榜前 10 名各抽 3 位，敬請期待！</div>
+      <div class="tabs" role="tablist" style="margin-top:0">
+        <button class="tab" type="button" role="tab" data-board="score" aria-selected="true">🏆 優秀學員榜</button>
+        <button class="tab" type="button" role="tab" data-board="volume" aria-selected="false">📈 交易量排行榜</button>
+      </div>
+      
+      <div id="topBox"></div>
+      <div id="lotteryBox" class="trade" hidden></div>
+    </div>
+
+    <div id="panelLecture" class="card" hidden>
+      <div id="lectureBox"></div>
+    </div>
+    <div id="panelTools" class="card" hidden>
+      <div id="toolsBox"></div>
+    </div>
+
+    <div id="panelCalc" class="card" hidden>
+      <h2>🛡️ 以損定量・開倉風險計算機</h2>
+      <p class="muted">輸入本金與停損設定，自動算出可開倉的數量與保證金。</p>
+      <div class="grid2">
+        <div><label>總本金 (USDT)</label><input id="rkCap" class="field" type="number" step="any" min="0" inputmode="decimal"></div>
+        <div><label>單筆允許虧損 (%)</label><input id="rkPct" class="field" type="number" step="any" min="0" inputmode="decimal" placeholder="例如 1"></div>
+        <div><label>預計進場價</label><input id="rkEntry" class="field" type="number" step="any" min="0" inputmode="decimal"></div>
+        <div><label>止損價 (SL)</label><input id="rkStop" class="field" type="number" step="any" min="0" inputmode="decimal"></div>
+        <div><label>止盈價 (TP)</label><input id="rkTp" class="field" type="number" step="any" min="0" inputmode="decimal"></div>
+        <div><label>槓桿倍數</label><input id="rkLev" class="field" type="number" step="any" min="1" inputmode="decimal" placeholder="例如 10"></div>
+      </div>
+      <div class="grid4" style="margin-top:12px">
+        <div class="stat"><div class="k">最大虧損金額 (USDT)</div><div class="v" id="rkMaxLoss">—</div></div>
+        <div class="stat"><div class="k">建議開倉總價值 (USDT)</div><div class="v" id="rkPosValue">—</div></div>
+        <div class="stat"><div class="k">應投入保證金 (USDT)</div><div class="v" id="rkMargin">—</div></div>
+        <div class="stat"><div class="k">預估盈虧比 (RR)</div><div class="v" id="rkRR">—</div></div>
+      </div>
+      <p class="muted" id="rkQty" style="margin-top:8px"></p>
+
+      <hr style="border:none;border-top:1px solid var(--border);margin:24px 0">
+
+      <h2>➕ 加倉均價計算機</h2>
+      <p class="muted">每次加倉輸入價格與數量，自動算出最新均價與累積倉位。</p>
+      <div id="avgLegs"></div>
+      <div class="row-btns"><button id="avgAdd" class="btn btn-sm btn-ghost" type="button">＋ 新增一筆加倉</button></div>
+      <div class="grid4" style="margin-top:12px">
+        <div class="stat"><div class="k">最新均價</div><div class="v" id="avgPrice">—</div></div>
+        <div class="stat"><div class="k">累積持倉量</div><div class="v" id="avgQty">—</div></div>
+        <div class="stat"><div class="k">累積倉位價值 (USDT)</div><div class="v" id="avgValue">—</div></div>
+      </div>
+    </div>
+
+    <div id="panelAdmin" class="card" hidden>
+      <h2>⚙️ 村長管理後台</h2>
+      <p class="muted">修改審核狀態、專屬帳號與密碼、到期日，或轉換會員類型。儲存後私訊文案會自動更新。</p>
+      <div class="grid2" style="margin:10px 0">
+        <div id="adminTotalVol" class="stat"></div>
+        <div id="adminTotalFee" class="stat"></div>
+      </div>
+      <input id="memberSearch" class="field" placeholder="搜尋學員：UID、專屬帳號、會員ID、交易所、聯絡方式、TxID、方案、狀態" style="margin-bottom:10px">
+      <div id="adminMsg" class="msg" role="status"></div>
+      
+      <div id="memberBox"></div>
+    </div>
+
+    <div id="panelReview" class="card" hidden>
+      <h2>✍️ 批改學員倉位</h2>
+      <p class="muted">只列學員的交易。四項評分各 0–25 分，總分自動加總，評語學員可見。</p>
+      <div class="row-btns" style="margin-top:0">
+        <input id="rvSearch" class="field" placeholder="搜尋學員、幣種、交易所、策略、心得、日期…">
+      </div>
+      <div id="reviewMsg" class="msg" role="status"></div>
+      <div id="reviewBox"></div>
+    </div>
+  </section>
+
+  <footer class="disclaimer">
+    <p><strong>⚠️ 投資理財風險自負聲明</strong></p>
+    <p>本系統所有內容（包含村長的教學、講義、復盤紀錄、評分與評語）僅供學習與經驗分享，不構成任何投資建議、買賣推薦或財務建議。加密貨幣與衍生品價格波動劇烈，可能導致本金全部損失，所有交易與投資決策均由使用者自行判斷，並自負盈虧。</p>
+    <p>© 幣圈新手村 PRO｜<a href="index.html">回新手村首頁</a></p>
+    <p class="muted" id="verText"></p>
+  </footer>
+</main>
+
+<script>
+  const API_URL = 'https://script.google.com/macros/s/AKfycbzHvrvqMGYMKpbO07CNd0y4sH86Xdrxgp2hGrYEFdJVhJ-Hdz_W5WGQ3hZ70SV4fv4WJQ/exec';
+  const TOKEN_KEY = 'pro_token', CACHE_KEY = 'pro_cache', CUSTOM_KEY = 'pro_strats';
+  const DEFAULT_STRATS = ['趨勢順勢', '突破', '回踩', '支撐壓力', '區間震盪', '反轉'];
+  const SESSION_ERRORS = ['SESSION_INVALID', 'PENDING_REVIEW', 'PAUSED', 'EXPIRED', 'NOT_READY'];
+  const PANELS = { diary: 'panelDiary', top: 'panelTop', lecture: 'panelLecture', tools: 'panelTools', calc: 'panelCalc', admin: 'panelAdmin', review: 'panelReview' };
+  const STATUS_OPTIONS = ['待審核', '已開通', '已暫停', '已到期'];
+  const SCORE_LABELS = ['停損設定', '倉位控制', '復盤完整度', '心得深度'];
+  const ERR_TEXT = {
+    BAD_REQUEST: '系統版本不一致，請重新整理頁面',
+    UNKNOWN_ACTION: '系統版本不一致，請重新整理頁面',
+    INVALID_INPUT: '資料格式有誤，請檢查欄位',
+    DUPLICATE_UID: '此 UID 已申請過，如有疑問請私訊村長',
+    DUPLICATE_TXID: '此轉帳紀錄已提交過，請勿重複申請',
+    DUPLICATE_ACCOUNT: '此專屬帳號已被使用，請換一個',
+    AUTH_FAILED: '帳號或密碼錯誤',
+    TOO_MANY_ATTEMPTS: '嘗試次數過多，請 10 分鐘後再試',
+    PENDING_REVIEW: '申請審核中，審核通過後即可登入',
+    PAUSED: '您的帳號目前已暫停使用，請聯繫村長恢復權限',
+    EXPIRED: '您的訂閱已到期，請續費後再登入',
+    NOT_READY: '帳號設定尚未完成，請聯繫村長',
+    SESSION_INVALID: '登入已過期，請重新登入',
+    FORBIDDEN: '沒有權限執行此操作',
+    NOT_FOUND: '找不到這筆資料，請重新整理',
+    SYSTEM_BUSY: '系統忙碌，請稍後再試',
+    DB_WRITE_FAILED: '儲存失敗，請稍後再試',
+    SYSTEM_NOT_READY: '系統維護中，請稍後再試',
+    INTERNAL_ERROR: '系統維護中，請稍後再試',
+    NETWORK: '網路連線異常，請稍後再試',
+    LOTTERY_TOO_SOON: '距離上次抽獎還不到兩週，請等到時間再抽',
+    NO_CANDIDATE: '目前沒有符合資格的學員可以抽獎',
+    ACCOUNT_INVALID: '專屬帳號格式不正確，只能用英文、數字、底線，長度 4 到 20 字',
+    PASSWORD_INVALID: '專屬密碼格式不正確，只能用英文和數字，長度 6 到 20 字'
+  };
+
+  const $ = id => document.getElementById(id);
+  let token = '', state = null, editingId = null, exchangeNames = [], customStrats = [], stratSel = new Set();
+  let adminMembers = [], reviewTrades = [];
+
+  /* ---------- 共用工具 ---------- */
+  function esc(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
+  }
+  function safeUrl(u) { const t = String(u || '').trim(); return /^https:\/\//i.test(t) ? t : ''; }
+  function errText(code) { return ERR_TEXT[code] || '系統發生錯誤'; }
+  function codeError(code) { const e = new Error(code); e.code = code; return e; }
+  function showMsg(el, text, type) { el.className = 'msg ' + (type || 'info'); el.textContent = text; }
+  function clearMsg(el) { el.className = 'msg'; el.textContent = ''; }
+  function setStatus(text, type) { showMsg($('statusMsg'), text, type); }
+  function money(n, d) {
+    if (n == null || isNaN(n)) return '—';
+    const p = d == null ? 2 : d;
+    return Number(n).toLocaleString('en-US', { minimumFractionDigits: p, maximumFractionDigits: p });
+  }
+  function signed(n, d) { if (n == null || isNaN(n)) return '—'; return (Number(n) > 0 ? '+' : '') + money(n, d); }
+  function cls(n) { return n > 0 ? 'pos' : (n < 0 ? 'neg' : ''); }
+  function fnum(n) { return String(Number(Number(n).toFixed(8))); }
+  function todayStr() {
+    const d = new Date();
+    return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+  }
+  async function copyText(text) {
+    try {
+      if (navigator.clipboard && window.isSecureContext) { await navigator.clipboard.writeText(text); return true; }
+    } catch (e) {}
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.setAttribute('readonly', '');
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    let ok = false;
+    try { ok = document.execCommand('copy'); } catch (e) {}
+    document.body.removeChild(ta);
+    return ok;
+  }
+
+  async function api(action, data, tk) {
+    let json;
+    try {
+      const res = await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action, token: tk || '', data: data || {} }) });
+      json = await res.json();
+    } catch (e) { throw codeError('NETWORK'); }
+    if (!json || !json.ok) throw codeError((json && json.code) || 'INTERNAL_ERROR');
+    return json.data;
+  }
+
+  function lsGet(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+  function lsSet(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+  function lsDel(k) { try { localStorage.removeItem(k); } catch (e) {} }
+  function clearSession() { token = ''; state = null; lsDel(TOKEN_KEY); lsDel(CACHE_KEY); }
+  function saveCache() { if (state) lsSet(CACHE_KEY, JSON.stringify(state)); }
+
+  function handleErr(err, el) {
+    if (SESSION_ERRORS.indexOf(err.code) >= 0) { clearSession(); showLogin(errText(err.code)); return; }
+    if (el) showMsg(el, errText(err.code), 'err'); else setStatus(errText(err.code), 'err');
+  }
+
+  /* ---------- 畫面切換 ---------- */
+  function showLogin(msg, type) {
+    $('loginView').hidden = false;
+    $('mainView').hidden = true;
+    $('syncBtn').hidden = true;
+    $('logoutBtn').hidden = true;
+    if (msg) showMsg($('loginMsg'), msg, type || 'err');
+  }
+  function showMain() {
+    $('loginView').hidden = true;
+    $('mainView').hidden = false;
+    $('syncBtn').hidden = false;
+    $('logoutBtn').hidden = false;
+    render();
+    showTab('diary');
+  }
+
+  /* ---------- 登入 / 同步 / 登出 ---------- */
+  async function doLogin(ev) {
+    ev.preventDefault();
+    const btn = $('loginBtn');
+    btn.disabled = true;
+    showMsg($('loginMsg'), '⏳ 登入中...', 'info');
+    try {
+      const d = await api('login', { account: $('lAcc').value.trim(), password: $('lPwd').value }, '');
+      token = d.token;
+      lsDel(CACHE_KEY);
+      lsSet(TOKEN_KEY, token);
+      state = { profile: d.profile, stats: null, trades: [], lectures: null };
+      $('lPwd').value = '';
+      clearMsg($('loginMsg'));
+      showMain();
+      await syncNow();
+    } catch (err) {
+      showMsg($('loginMsg'), errText(err.code), 'err');
+    } finally {
+      btn.disabled = false;
+    }
+  }
+
+  async function syncNow() {
+    setStatus('⏳ 正在同步...', 'info');
+    try {
+      state = await api('sync', {}, token);
+      saveCache();
+      render();
+      setStatus('✅ 同步完成', 'ok');
+    } catch (err) {
+      handleErr(err);
+    }
+  }
+
+  async function logout() {
+    const tk = token;
+    setStatus('⏳ 正在同步...', 'info');
+    try { await api('sync', {}, tk); } catch (e) {}
+    try { await api('logout', {}, tk); } catch (e) {}
+    clearSession();
+    showLogin('已登出', 'info');
+  }
+
+  async function saveCapital() {
+    const v = $('capInput').value;
+    if (v === '' || Number(v) < 0) { setStatus('請輸入正確的起始本金', 'err'); return; }
+    const btn = $('capSave');
+    btn.disabled = true;
+    try {
+      await api('updateCapital', { capital: Number(v) }, token);
+      await syncNow();
+      setStatus('✅ 起始本金已更新', 'ok');
+    } catch (err) { handleErr(err); } finally { btn.disabled = false; }
+  }
+
+  /* ---------- 主畫面渲染 ---------- */
+  function render() {
+    if (!state || !state.profile) { $('whoLine').textContent = '載入中…'; return; }
+    const p = state.profile, s = state.stats || {}, isAdmin = p.role === 'admin';
+    $('whoLine').textContent = isAdmin ? '👑 村長' : '👤 ' + (p.identity || '');
+    $('vipLine').textContent = isAdmin ? '村長權限' : (p.type === '訂閱制'
+      ? '💎 訂閱制｜到期日 ' + (p.expiry || '—') + '｜剩餘 ' + (p.remainingDays == null ? '—' : p.remainingDays) + ' 天'
+      : '💎 VIP 專屬通行證');
+    $('capBox').hidden = isAdmin;
+    $('tabAdmin').hidden = !isAdmin;
+    $('tabReview').hidden = !isAdmin;
+    $('lotteryBox').hidden = !isAdmin;
+    if (!isAdmin && document.activeElement !== $('capInput')) $('capInput').value = p.capital || '';
+    const items = [
+      ['目前總資產 (USDT)', s.totalAssets == null ? '—' : money(s.totalAssets), ''],
+      ['累積總淨利 (USDT)', signed(s.pnl), cls(s.pnl)],
+      ['總報酬率 (ROI)', s.roi == null ? '—' : signed(s.roi) + '%', cls(s.roi)],
+      ['實戰勝率', (s.winRate || 0) + '%', ''],
+      ['總交易筆數', String(s.count || 0), ''],
+      ['累積手續費磨耗 (USDT)', money(s.fee, 4), '']
+    ];
+    $('statsGrid').innerHTML = items.map(i =>
+      '<div class="stat"><div class="k">' + i[0] + '</div><div class="v ' + i[2] + '">' + esc(i[1]) + '</div></div>'
+    ).join('');
+    renderWins(p);
+    renderTrades();
+    renderLecture();
+  }
+
+  function renderTrades() {
+    renderTradesRaw();
+    fixShots($('tradeList'));
+  }
+  function renderTradesRaw() {
+    const list = (state && state.trades) || [];
+    $('tradeList').innerHTML = list.length
+      ? list.map(tradeHtml).join('')
+      : '<p class="muted" style="margin-top:12px">尚無交易紀錄，點上方「＋ 新增交易」開始復盤。</p>';
+  }
+
+  function tradeHtml(t) {
+    const shot = safeUrl(t.screenshot);
+    const score = t.score == null ? '⏳ 待村長評分' : '⭐ 村長評分：' + esc(t.score) + ' / 100';
+    return '<div class="trade">' +
+      '<div class="trade-head"><span>' + esc(t.coin) + '｜' + (t.side === 'short' ? '做空' : '做多') + '｜' + esc(t.leverage) + 'x</span>' +
+      '<span class="' + cls(t.net) + '">' + signed(t.net) + ' USDT</span></div>' +
+      '<div class="trade-meta">' + esc(t.exchange) + '｜' + esc(t.openDate) + ' → ' + esc(t.closeDate) + '｜' +
+        (t.mode === 'batch' ? '分批' : '單筆') + '｜' + esc(t.result) + '</div>' +
+      '<div class="trade-meta">開倉 ' + fnum(t.entryAvg) + '｜平倉 ' + fnum(t.exitAvg) + '｜持倉量 ' + fnum(t.qty) +
+        '｜交易量 ' + money(t.volume) + '｜手續費磨耗 ' + money(t.fee, 4) + '</div>' +
+      (t.strategies && t.strategies.length ? '<div class="trade-meta">策略：' + esc(t.strategies.join('、')) + '</div>' : '') +
+      (t.notes ? '<div class="pre">' + esc(t.notes) + '</div>' : '') +
+      (shot ? '<img src="' + esc(shot) + '" alt="盤面截圖" loading="lazy">' : '') +
+      '<div class="trade-meta">' + score + '</div>' +
+      (t.comment ? '<div class="review"><strong>村長評語</strong>\n' + esc(t.comment) + '</div>' : '') +
+      '<div class="row-btns"><button class="btn-mini" type="button" data-edit="' + esc(t.tradeId) + '">編輯</button>' +
+      '<button class="btn-mini" type="button" data-del="' + esc(t.tradeId) + '">刪除</button></div>' +
+      '</div>';
+  }
+
+  function renderLecture() {
+    const L = state && state.lectures;
+    const box = $('lectureBox');
+    const tools = $('toolsBox');
+    if (!L) {
+      box.innerHTML = '<p class="muted">載入中…</p>';
+      tools.innerHTML = '';
+      return;
+    }
+    box.innerHTML = (L.lectures || []).map(x => {
+      const u = safeUrl(x.url);
+      return '<div class="trade"><div class="trade-head">' + esc(x.title) + '</div>' +
+        (x.note ? '<div class="pre">' + esc(x.note) + '</div>' : '') +
+        (u ? '<p style="margin:8px 0 0"><a href="' + esc(u) + '" target="_blank" rel="noopener noreferrer">開啟講義</a></p>' : '') +
+        '</div>';
+    }).join('');
+    let h = '';
+    (L.tiers || []).forEach(t => {
+      h += '<h3>' + esc(t.name) + '</h3><ul class="list">' + t.sites.map(s => {
+        const u = safeUrl(s.url);
+        return '<li>' + (u ? '<a href="' + esc(u) + '" target="_blank" rel="noopener noreferrer">' + esc(s.title) + '</a>' : esc(s.title)) +
+          (s.note ? ' <span class="muted">｜' + esc(s.note) + '</span>' : '') + '</li>';
+      }).join('') + '</ul>';
+    });
+    tools.innerHTML = h;
+  }
+
+  function renderLectureOld() {
+    const L = state && state.lectures;
+    const box = $('lectureBox');
+    if (!L) { box.innerHTML = '<p class="muted">載入中…</p>'; return; }
+    let h = (L.lectures || []).length ? '<h2>📘 核心講義</h2>' : '';
+    (L.lectures || []).forEach(x => {
+      const u = safeUrl(x.url);
+      h += '<div class="trade"><div class="trade-head">' + esc(x.title) + '</div>' +
+        (x.note ? '<div class="pre">' + esc(x.note) + '</div>' : '') +
+        (u ? '<p style="margin:8px 0 0"><a href="' + esc(u) + '" target="_blank" rel="noopener noreferrer">開啟講義</a></p>' : '') +
+        '</div>';
+    });
+    if ((L.tiers || []).length) h += '<h2 style="margin-top:20px">🧰 必備網站</h2>';
+    (L.tiers || []).forEach(t => {
+      h += '<h3>' + esc(t.name) + '</h3><ul class="list">' + t.sites.map(s => {
+        const u = safeUrl(s.url);
+        return '<li>' + (u ? '<a href="' + esc(u) + '" target="_blank" rel="noopener noreferrer">' + esc(s.title) + '</a>' : esc(s.title)) +
+          (s.note ? ' <span class="muted">｜' + esc(s.note) + '</span>' : '') + '</li>';
+      }).join('') + '</ul>';
+    });
+    box.innerHTML = h || '<p class="muted">目前尚無講義與網站</p>';
+  }
+
+  /* ---------- 優秀學員榜 ---------- */
+  async function loadTop() {
+    const box = $('topBox');
+    box.innerHTML = '<p class="muted">載入中…</p>';
+    try {
+      const d = await api('getTopStudents', {}, token);
+      if (!d.rows || !d.rows.length) {
+        box.innerHTML = '<p class="muted">目前尚無上榜學員（需至少 ' + esc(d.minCount) + ' 筆村長評分才會上榜）。</p>';
+        return;
+      }
+      box.innerHTML = '<p class="muted">至少 ' + esc(d.minCount) + ' 筆評分才會上榜，名稱已匿名。</p>' +
+        '<div class="table-wrap"><table><thead><tr><th>名次</th><th>學員</th><th>平均分數</th><th>評分筆數</th></tr></thead><tbody>' +
+        d.rows.map(r => '<tr><td>' + esc(r.rank) + '</td><td>' + esc(r.name) + '</td><td>' + esc(r.score) + '</td><td>' + esc(r.count) + '</td></tr>').join('') +
+        '</tbody></table></div>';
+    } catch (err) {
+      box.innerHTML = '';
+      handleErr(err);
+    }
+  }
+
+  function showTab(name) {
+    document.querySelectorAll('.tab[data-tab]').forEach(b => b.setAttribute('aria-selected', String(b.dataset.tab === name)));
+    Object.keys(PANELS).forEach(k => { $(PANELS[k]).hidden = k !== name; });
+    if (name === 'top') { loadBoard(); if (isAdminUser()) loadLotteryAdmin(); }
+    if (name === 'admin') loadAdminMembers();
+    if (name === 'review') loadReview();
+  }
+
+  /* ---------- 紅包抽獎：中獎提示與村長抽獎 ---------- */
+  function renderWins(p) {
+    const wins = (state && state.wins) || [];
+    $('winBox').innerHTML = (p && p.role !== 'admin' && wins.length)
+      ? wins.map(w => '<div class="card" style="border-color:var(--ok)"><strong>🎉 恭喜你在「' + esc(w.board) + '」中獎！</strong><div class="muted" style="margin-top:6px">請於 ' + esc(w.deadline) + ' 前私訊村長領取獎品，逾期視為放棄。</div></div>').join('')
+      : '';
+    const L = state && state.lottery;
+    $('adminDueBox').innerHTML = (p && p.role === 'admin' && L && L.isDue)
+      ? '<div class="card" style="border-color:var(--accent)"><strong>🎁 該抽獎了！</strong><div class="muted" style="margin-top:6px">距離上次抽獎已滿兩週，請到「⚙️ 村長管理後台」的「紅包抽獎」開始抽獎。</div></div>'
+      : '';
+  }
+
+  async function loadLotteryAdmin() {
+    const box = $('lotteryBox');
+    box.innerHTML = '<p class="muted">載入中…</p>';
+    try {
+      const d = await api('adminLotteryHistory', {}, token);
+      const st = d.status || {};
+      let statusText;
+      if (!st.hasDrawn) statusText = '尚未抽過獎，可以開始抽獎。';
+      else if (st.isDue) statusText = '🎁 該抽獎了（上次抽獎：' + esc(st.lastAt) + '）';
+      else statusText = '下次可抽獎：' + esc(st.dueAt) + '（還有 ' + esc(st.daysLeft) + ' 天）';
+      const rows = (d.rows || []).map(r =>
+        '<tr><td>' + esc(r.at) + '</td><td>' + esc(r.board) + '</td><td>' + esc(r.identity) + '</td><td>' + esc(r.name) + '</td><td>' +
+        (r.claimed ? '✅ 已領取' : (r.expired ? '⏰ 已逾期（' + esc(r.deadline) + '）' : '待領取，' + esc(r.deadline) + ' 前<br><button class="btn-mini" type="button" data-claim="' + esc(r.row) + '">標記已領取</button>')) +
+        '</td></tr>'
+      ).join('');
+      box.innerHTML =
+        '<h3 style="margin-top:0">🎁 紅包抽獎</h3>' +
+        '<p>' + statusText + '</p>' +
+        '<p class="muted">規則：優秀學員榜前 10 名抽 3 位，交易量排行榜前 10 名抽 3 位，同一人只會中一次。兩次抽獎間隔兩週。</p>' +
+        '<div class="row-btns"><button class="btn btn-sm" type="button" data-act="draw">開始抽獎</button></div>' +
+        '<h4 style="margin-top:14px">最近抽獎紀錄</h4>' +
+        (rows
+          ? '<div class="table-wrap"><table><thead><tr><th>時間</th><th>榜單</th><th>學員</th><th>遮罩名稱</th><th>領取</th></tr></thead><tbody>' + rows + '</tbody></table></div>'
+          : '<p class="muted">尚無紀錄</p>');
+    } catch (err) {
+      box.innerHTML = '';
+      handleErr(err, $('adminMsg'));
+    }
+  }
+
+  async function drawLottery() {
+    if (!confirm('確定要現在抽獎嗎？抽出的結果會寫入紀錄，無法撤銷。')) return;
+    try {
+      let res;
+      try {
+        res = await api('adminRunLottery', { force: false }, token);
+      } catch (err) {
+        if (err.code !== 'LOTTERY_TOO_SOON') throw err;
+        if (!confirm('距離上次抽獎還不到兩週，確定要提前抽獎嗎？')) return;
+        res = await api('adminRunLottery', { force: true }, token);
+      }
+      const names = arr => arr.length ? arr.map(w => w.name).join('、') : '（無符合資格者）';
+      showMsg($('adminMsg'), '✅ 抽獎完成　優秀學員榜：' + names(res.score) + '｜交易量排行榜：' + names(res.volume), 'ok');
+      await loadLotteryAdmin();
+      await syncNow();
+    } catch (err) {
+      handleErr(err, $('adminMsg'));
+    }
+  }
+
+  async function claimLottery(row) {
+    if (!confirm('確認這位學員已經私訊領取完成？')) return;
+    try {
+      await api('adminClaimLottery', { row: row }, token);
+      showMsg($('adminMsg'), '✅ 已標記為已領取，學員的中獎提示已隱藏', 'ok');
+      await loadLotteryAdmin();
+      await syncNow();
+    } catch (err) {
+      handleErr(err, $('adminMsg'));
+    }
+  }
+
+  function lotteryClick(ev) {
+    if (ev.target.closest('[data-act="draw"]')) return drawLottery();
+    const cl = ev.target.closest('[data-claim]');
+    if (cl) return claimLottery(Number(cl.dataset.claim));
+  }
+
+  /* ---------- 盤面截圖縮圖與排行榜 ---------- */
+  let currentBoard = 'score';
+  function driveThumb(u) {
+    const m = /[?&]id=([\w-]+)/.exec(u);
+    return m ? 'https://drive.google.com/thumbnail?id=' + m[1] + '&sz=w1000' : u;
+  }
+  function fixShots(root) {
+    root.querySelectorAll('img[alt="盤面截圖"]').forEach(img => {
+      const orig = img.getAttribute('src');
+      const a = document.createElement('a');
+      a.href = orig;
+      a.target = '_blank';
+      a.rel = 'noopener noreferrer';
+      a.textContent = '開啟盤面截圖';
+      a.style.display = 'inline-block';
+      a.style.marginTop = '6px';
+      img.src = driveThumb(orig);
+      img.onerror = () => img.remove();
+      img.parentNode.insertBefore(a, img.nextSibling);
+    });
+  }
+  function tableHtml(heads, rows) {
+    return '<div class="table-wrap"><table><thead><tr>' +
+      heads.map(h => '<th>' + esc(h) + '</th>').join('') +
+      '</tr></thead><tbody>' +
+      rows.map(r => '<tr>' + r.map(c => '<td>' + esc(c) + '</td>').join('') + '</tr>').join('') +
+      '</tbody></table></div>';
+  }
+  async function loadBoard() {
+    const box = $('topBox');
+    document.querySelectorAll('[data-board]').forEach(b => b.setAttribute('aria-selected', String(b.dataset.board === currentBoard)));
+    box.innerHTML = '<p class="muted">載入中…</p>';
+    try {
+      if (currentBoard === 'score') {
+        const d = await api('getTopStudents', {}, token);
+        if (!d.rows || !d.rows.length) {
+          box.innerHTML = '<p class="muted">目前尚無上榜學員（需至少 ' + esc(d.minCount) + ' 筆村長評分才會上榜）。</p>';
+          return;
+        }
+        box.innerHTML = '<p class="muted">依村長評分的平均分數排序，至少 ' + esc(d.minCount) + ' 筆評分才會上榜，名稱已匿名。</p>' +
+          tableHtml(['名次', '學員', '平均分數', '評分筆數'], d.rows.map(r => [r.rank, r.name, r.score, r.count]));
+      } else {
+        const d = await api('getVolumeBoard', {}, token);
+        if (!d.rows || !d.rows.length) {
+          box.innerHTML = '<p class="muted">目前尚無上榜學員。</p>';
+          return;
+        }
+        box.innerHTML = '<p class="muted">' + esc(d.rule) + '，名稱已匿名。</p>' +
+          tableHtml(['名次', '學員', '交易量 (USDT)', '交易筆數'], d.rows.map(r => [r.rank, r.name, money(r.volume), r.count]));
+      }
+    } catch (err) {
+      box.innerHTML = '';
+      handleErr(err);
+    }
+  }
+
+  /* ---------- 倉位計算機（純前端） ---------- */
+  function fmtNum(n, d) {
+    if (!isFinite(n)) return '—';
+    return n.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: d == null ? 4 : d });
+  }
+  function riskCalc() {
+    const cap = Number($('rkCap').value);
+    const pct = Number($('rkPct').value);
+    const entry = Number($('rkEntry').value);
+    const stop = Number($('rkStop').value);
+    const tp = Number($('rkTp').value);
+    const lev = Number($('rkLev').value) || 1;
+    const ok = cap > 0 && pct > 0 && entry > 0 && stop > 0 && entry !== stop;
+    if (!ok) {
+      ['rkMaxLoss', 'rkPosValue', 'rkMargin', 'rkRR'].forEach(id => { $(id).textContent = '—'; });
+      $('rkQty').textContent = '';
+      return;
+    }
+    const maxLoss = cap * pct / 100;
+    const riskPerUnit = Math.abs(entry - stop);
+    const qty = maxLoss / riskPerUnit;
+    const posValue = qty * entry;
+    const margin = posValue / lev;
+    const rr = (tp > 0 && tp !== entry) ? Math.abs(tp - entry) / riskPerUnit : null;
+    $('rkMaxLoss').textContent = fmtNum(maxLoss, 2);
+    $('rkPosValue').textContent = fmtNum(posValue, 2);
+    $('rkMargin').textContent = fmtNum(margin, 2);
+    $('rkRR').textContent = rr == null ? '—' : ('1 : ' + fmtNum(rr, 2));
+    $('rkQty').textContent = '可開倉數量：約 ' + fmtNum(qty, 6) + ' 顆（槓桿 ' + lev + 'x 下，約需保證金 ' + fmtNum(margin, 2) + ' USDT）';
+  }
+  let avgLegRows = [{ price: '', qty: '' }, { price: '', qty: '' }];
+  function renderAvgLegs() {
+    $('avgLegs').innerHTML = avgLegRows.map((l, i) =>
+      '<div class="grid2" data-i="' + i + '" style="margin-bottom:8px">' +
+        '<div><label>第 ' + (i + 1) + ' 筆價格</label><input class="field avg-price" type="number" step="any" min="0" inputmode="decimal" value="' + esc(l.price) + '"></div>' +
+        '<div><label>第 ' + (i + 1) + ' 筆數量' + (avgLegRows.length > 1 ? ' <button class="btn-mini avg-del" type="button" style="float:right">刪除</button>' : '') + '</label><input class="field avg-qty" type="number" step="any" min="0" inputmode="decimal" value="' + esc(l.qty) + '"></div>' +
+      '</div>'
+    ).join('');
+  }
+  function avgCalc() {
+    const rows = [...$('avgLegs').querySelectorAll('[data-i]')];
+    avgLegRows = rows.map(r => ({
+      price: r.querySelector('.avg-price').value,
+      qty: r.querySelector('.avg-qty').value
+    }));
+    const legs = avgLegRows
+      .map(l => ({ price: Number(l.price), qty: Number(l.qty) }))
+      .filter(l => l.price > 0 && l.qty > 0);
+    if (!legs.length) {
+      $('avgPrice').textContent = '—';
+      $('avgQty').textContent = '—';
+      $('avgValue').textContent = '—';
+      return;
+    }
+    const totalQty = legs.reduce((s, l) => s + l.qty, 0);
+    const totalValue = legs.reduce((s, l) => s + l.price * l.qty, 0);
+    $('avgPrice').textContent = fmtNum(totalValue / totalQty, 6);
+    $('avgQty').textContent = fmtNum(totalQty, 6);
+    $('avgValue').textContent = fmtNum(totalValue, 2);
+  }
+  ['rkCap', 'rkPct', 'rkEntry', 'rkStop', 'rkTp', 'rkLev'].forEach(id => {
+    $(id).addEventListener('input', riskCalc);
+  });
+  $('avgLegs').addEventListener('input', avgCalc);
+  $('avgLegs').addEventListener('click', ev => {
+    const btn = ev.target.closest('.avg-del');
+    if (!btn) return;
+    const i = Number(btn.closest('[data-i]').dataset.i);
+    avgLegRows.splice(i, 1);
+    renderAvgLegs();
+    avgCalc();
+  });
+  $('avgAdd').addEventListener('click', () => {
+    avgCalc();
+    avgLegRows.push({ price: '', qty: '' });
+    renderAvgLegs();
+  });
+  renderAvgLegs();
+
+  /* ---------- 版本、自動登出、搜尋 ---------- */
+  let lastActive = Date.now();
+  ['click', 'keydown', 'touchstart', 'scroll'].forEach(ev => window.addEventListener(ev, () => { lastActive = Date.now(); }, { passive: true }));
+  async function loadVersion() {
+    try {
+      const cfg = await api('getPublicConfig', {}, '');
+      $('verText').textContent = cfg.version ? '版本 ' + cfg.version : '';
+    } catch (e) {}
+  }
+  function autoLogoutCheck() {
+    if (!token) return;
+    if (Date.now() - lastActive < 30 * 60 * 1000) return;
+    const tk = token;
+    clearSession();
+    showLogin('超過 30 分鐘未操作，已自動登出', 'info');
+    api('logout', {}, tk).catch(() => {});
+  }
+  function isAdminUser() { return !!(state && state.profile && state.profile.role === 'admin'); }
+  function reviewMatches(t, q) {
+    const text = [
+      t.identity, t.coin, t.exchange,
+      t.side === 'short' ? '做空 short' : '做多 long',
+      t.result, t.mode === 'batch' ? '分批' : '單筆',
+      (t.strategies || []).join(' '), t.notes, t.comment,
+      t.openDate, t.closeDate,
+      t.score == null ? '' : t.score + '分',
+      t.leverage + 'x'
+    ].join(' ').toLowerCase();
+    return !q || text.indexOf(q) >= 0;
+  }
+  function memberCard(m) {
+    const st = m.stats || {};
+    const isSub = m.type === '訂閱制';
+    const isUid = m.type === 'UID審核';
+    const o = cfgOptions();
+    const join = parts => parts.filter(Boolean).join('｜');
+    const statusOpts = STATUS_OPTIONS.map(s => '<option' + (s === m.status ? ' selected' : '') + '>' + s + '</option>').join('');
+    const head = join([m.identity, m.type, m.status]);
+    const info = join([
+      m.exchange, m.contact,
+      isSub ? m.plan : '',
+      isSub && m.currency ? m.currency + (m.chain ? ' ' + m.chain : '') : '',
+      isSub && m.txid ? 'TxID ' + m.txid : ''
+    ]);
+    const numbers = st.count ? join([
+      '交易量 ' + money(st.volume),
+      '筆數 ' + st.count,
+      '累積淨利 ' + signed(st.pnl),
+      st.avgScore != null ? '評分 ' + st.avgScore + '（' + st.scoredCount + ' 筆）' : ''
+    ]) : '';
+    const edit = '<div class="member-edit" hidden style="margin-top:12px">' +
+      '<div class="grid2">' +
+        '<div><label>審核狀態</label><select class="field" data-f="status">' + statusOpts + '</select></div>' +
+        '<div><label>專屬帳號</label><input class="field" data-f="account" maxlength="20" value="' + esc(m.account) + '"></div>' +
+        '<div><label>專屬密碼</label><input class="field" data-f="password" maxlength="20" value="' + esc(m.password) + '"></div>' +
+        (isSub ? '<div><label>到期日</label><input class="field" type="date" data-f="expiry" value="' + esc(m.expiry) + '"></div>' : '') +
+      '</div>' +
+      '<div class="row-btns"><button class="btn btn-sm" type="button" data-act="save">儲存修改</button><button class="btn btn-sm btn-ghost" type="button" data-act="copy">複製私訊文案</button><button class="btn btn-sm btn-ghost" type="button" data-act="delete" style="color:var(--err);border-color:var(--err)">🗑 刪除學員</button></div>' +
+      (isUid ? '' : '<div class="step-box" style="margin-top:12px"><h4>🔄 轉為 UID 永久用戶</h4><div class="grid2">' +
+        '<div><label>註冊交易所</label><select class="field" data-f="uidEx">' + o.exs + '</select></div>' +
+        '<div><label>交易所 UID</label><input class="field" data-f="uid" maxlength="40" value="' + esc(m.uid) + '"></div>' +
+        '</div><div class="row-btns"><button class="btn btn-sm btn-ghost" type="button" data-act="toUid">確認轉為 UID</button></div></div>') +
+      (isSub ? '' : '<div class="step-box" style="margin-top:12px"><h4>📅 轉為訂閱制</h4><div class="grid2">' +
+        '<div><label>方案</label><select class="field" data-f="plan">' + o.plans + '</select></div>' +
+        '<div><label>支付幣種與主鏈</label><select class="field" data-f="pay">' + o.pays + '</select></div>' +
+        '<div><label>TxID</label><input class="field" data-f="txid" maxlength="120"></div>' +
+        '<div><label>到期日（留空＝依方案自動計算）</label><input class="field" type="date" data-f="subExpiry"></div>' +
+        '</div><div class="row-btns"><button class="btn btn-sm btn-ghost" type="button" data-act="toSub">確認轉為訂閱</button></div></div>') +
+      '</div>';
+    return '<div class="trade" data-mid="' + esc(m.memberId) + '">' +
+      '<div class="trade-head"><span>' + esc(head) + '</span><span class="muted">' + esc(m.applyAt) + '</span></div>' +
+      (info ? '<div class="trade-meta">' + esc(info) + '</div>' : '') +
+      (numbers ? '<div class="trade-meta">' + esc(numbers) + '</div>' : '') +
+      '<div class="row-btns"><button class="btn btn-sm btn-ghost" type="button" data-act="edit">✏️ 修改</button></div>' + edit + '</div>';
+  }
+  function renderMemberList() {
+    const q = $('memberSearch').value.trim().toLowerCase();
+    const list = adminMembers
+      .filter(m => m.memberId && (m.uid || m.account || m.status))
+      .filter(m => !q || [m.identity, m.uid, m.account, m.memberId, m.exchange, m.contact, m.txid, m.plan, m.status, m.type, m.currency, m.chain].join(' ').toLowerCase().indexOf(q) >= 0);
+    const pending = list.filter(m => m.status === '待審核');
+    const others = list.filter(m => m.status !== '待審核');
+    const group = (title, arr) => '<h3>' + title + '（' + arr.length + '）</h3>' + (arr.length ? arr.map(memberCard).join('') : '<p class="muted">沒有資料</p>');
+    $('memberBox').innerHTML = list.length
+      ? group('⏳ 待審核', pending) + group('📋 其他學員', others)
+      : '<p class="muted">沒有符合條件的學員</p>';
+  }
+
+  /* ---------- 村長後台：學員管理 ---------- */
+  async function loadAdminMembers() {
+    $('memberBox').innerHTML = '<p class="muted">載入中…</p>';
+    try {
+      adminCfg = await api('getPublicConfig', {}, '');
+      const d = await api('adminListMembers', {}, token);
+      adminMembers = d.members || [];
+      $('adminTotalVol').innerHTML = '<div class="k">學員總交易量 (USDT)</div><div class="v">' + esc(money(d.totalVolume)) + '</div>';
+      $('adminTotalFee').innerHTML = '<div class="k">學員總手續費磨耗 (USDT)</div><div class="v">' + esc(money(d.totalFee, 4)) + '</div>';
+      renderMemberList();
+    } catch (err) {
+      $('memberBox').innerHTML = '';
+      handleErr(err, $('adminMsg'));
+    }
+  }
+
+  async function loadAdminMembersOld2() {
+    $('memberBox').innerHTML = '<p class="muted">載入中…</p>';
+    try {
+      adminCfg = await api('getPublicConfig', {}, '');
+      adminMembers = (await api('adminListMembers', {}, token)).members || [];
+      $('memberBox').innerHTML = adminMembers.length
+        ? adminMembers.map(memberHtml).join('')
+        : '<p class="muted">目前沒有學員申請</p>';
+    } catch (err) {
+      $('memberBox').innerHTML = '';
+      handleErr(err, $('adminMsg'));
+    }
+  }
+
+  async function loadAdminMembersOld() {
+    $('memberBox').innerHTML = '<p class="muted">載入中…</p>';
+    try {
+      adminMembers = (await api('adminListMembers', {}, token)).members || [];
+      $('memberBox').innerHTML = adminMembers.length
+        ? adminMembers.map(memberHtml).join('')
+        : '<p class="muted">目前沒有學員申請</p>';
+    } catch (err) {
+      $('memberBox').innerHTML = '';
+      handleErr(err, $('adminMsg'));
+    }
+  }
+
+  let adminCfg = null;
+  function cfgOptions() {
+    const cfg = adminCfg || {};
+    return {
+      plans: (cfg.plans || []).map(p => '<option value="' + p.days + '">' + esc(p.label) + '</option>').join(''),
+      pays: (cfg.payments || []).map(p => '<option value="' + esc(p.currency + '|' + p.chain) + '">' + esc(p.currency + '｜' + p.chain) + '</option>').join(''),
+      exs: (cfg.applyExchanges || []).map(e => '<option value="' + esc(e.name) + '">' + esc(e.name) + '</option>').join('')
+    };
+  }
+  function memberHtml(m) {
+    const st = m.stats || {};
+    const isSub = m.type === '訂閱制';
+    const isUid = m.type === 'UID審核';
+    const o = cfgOptions();
+    const statusOpts = STATUS_OPTIONS.map(s => '<option' + (s === m.status ? ' selected' : '') + '>' + s + '</option>').join('');
+    const summary = '<div class="trade-head"><span>' + esc(m.identity) + '｜' + esc(m.type || '未設定') + '｜' + esc(m.status) + '</span><span class="muted">' + esc(m.applyAt) + '</span></div>' +
+      '<div class="trade-meta">' + esc(m.exchange) + '｜' + esc(m.contact) + (isSub ? '｜' + esc(m.plan) + '｜' + esc(m.currency) + ' ' + esc(m.chain) + '｜TxID ' + esc(m.txid) : '') + '</div>' +
+      '<div class="trade-meta">交易量 ' + money(st.volume) + '｜筆數 ' + (st.count || 0) + '｜累積淨利 ' + signed(st.pnl) + '｜評分 ' + (st.avgScore == null ? '—' : esc(st.avgScore)) + '（' + (st.scoredCount || 0) + ' 筆）</div>';
+    const edit = '<div class="member-edit" hidden style="margin-top:12px">' +
+      '<div class="grid2">' +
+        '<div><label>審核狀態</label><select class="field" data-f="status">' + statusOpts + '</select></div>' +
+        '<div><label>專屬帳號</label><input class="field" data-f="account" maxlength="20" value="' + esc(m.account) + '"></div>' +
+        '<div><label>專屬密碼</label><input class="field" data-f="password" maxlength="20" value="' + esc(m.password) + '"></div>' +
+        (isSub ? '<div><label>到期日</label><input class="field" type="date" data-f="expiry" value="' + esc(m.expiry) + '"></div>' : '') +
+      '</div>' +
+      '<div class="row-btns"><button class="btn btn-sm" type="button" data-act="save">儲存修改</button><button class="btn btn-sm btn-ghost" type="button" data-act="copy">複製私訊文案</button></div>' +
+      (isUid ? '' : '<div class="step-box" style="margin-top:12px"><h4>🔄 轉為 UID 永久用戶</h4><div class="grid2">' +
+        '<div><label>註冊交易所</label><select class="field" data-f="uidEx">' + o.exs + '</select></div>' +
+        '<div><label>交易所 UID</label><input class="field" data-f="uid" maxlength="40" value="' + esc(m.uid) + '"></div>' +
+        '</div><div class="row-btns"><button class="btn btn-sm btn-ghost" type="button" data-act="toUid">確認轉為 UID</button></div></div>') +
+      (isSub ? '' : '<div class="step-box" style="margin-top:12px"><h4>📅 轉為訂閱制</h4><div class="grid2">' +
+        '<div><label>方案</label><select class="field" data-f="plan">' + o.plans + '</select></div>' +
+        '<div><label>支付幣種與主鏈</label><select class="field" data-f="pay">' + o.pays + '</select></div>' +
+        '<div><label>TxID</label><input class="field" data-f="txid" maxlength="120"></div>' +
+        '<div><label>到期日（留空＝依方案自動計算）</label><input class="field" type="date" data-f="subExpiry"></div>' +
+        '</div><div class="row-btns"><button class="btn btn-sm btn-ghost" type="button" data-act="toSub">確認轉為訂閱</button></div></div>') +
+      '</div>';
+    return '<div class="trade" data-mid="' + esc(m.memberId) + '">' + summary +
+      '<div class="row-btns"><button class="btn btn-sm btn-ghost" type="button" data-act="edit">✏️ 修改</button></div>' + edit + '</div>';
+  }
+
+  function memberHtmlOld(m) {
+    const st = m.stats || {};
+    const opts = STATUS_OPTIONS.map(s => '<option' + (s === m.status ? ' selected' : '') + '>' + s + '</option>').join('');
+    const detail = m.type === '訂閱制' ? '｜' + m.plan + '｜' + m.currency + ' ' + m.chain + '｜TxID ' + m.txid : '';
+    return '<div class="trade" data-mid="' + esc(m.memberId) + '">' +
+      '<div class="trade-head"><span>' + esc(m.identity) + '｜' + esc(m.type || '未設定') + '</span><span class="muted">' + esc(m.applyAt) + '</span></div>' +
+      '<div class="trade-meta">' + esc(m.exchange) + '｜' + esc(m.contact) + esc(detail) + '</div>' +
+      '<div class="trade-meta">交易量 ' + money(st.volume) + '｜筆數 ' + (st.count || 0) + '｜累積淨利 ' + signed(st.pnl) +
+        '｜評分 ' + (st.avgScore == null ? '—' : esc(st.avgScore)) + '（' + (st.scoredCount || 0) + ' 筆）</div>' +
+      '<div class="grid2" style="margin-top:10px">' +
+        '<div><label>審核狀態</label><select class="field" data-f="status">' + opts + '</select></div>' +
+        '<div><label>到期日（訂閱制用）</label><input class="field" type="date" data-f="expiry" value="' + esc(m.expiry) + '"></div>' +
+        '<div><label>專屬帳號</label><input class="field" data-f="account" maxlength="20" value="' + esc(m.account) + '"></div>' +
+        '<div><label>專屬密碼</label><input class="field" data-f="password" maxlength="20" value="' + esc(m.password) + '"></div>' +
+        '<div><label>UID（轉永久用戶用）</label><input class="field" data-f="uid" maxlength="40" value="' + esc(m.uid) + '"></div>' +
+      '</div>' +
+      '<div class="row-btns">' +
+        '<label style="display:flex;gap:6px;align-items:center;width:100%"><input type="checkbox" data-f="banned"' + (m.banned ? ' checked' : '') + '> 取消上榜資格（不列入優秀學員榜、交易量排行榜與抽獎）</label>' +
+        '<button class="btn btn-sm" type="button" data-act="save">儲存修改</button>' +
+        '<button class="btn btn-sm btn-ghost" type="button" data-act="copy">複製私訊文案</button>' +
+        '<button class="btn btn-sm btn-ghost" type="button" data-act="toUid">🔄 轉為 UID 永久用戶</button>' +
+        '<button class="btn btn-sm btn-ghost" type="button" data-act="toSub">📅 轉為訂閱（依到期日）</button>' +
+      '</div></div>';
+  }
+
+  async function adminRun(action, data, okText) {
+    try {
+      await api(action, data, token);
+      showMsg($('adminMsg'), okText, 'ok');
+      await loadAdminMembers();
+    } catch (err) { handleErr(err, $('adminMsg')); }
+  }
+
+  async function memberClick(ev) {
+    const btn = ev.target.closest('[data-act]');
+    if (!btn) return;
+    const card = btn.closest('[data-mid]');
+    const m = adminMembers.find(x => x.memberId === card.dataset.mid);
+    if (!m) return;
+    const f = k => { const el = card.querySelector('[data-f="' + k + '"]'); return el ? el.value.trim() : ''; };
+    const memberId = m.memberId;
+    switch (btn.dataset.act) {
+      case 'edit': {
+        const box = card.querySelector('.member-edit');
+        box.hidden = !box.hidden;
+        return;
+      }
+      case 'save':
+        return adminRun('adminUpdateMember', { memberId: memberId, status: f('status'), account: f('account'), password: f('password'), expiry: f('expiry') }, '✅ 已儲存，私訊文案已更新');
+      case 'toUid':
+        if (!f('uidEx') || !f('uid')) { showMsg($('adminMsg'), '請選擇註冊交易所並填寫交易所 UID', 'err'); return; }
+        if (!confirm('確定轉為 UID 永久用戶？到期日會被清除。')) return;
+        return adminRun('adminConvertType', { memberId: memberId, toType: 'uid', uid: f('uid'), exchange: f('uidEx') }, '✅ 已轉為 UID 永久用戶');
+      case 'toSub': {
+        const pair = f('pay').split('|');
+        if (!f('plan') || pair.length < 2 || !pair[0] || !f('txid')) { showMsg($('adminMsg'), '請選擇方案、支付方式並填寫 TxID', 'err'); return; }
+        return adminRun('adminConvertType', { memberId: memberId, toType: 'sub', plan: f('plan'), currency: pair[0], chain: pair[1], txid: f('txid'), expiry: f('subExpiry') }, '✅ 已轉為訂閱制');
+      }
+      case 'copy': {
+        if (!m.message) { showMsg($('adminMsg'), '尚未開通，沒有私訊文案', 'err'); return; }
+        const ok = await copyText(m.message);
+        showMsg($('adminMsg'), ok ? '✅ 私訊文案已複製' : '複製失敗，請手動選取', ok ? 'ok' : 'err');
+        return;
+      }
+      case 'delete':
+        if (!confirm('確定要刪除「' + m.identity + '」嗎？此操作無法復原，學員的交易紀錄不會一併刪除。')) return;
+        return adminRun('adminDeleteMember', { memberId: memberId }, '✅ 已刪除該學員');
+    }
+  }
+
+  async function memberClickOld(ev) {
+    const btn = ev.target.closest('[data-act]');
+    if (!btn) return;
+    const card = btn.closest('[data-mid]');
+    const m = adminMembers.find(x => x.memberId === card.dataset.mid);
+    if (!m) return;
+    const f = k => card.querySelector('[data-f="' + k + '"]').value.trim();
+    const memberId = m.memberId;
+    switch (btn.dataset.act) {
+      case 'save':
+        return adminRun('adminUpdateMember', { memberId, status: f('status'), account: f('account'), password: f('password'), expiry: f('expiry'), banned: card.querySelector('[data-f="banned"]').checked }, '✅ 已儲存，私訊文案已更新');
+      case 'toUid':
+        if (!confirm('確定轉為 UID 永久用戶？到期日會被清除。')) return;
+        return adminRun('adminConvertType', { memberId, toType: 'uid', uid: f('uid') }, '✅ 已轉為 UID 永久用戶');
+      case 'toSub':
+        if (!f('expiry')) { showMsg($('adminMsg'), '請先選擇到期日', 'err'); return; }
+        return adminRun('adminConvertType', { memberId, toType: 'sub', expiry: f('expiry') }, '✅ 已轉為訂閱制');
+      case 'copy': {
+        if (!m.message) { showMsg($('adminMsg'), '尚未開通，沒有私訊文案', 'err'); return; }
+        const ok = await copyText(m.message);
+        showMsg($('adminMsg'), ok ? '✅ 私訊文案已複製' : '複製失敗，請手動選取', ok ? 'ok' : 'err');
+        return;
+      }
+    }
+  }
+
+  /* ---------- 村長後台：批改學員倉位 ---------- */
+  async function loadReview() {
+    $('reviewBox').innerHTML = '<p class="muted">載入中…</p>';
+    try {
+      reviewTrades = (await api('adminListTrades', {}, token)).trades || [];
+      renderReview();
+    } catch (err) {
+      $('reviewBox').innerHTML = '';
+      handleErr(err, $('reviewMsg'));
+    }
+  }
+
+  function renderReview() {
+    renderReviewRaw();
+    fixShots($('reviewBox'));
+  }
+  function renderReviewRaw() {
+    const q = $('rvSearch').value.trim().toLowerCase();
+    const list = reviewTrades.filter(t => reviewMatches(t, q));
+    if (!list.length) {
+      $('reviewBox').innerHTML = '<p class="muted" style="margin-top:12px">沒有符合條件的交易</p>';
+      return;
+    }
+    const done = t => t.score != null || !!String(t.comment || '').trim();
+    const todo = list.filter(t => !done(t));
+    const finished = list.filter(done);
+    const group = (title, arr) => '<h3>' + title + '（' + arr.length + '）</h3>' + (arr.length ? arr.map(reviewHtml).join('') : '<p class="muted">沒有資料</p>');
+    $('reviewBox').innerHTML = group('📝 未批改', todo) + group('✅ 已批改', finished);
+  }
+
+  function renderReviewRawV1() {
+    const q = $('rvSearch').value.trim().toLowerCase();
+    const list = reviewTrades.filter(t => !q || (String(t.identity) + ' ' + String(t.coin)).toLowerCase().indexOf(q) >= 0);
+    if (!list.length) {
+      $('reviewBox').innerHTML = '<p class="muted" style="margin-top:12px">沒有符合條件的交易</p>';
+      return;
+    }
+    const done = t => t.score != null || !!String(t.comment || '').trim();
+    const todo = list.filter(t => !done(t));
+    const finished = list.filter(done);
+    const group = (title, arr) => '<h3>' + title + '（' + arr.length + '）</h3>' + (arr.length ? arr.map(reviewHtml).join('') : '<p class="muted">沒有資料</p>');
+    $('reviewBox').innerHTML = group('📝 未批改', todo) + group('✅ 已批改', finished);
+  }
+
+  function renderReviewRawOld() {
+    const q = $('rvSearch').value.trim().toLowerCase();
+    const list = reviewTrades.filter(t => !q || (String(t.identity) + ' ' + String(t.coin)).toLowerCase().indexOf(q) >= 0);
+    $('reviewBox').innerHTML = list.length
+      ? list.map(reviewHtml).join('')
+      : '<p class="muted" style="margin-top:12px">沒有符合條件的交易</p>';
+  }
+
+  function reviewHtml(t) {
+    const items = t.scoreItems || [null, null, null, null];
+    const shot = safeUrl(t.screenshot);
+    return '<div class="trade" data-tid="' + esc(t.tradeId) + '">' +
+      '<div class="trade-head"><span>' + esc(t.identity) + '｜' + esc(t.coin) + '｜' + (t.side === 'short' ? '做空' : '做多') + '｜' + esc(t.leverage) + 'x</span>' +
+      '<span class="' + cls(t.net) + '">' + signed(t.net) + ' USDT</span></div>' +
+      '<div class="trade-meta">' + esc(t.openDate) + ' → ' + esc(t.closeDate) + '｜' + (t.mode === 'batch' ? '分批' : '單筆') + '｜' + esc(t.exchange) + '</div>' +
+      '<div class="trade-meta">開倉 ' + fnum(t.entryAvg) + '｜平倉 ' + fnum(t.exitAvg) + '｜持倉量 ' + fnum(t.qty) + '｜交易量 ' + money(t.volume) + '</div>' +
+      (t.notes ? '<div class="pre">學員心得：' + esc(t.notes) + '</div>' : '') +
+      (shot ? '<img src="' + esc(shot) + '" alt="盤面截圖" loading="lazy">' : '') +
+      '<div class="grid2" style="margin-top:10px">' + SCORE_LABELS.map((l, i) =>
+        '<div><label>' + l + '（0–25）</label><input class="field" type="number" min="0" max="25" step="1" data-sc="' + i + '" value="' + (items[i] == null ? '' : esc(items[i])) + '"></div>'
+      ).join('') + '</div>' +
+      '<div class="trade-meta">總分：<span data-total>' + (t.score == null ? '—' : esc(t.score)) + '</span> / 100</div>' +
+      '<div style="margin-top:8px"><label>村長評語（學員可見）</label><textarea class="field" rows="3" maxlength="2000" data-comment>' + esc(t.comment) + '</textarea></div>' +
+      '<label style="display:flex;gap:6px;align-items:center;margin-top:8px"><input type="checkbox" data-include' + (t.excluded ? '' : ' checked') + '> 列入排行榜（取消勾選＝不列入優秀學員榜與交易量排行榜，也不計入抽獎）</label>' +
+      '<div class="row-btns"><button class="btn btn-sm" type="button" data-act="review">儲存評分與評語</button></div>' +
+      '</div>';
+  }
+
+  function updateTotal(card) {
+    const vals = [...card.querySelectorAll('[data-sc]')].map(i => i.value.trim());
+    const ok = vals.every(v => v !== '');
+    card.querySelector('[data-total]').textContent = ok ? String(vals.reduce((a, v) => a + Number(v), 0)) : '—';
+  }
+
+  async function saveReview(card) {
+    const vals = [...card.querySelectorAll('[data-sc]')].map(i => i.value.trim());
+    const filled = vals.filter(v => v !== '').length;
+    if (filled !== 0 && filled !== 4) { showMsg($('reviewMsg'), '四項評分要全部填寫，或全部留空', 'err'); return; }
+    try {
+      await api('adminSaveReview', {
+        tradeId: card.dataset.tid,
+        scores: { stop: vals[0], position: vals[1], complete: vals[2], depth: vals[3] },
+        comment: card.querySelector('[data-comment]').value,
+        exclude: !card.querySelector('[data-include]').checked
+      }, token);
+      showMsg($('reviewMsg'), '✅ 評分與評語已儲存', 'ok');
+      await loadReview();
+    } catch (err) { handleErr(err, $('reviewMsg')); }
+  }
+
+  /* ---------- 交易表單 ---------- */
+  function openForm(t) {
+    editingId = t ? t.tradeId : null;
+    $('formTitle').textContent = t ? '編輯交易' : '新增交易';
+    $('tradeForm').reset();
+    $('tOpen').value = t ? String(t.openDate).replace(' ', 'T') : nowStr();
+    $('tClose').value = t ? String(t.closeDate).replace(' ', 'T') : nowStr();
+    $('tCoin').value = t ? t.coin : '';
+    $('tSide').value = t && t.side === 'short' ? 'short' : 'long';
+    $('tLev').value = t ? t.leverage : 1;
+    $('tRR1').value = t && t.expectedRR != null ? t.expectedRR : '';
+    $('tRR2').value = t && t.actualRR != null ? t.actualRR : '';
+    $('tNet').value = t ? t.net : '';
+    $('tNote').value = t ? t.notes : '';
+    $('tMode').value = t && t.mode === 'batch' ? 'batch' : 'single';
+    stratSel = new Set(t ? t.strategies : []);
+    (t ? t.strategies : []).forEach(s => {
+      if (DEFAULT_STRATS.indexOf(s) < 0 && customStrats.indexOf(s) < 0) customStrats.push(s);
+    });
+    saveCustom();
+    renderStrats();
+    $('entryLegs').innerHTML = '';
+    $('exitLegs').innerHTML = '';
+    if (t && t.mode === 'batch') {
+      (t.entries || []).forEach(l => addLeg('entry', l.price, l.qty));
+      (t.exits || []).forEach(l => addLeg('exit', l.price, l.qty));
+    } else {
+      $('sEntry').value = t ? t.entryAvg : '';
+      $('sExit').value = t ? t.exitAvg : '';
+      $('sQty').value = t ? t.qty : '';
+    }
+    if (!$('entryLegs').children.length) addLeg('entry');
+    if (!$('exitLegs').children.length) addLeg('exit');
+    $('tShot').value = '';
+    const url = t ? safeUrl(t.screenshot) : '';
+    $('shotPrev').src = url;
+    $('shotPrev').hidden = !url;
+    toggleMode();
+    clearMsg($('tradeMsg'));
+    if (t && t.score != null) showMsg($('tradeMsg'), '修改後村長評分會清空，需要村長重新評分。', 'info');
+    $('tradeForm').hidden = false;
+    $('tradeForm').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  function nowStr() {
+    const d = new Date();
+    return todayStr() + 'T' + String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
+  }
+
+  function addLeg(kind, price, qty) {
+    const row = document.createElement('div');
+    row.className = 'leg';
+    row.innerHTML =
+      '<input class="field" type="number" min="0" step="any" placeholder="價格" data-k="price" value="' + (price == null ? '' : esc(price)) + '">' +
+      '<input class="field" type="number" min="0" step="any" placeholder="數量" data-k="qty" value="' + (qty == null ? '' : esc(qty)) + '">' +
+      '<button type="button" class="btn-mini" data-rm>移除</button>';
+    $(kind === 'entry' ? 'entryLegs' : 'exitLegs').appendChild(row);
+  }
+
+  function readLegs(kind) {
+    const out = [];
+    $(kind === 'entry' ? 'entryLegs' : 'exitLegs').querySelectorAll('.leg').forEach(row => {
+      const p = row.querySelector('[data-k="price"]').value;
+      const q = row.querySelector('[data-k="qty"]').value;
+      if (p !== '' || q !== '') out.push({ price: Number(p), qty: Number(q) });
+    });
+    return out;
+  }
+
+  function legsForSave() {
+    if ($('tMode').value === 'batch') return { entries: readLegs('entry'), exits: readLegs('exit') };
+    const q = Number($('sQty').value);
+    return { entries: [{ price: Number($('sEntry').value), qty: q }], exits: [{ price: Number($('sExit').value), qty: q }] };
+  }
+
+  function calcPreview() {
+    const L = legsForSave();
+    const en = L.entries.filter(l => l.price > 0 && l.qty > 0);
+    const ex = L.exits.filter(l => l.price > 0 && l.qty > 0);
+    if (!en.length || !ex.length) return null;
+    const q = en.reduce((a, l) => a + l.qty, 0);
+    const xq = ex.reduce((a, l) => a + l.qty, 0);
+    const ea = en.reduce((a, l) => a + l.price * l.qty, 0) / q;
+    const xa = ex.reduce((a, l) => a + l.price * l.qty, 0) / xq;
+    const gross = $('tSide').value === 'long' ? (xa - ea) * q : (ea - xa) * q;
+    return { q, ea, xa, gross, vol: (ea + xa) * q, ok: Math.abs(q - xq) <= 1e-8 * Math.max(1, q) };
+  }
+
+  function updatePreview() {
+    const box = $('preview');
+    const c = calcPreview();
+    if (!c) { box.textContent = '請填寫開倉與平倉的價格與數量，系統會自動計算。'; return; }
+    let txt = '開倉均價 ' + fnum(c.ea) + '｜平倉均價 ' + fnum(c.xa) + '｜持倉量 ' + fnum(c.q) +
+      '｜交易量 ' + money(c.vol) + ' USDT\n理論毛損益 ' + signed(c.gross) + ' USDT';
+    if (!c.ok) txt = '⚠️ 進場與出場的持倉量總和不相同，請檢查。\n' + txt;
+    const netRaw = $('tNet').value;
+    if (netRaw === '') txt += '\n請填寫實際淨利，系統會自動算出手續費磨耗。';
+    else {
+      const diff = Math.abs(c.gross - Number(netRaw));
+      const fee = diff < 1e-9 ? (c.ea * c.q + c.xa * c.q) * 0.0005 : diff;
+      txt += '\n自動計算手續費磨耗 ' + money(fee, 4) + ' USDT';
+    }
+    box.textContent = txt;
+  }
+
+  function toggleMode() {
+    const batch = $('tMode').value === 'batch';
+    $('singleBox').hidden = batch;
+    $('batchBox').hidden = !batch;
+    updatePreview();
+  }
+
+  function onShotChange() {
+    const f = $('tShot').files[0];
+    if (f) { $('shotPrev').src = URL.createObjectURL(f); $('shotPrev').hidden = false; }
+  }
+
+  function compressImage(file) {
+    return new Promise((resolve, reject) => {
+      if (!/^image\/(png|jpeg|webp)$/.test(file.type)) return reject(codeError('INVALID_INPUT'));
+      const url = URL.createObjectURL(file);
+      const img = new Image();
+      img.onload = () => {
+        try {
+          const scale = Math.min(1, 1600 / img.width);
+          const c = document.createElement('canvas');
+          c.width = Math.round(img.width * scale);
+          c.height = Math.round(img.height * scale);
+          const ctx = c.getContext('2d');
+          ctx.fillStyle = '#ffffff';
+          ctx.fillRect(0, 0, c.width, c.height);
+          ctx.drawImage(img, 0, 0, c.width, c.height);
+          let q = 0.85, data = c.toDataURL('image/jpeg', q);
+          while (data.length > 2600000 && q > 0.5) { q -= 0.1; data = c.toDataURL('image/jpeg', q); }
+          URL.revokeObjectURL(url);
+          resolve({ base64: data.split(',')[1], mime: 'image/jpeg' });
+        } catch (e) { reject(codeError('INVALID_INPUT')); }
+      };
+      img.onerror = () => { URL.revokeObjectURL(url); reject(codeError('INVALID_INPUT')); };
+      img.src = url;
+    });
+  }
+
+  async function saveTrade(ev) {
+    ev.preventDefault();
+    const msg = $('tradeMsg');
+    const L = legsForSave();
+    const c = calcPreview();
+    if (!c) { showMsg(msg, '請填寫開倉與平倉的價格與數量', 'err'); return; }
+    if (!c.ok) { showMsg(msg, '進場與出場的持倉量總和必須相同', 'err'); return; }
+    if ($('tNet').value === '') { showMsg(msg, '請填寫實際淨利 (USDT)', 'err'); return; }
+    const btn = $('saveTradeBtn');
+    btn.disabled = true;
+    showMsg(msg, '⏳ 儲存中...', 'info');
+    try {
+      const file = $('tShot').files[0];
+      const shot = file ? await compressImage(file) : null;
+      const rr1 = $('tRR1').value, rr2 = $('tRR2').value;
+      await api('saveTrade', {
+        tradeId: editingId || '',
+        coin: $('tCoin').value.trim(),
+        side: $('tSide').value,
+        leverage: Number($('tLev').value),
+        mode: $('tMode').value,
+        openDate: $('tOpen').value,
+        closeDate: $('tClose').value,
+        entries: L.entries,
+        exits: L.exits,
+        expectedRR: rr1 === '' ? null : Number(rr1),
+        actualRR: rr2 === '' ? null : Number(rr2),
+        netPnl: Number($('tNet').value),
+        strategies: Array.from(stratSel),
+        notes: $('tNote').value,
+        screenshot: shot
+      }, token);
+      $('tradeForm').hidden = true;
+      editingId = null;
+      await syncNow();
+      setStatus('✅ 交易已儲存', 'ok');
+    } catch (err) {
+      handleErr(err, msg);
+    } finally {
+      btn.disabled = false;
+    }
+  }
+
+  async function tradeListClick(ev) {
+    const ed = ev.target.closest('[data-edit]');
+    const del = ev.target.closest('[data-del]');
+    if (ed) {
+      const t = (state.trades || []).find(x => x.tradeId === ed.dataset.edit);
+      if (t) openForm(t);
+      return;
+    }
+    if (!del || !confirm('確定要刪除這筆交易嗎？刪除後無法復原。')) return;
+    try {
+      await api('deleteTrade', { tradeId: del.dataset.del }, token);
+      await syncNow();
+    } catch (err) { handleErr(err); }
+  }
+
+  /* ---------- 策略標籤 ---------- */
+  function loadCustom() {
+    try { customStrats = JSON.parse(lsGet(CUSTOM_KEY) || '[]') || []; } catch (e) { customStrats = []; }
+  }
+  function saveCustom() { lsSet(CUSTOM_KEY, JSON.stringify(customStrats)); }
+  function renderStrats() {
+    const all = DEFAULT_STRATS.concat(customStrats.filter(s => DEFAULT_STRATS.indexOf(s) < 0));
+    $('stratBox').innerHTML = all.map(s =>
+      '<label class="chip"><input type="checkbox" value="' + esc(s) + '"' + (stratSel.has(s) ? ' checked' : '') + '>' + esc(s) + '</label>'
+    ).join('');
+  }
+  function addCustomStrat() {
+    const v = $('customStrat').value.trim().replace(/、/g, ',').slice(0, 30);
+    if (!v) return;
+    if (DEFAULT_STRATS.indexOf(v) < 0 && customStrats.indexOf(v) < 0) { customStrats.push(v); saveCustom(); }
+    stratSel.add(v);
+    $('customStrat').value = '';
+    renderStrats();
+  }
+
+
+
+  /* ---------- 主題 ---------- */
+  function toggleTheme() {
+    const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', next);
+    lsSet('theme', next);
+  }
+
+  /* ---------- 事件綁定與初始化 ---------- */
+  function bindEvents() {
+    $('loginForm').addEventListener('submit', doLogin);
+    $('logoutBtn').addEventListener('click', logout);
+    $('syncBtn').addEventListener('click', syncNow);
+    $('themeBtn').addEventListener('click', toggleTheme);
+    document.querySelectorAll('.tab[data-tab]').forEach(b => b.addEventListener('click', () => showTab(b.dataset.tab)));
+    $('capSave').addEventListener('click', saveCapital);
+    $('newTradeBtn').addEventListener('click', () => openForm(null));
+    $('cancelTradeBtn').addEventListener('click', () => { $('tradeForm').hidden = true; editingId = null; });
+    $('tradeForm').addEventListener('submit', saveTrade);
+    $('tradeForm').addEventListener('input', updatePreview);
+    $('tradeForm').addEventListener('change', e => {
+      if (e.target.id === 'tMode') toggleMode();
+      else if (e.target.id === 'tShot') onShotChange();
+      else if (e.target.id === 'tSide') updatePreview();
+    });
+    $('tradeForm').addEventListener('click', e => {
+      const add = e.target.closest('[data-add]');
+      const rm = e.target.closest('[data-rm]');
+      if (add) addLeg(add.dataset.add);
+      else if (rm) rm.closest('.leg').remove();
+      else return;
+      updatePreview();
+    });
+    $('addStrat').addEventListener('click', addCustomStrat);
+    $('stratBox').addEventListener('change', e => {
+      if (e.target.type !== 'checkbox') return;
+      if (e.target.checked) stratSel.add(e.target.value); else stratSel.delete(e.target.value);
+    });
+    $('tradeList').addEventListener('click', tradeListClick);
+    $('memberBox').addEventListener('click', memberClick);
+    $('lotteryBox').addEventListener('click', lotteryClick);
+    $('memberSearch').addEventListener('input', renderMemberList);
+    $('pwdEye').addEventListener('click', () => { const i = $('lPwd'); i.type = i.type === 'password' ? 'text' : 'password'; });
+    document.querySelectorAll('[data-board]').forEach(b => b.addEventListener('click', () => { currentBoard = b.dataset.board; loadBoard(); }));
+    $('reviewBox').addEventListener('click', e => {
+      const b = e.target.closest('[data-act="review"]');
+      if (b) saveReview(b.closest('[data-tid]'));
+    });
+    $('reviewBox').addEventListener('input', e => {
+      if (e.target.matches('[data-sc]')) updateTotal(e.target.closest('[data-tid]'));
+    });
+    $('rvSearch').addEventListener('input', renderReview);
+  }
+
+  function init() {
+    bindEvents();
+    loadCustom();
+    renderStrats();
+    toggleMode();
+    token = lsGet(TOKEN_KEY) || '';
+    if (!token) { showLogin(); return; }
+    try { state = JSON.parse(lsGet(CACHE_KEY) || 'null'); } catch (e) { state = null; }
+    showMain();
+    syncNow();
+  }
+
+  init();
+  loadVersion();
+  setInterval(autoLogoutCheck, 60000);
+</script>
+</body>
+</html>
