@@ -118,10 +118,10 @@
     <p class="muted center">請輸入專屬帳號（或 UID）與專屬密碼</p>
     <form id="loginForm" autocomplete="off">
       <label for="lAcc">帳號 / UID</label>
-      <input id="lAcc" class="field" type="text" maxlength="60" required>
+      <input id="lAcc" class="field" type="text" maxlength="60" required autocomplete="username" autocapitalize="none" autocorrect="off" spellcheck="false" inputmode="email">
       <div style="height:12px"></div>
       <label for="lPwd">密碼</label>
-      <div style="position:relative"><input id="lPwd" class="field" type="password" maxlength="60" required style="padding-right:48px"><button id="pwdEye" class="btn-mini" type="button" aria-label="顯示或隱藏密碼" style="position:absolute;right:6px;top:50%;transform:translateY(-50%)">👁</button></div>
+      <div style="position:relative"><input id="lPwd" class="field" type="password" maxlength="60" required autocomplete="current-password" autocapitalize="none" autocorrect="off" spellcheck="false" style="padding-right:48px"><button id="pwdEye" class="btn-mini" type="button" aria-label="顯示或隱藏密碼" style="position:absolute;right:6px;top:50%;transform:translateY(-50%)">👁</button></div>
       <div style="height:16px"></div>
       <button id="loginBtn" class="btn btn-block" type="submit">登入</button>
       <div id="loginMsg" class="msg" role="status"></div>
@@ -158,6 +158,7 @@
       <button class="tab" type="button" role="tab" data-tab="tools" aria-selected="false">🧰 好用工具</button>
       <button class="tab" type="button" role="tab" data-tab="calc" aria-selected="false">🧮 倉位計算機</button>
       <button id="tabAdmin" class="tab" type="button" role="tab" data-tab="admin" aria-selected="false" hidden>⚙️ 村長管理後台</button>
+      <button id="tabActivity" class="tab" type="button" role="tab" data-tab="activity" aria-selected="false" hidden>🎉 活動管理</button>
       <button id="tabReview" class="tab" type="button" role="tab" data-tab="review" aria-selected="false" hidden>✍️ 批改學員倉位</button>
     </div>
 
@@ -279,8 +280,9 @@
     <div id="panelAdmin" class="card" hidden>
       <h2>⚙️ 村長管理後台</h2>
       <p class="muted">修改審核狀態、專屬帳號與密碼、到期日，或轉換會員類型。儲存後私訊文案會自動更新。</p>
-      <div class="grid2" style="margin:10px 0">
+      <div class="grid4" style="margin:10px 0">
         <div id="adminTotalVol" class="stat"></div>
+        <div id="adminTotalRebate" class="stat"></div>
         <div id="adminTotalFee" class="stat"></div>
       </div>
       <input id="memberSearch" class="field" placeholder="搜尋學員：UID、專屬帳號、會員ID、交易所、聯絡方式、TxID、方案、狀態" style="margin-bottom:10px">
@@ -289,9 +291,31 @@
       <div id="memberBox"></div>
     </div>
 
+    <div id="panelActivity" class="card" hidden>
+      <h2>🎉 活動管理</h2>
+      <p class="muted">活動會顯示在新手村首頁。圖片會存到 Google Drive，建議上傳前先壓縮過。</p>
+      <form id="actForm">
+        <input type="hidden" id="actId">
+        <div class="grid2">
+          <div><label>活動標題</label><input id="actTitle" class="field" maxlength="100" required></div>
+          <div><label>活動連結（選填）</label><input id="actLink" class="field" type="url" placeholder="https://"></div>
+          <div><label>開始日期</label><input id="actStart" class="field" type="date" required></div>
+          <div><label>結束日期</label><input id="actEnd" class="field" type="date" required></div>
+        </div>
+        <div style="margin-top:10px"><label>活動說明（選填）</label><textarea id="actDesc" class="field" rows="3" maxlength="500"></textarea></div>
+        <div style="margin-top:10px"><label>活動圖片（新增必填，修改時留空＝沿用原圖）</label><input id="actImage" class="field" type="file" accept="image/*"></div>
+        <div class="row-btns">
+          <button class="btn btn-sm" type="submit">儲存活動</button>
+          <button id="actCancel" class="btn btn-sm btn-ghost" type="button" hidden>取消修改</button>
+        </div>
+        <div id="actMsg" class="msg" role="status"></div>
+      </form>
+      <h3 style="margin-top:20px">目前的活動</h3>
+      <div id="actList"></div>
+    </div>
+
     <div id="panelReview" class="card" hidden>
       <h2>✍️ 批改學員倉位</h2>
-      <p class="muted">只列學員的交易。四項評分各 0–25 分，總分自動加總，評語學員可見。</p>
       <div class="row-btns" style="margin-top:0">
         <input id="rvSearch" class="field" placeholder="搜尋學員、幣種、交易所、策略、心得、日期…">
       </div>
@@ -313,7 +337,7 @@
   const TOKEN_KEY = 'pro_token', CACHE_KEY = 'pro_cache', CUSTOM_KEY = 'pro_strats';
   const DEFAULT_STRATS = ['趨勢順勢', '突破', '回踩', '支撐壓力', '區間震盪', '反轉'];
   const SESSION_ERRORS = ['SESSION_INVALID', 'PENDING_REVIEW', 'PAUSED', 'EXPIRED', 'NOT_READY'];
-  const PANELS = { diary: 'panelDiary', top: 'panelTop', lecture: 'panelLecture', tools: 'panelTools', calc: 'panelCalc', admin: 'panelAdmin', review: 'panelReview' };
+  const PANELS = { diary: 'panelDiary', top: 'panelTop', lecture: 'panelLecture', tools: 'panelTools', calc: 'panelCalc', admin: 'panelAdmin', activity: 'panelActivity', review: 'panelReview' };
   const STATUS_OPTIONS = ['待審核', '已開通', '已暫停', '已到期'];
   const SCORE_LABELS = ['停損設定', '倉位控制', '復盤完整度', '心得深度'];
   const ERR_TEXT = {
@@ -490,6 +514,7 @@
       : '💎 VIP 專屬通行證');
     $('capBox').hidden = isAdmin;
     $('tabAdmin').hidden = !isAdmin;
+    $('tabActivity').hidden = !isAdmin;
     $('tabReview').hidden = !isAdmin;
     $('lotteryBox').hidden = !isAdmin;
     if (!isAdmin && document.activeElement !== $('capInput')) $('capInput').value = p.capital || '';
@@ -615,6 +640,7 @@
     Object.keys(PANELS).forEach(k => { $(PANELS[k]).hidden = k !== name; });
     if (name === 'top') { loadBoard(); if (isAdminUser()) loadLotteryAdmin(); }
     if (name === 'admin') loadAdminMembers();
+    if (name === 'activity') loadActivities();
     if (name === 'review') loadReview();
   }
 
@@ -880,8 +906,8 @@
       isSub && m.currency ? m.currency + (m.chain ? ' ' + m.chain : '') : '',
       isSub && m.txid ? 'TxID ' + m.txid : ''
     ]);
+    const volBig = st.count ? '<div style="margin-top:8px;font-size:1.25rem;font-weight:700;color:var(--link)">交易量 ' + money(st.volume) + ' USDT</div>' : '';
     const numbers = st.count ? join([
-      '交易量 ' + money(st.volume),
       '筆數 ' + st.count,
       '累積淨利 ' + signed(st.pnl),
       st.avgScore != null ? '評分 ' + st.avgScore + '（' + st.scoredCount + ' 筆）' : ''
@@ -908,6 +934,7 @@
     return '<div class="trade" data-mid="' + esc(m.memberId) + '">' +
       '<div class="trade-head"><span>' + esc(head) + '</span><span class="muted">' + esc(m.applyAt) + '</span></div>' +
       (info ? '<div class="trade-meta">' + esc(info) + '</div>' : '') +
+      volBig +
       (numbers ? '<div class="trade-meta">' + esc(numbers) + '</div>' : '') +
       '<div class="row-btns"><button class="btn btn-sm btn-ghost" type="button" data-act="edit">✏️ 修改</button></div>' + edit + '</div>';
   }
@@ -918,10 +945,10 @@
       .filter(m => !q || [m.identity, m.uid, m.account, m.memberId, m.exchange, m.contact, m.txid, m.plan, m.status, m.type, m.currency, m.chain].join(' ').toLowerCase().indexOf(q) >= 0);
     const pending = list.filter(m => m.status === '待審核');
     const others = list.filter(m => m.status !== '待審核');
-    const group = (title, arr) => '<h3>' + title + '（' + arr.length + '）</h3>' + (arr.length ? arr.map(memberCard).join('') : '<p class="muted">沒有資料</p>');
+    const group = (title, arr) => arr.length ? '<h3>' + title + '（' + arr.length + '）</h3>' + arr.map(memberCard).join('') : '';
     $('memberBox').innerHTML = list.length
       ? group('⏳ 待審核', pending) + group('📋 其他學員', others)
-      : '<p class="muted">沒有符合條件的學員</p>';
+      : (q ? '' : '<p class="muted">目前沒有學員</p>');
   }
 
   /* ---------- 村長後台：學員管理 ---------- */
@@ -932,6 +959,7 @@
       const d = await api('adminListMembers', {}, token);
       adminMembers = d.members || [];
       $('adminTotalVol').innerHTML = '<div class="k">學員總交易量 (USDT)</div><div class="v">' + esc(money(d.totalVolume)) + '</div>';
+      $('adminTotalRebate').innerHTML = '<div class="k">預計返傭金額 (USDT)</div><div class="v">' + esc(money(d.totalVolume * 0.0003 * 0.2, 4)) + '</div>';
       $('adminTotalFee').innerHTML = '<div class="k">學員總手續費磨耗 (USDT)</div><div class="v">' + esc(money(d.totalFee, 4)) + '</div>';
       renderMemberList();
     } catch (err) {
@@ -939,6 +967,89 @@
       handleErr(err, $('adminMsg'));
     }
   }
+
+  function activityCard(a) {
+    const period = esc(a.start) + ' ～ ' + esc(a.end);
+    const img = a.image ? '<img src="' + esc(a.image) + '" alt="" style="max-width:160px;border-radius:8px;display:block;margin-bottom:8px">' : '';
+    const link = a.link ? '<p><a href="' + esc(a.link) + '" target="_blank" rel="noopener noreferrer">' + esc(a.link) + '</a></p>' : '';
+    return '<div class="trade" data-aid="' + esc(a.id) + '">' +
+      img +
+      '<div class="trade-head"><span>' + esc(a.title) + '</span><span class="muted">' + period + '</span></div>' +
+      (a.desc ? '<div class="trade-meta">' + esc(a.desc) + '</div>' : '') +
+      link +
+      '<div class="row-btns"><button class="btn btn-sm btn-ghost" type="button" data-act="editAct">✏️ 修改</button><button class="btn btn-sm btn-ghost" type="button" data-act="delAct" style="color:var(--err);border-color:var(--err)">🗑 刪除</button></div>' +
+      '</div>';
+  }
+  let activityList = [];
+  async function loadActivities() {
+    $('actList').innerHTML = '<p class="muted">載入中…</p>';
+    try {
+      const d = await api('adminListActivities', {}, token);
+      activityList = d.activities || [];
+      $('actList').innerHTML = activityList.length ? activityList.map(activityCard).join('') : '<p class="muted">目前沒有活動</p>';
+    } catch (err) {
+      $('actList').innerHTML = '';
+      handleErr(err, $('actMsg'));
+    }
+  }
+  function resetActForm() {
+    $('actForm').reset();
+    $('actId').value = '';
+    $('actCancel').hidden = true;
+  }
+  $('actForm').addEventListener('submit', async ev => {
+    ev.preventDefault();
+    const msg = $('actMsg');
+    msg.textContent = '';
+    msg.className = 'msg';
+    const file = $('actImage').files[0];
+    const id = $('actId').value;
+    if (!file && !id) { showMsg(msg, '新增活動請上傳圖片', 'err'); return; }
+    try {
+      const data = {
+        activityId: id || undefined,
+        title: $('actTitle').value.trim(),
+        desc: $('actDesc').value.trim(),
+        link: $('actLink').value.trim(),
+        start: $('actStart').value,
+        end: $('actEnd').value
+      };
+      if (file) data.image = await compressImage(file);
+      await api('adminSaveActivity', data, token);
+      showMsg(msg, '✅ 已儲存', 'ok');
+      resetActForm();
+      loadActivities();
+    } catch (err) {
+      handleErr(err, msg);
+    }
+  });
+  $('actCancel').addEventListener('click', resetActForm);
+  $('actList').addEventListener('click', async ev => {
+    const card = ev.target.closest('[data-aid]');
+    if (!card) return;
+    const id = card.dataset.aid;
+    const a = activityList.find(x => x.id === id);
+    if (ev.target.closest('[data-act="editAct"]')) {
+      $('actId').value = a.id;
+      $('actTitle').value = a.title;
+      $('actLink').value = a.link;
+      $('actDesc').value = a.desc;
+      $('actStart').value = a.start;
+      $('actEnd').value = a.end;
+      $('actCancel').hidden = false;
+      window.scrollTo({ top: $('actForm').offsetTop - 80, behavior: 'smooth' });
+      return;
+    }
+    if (ev.target.closest('[data-act="delAct"]')) {
+      if (!confirm('確定要刪除「' + a.title + '」這個活動嗎？')) return;
+      try {
+        await api('adminDeleteActivity', { activityId: id }, token);
+        loadActivities();
+      } catch (err) {
+        handleErr(err, $('actMsg'));
+      }
+    }
+  });
 
   async function loadAdminMembersOld2() {
     $('memberBox').innerHTML = '<p class="muted">載入中…</p>';
@@ -1167,12 +1278,12 @@
       (t.notes ? '<div class="pre">學員心得：' + esc(t.notes) + '</div>' : '') +
       (shot ? '<img src="' + esc(shot) + '" alt="盤面截圖" loading="lazy">' : '') +
       '<div class="grid2" style="margin-top:10px">' + SCORE_LABELS.map((l, i) =>
-        '<div><label>' + l + '（0–100）</label><input class="field" type="number" min="0" max="100" step="1" data-sc="' + i + '" value="' + (items[i] == null ? '' : esc(Math.round(items[i] * 4))) + '"></div>'
+        '<div><label>' + l + '（0–100）</label><input class="field" type="number" min="0" max="100" step="1" data-sc="' + i + '" disabled value="' + (items[i] == null ? '' : esc(Math.round(items[i] * 4))) + '"></div>'
       ).join('') + '</div>' +
       '<div class="trade-meta">總分：<span data-total>' + (t.score == null ? '—' : esc(t.score)) + '</span> / 100</div>' +
-      '<div style="margin-top:8px"><label>村長評語（學員可見）</label><textarea class="field" rows="3" maxlength="2000" data-comment>' + esc(t.comment) + '</textarea></div>' +
-      '<label style="display:flex;gap:6px;align-items:center;margin-top:8px"><input type="checkbox" data-include' + (t.excluded ? '' : ' checked') + '> 列入排行榜（取消勾選＝不列入優秀學員榜與交易量排行榜，也不計入抽獎）</label>' +
-      '<div class="row-btns"><button class="btn btn-sm" type="button" data-act="review">儲存評分與評語</button></div>' +
+      '<div style="margin-top:8px"><label>村長評語（學員可見）</label><textarea class="field" rows="3" maxlength="2000" data-comment disabled>' + esc(t.comment) + '</textarea></div>' +
+      '<label style="display:flex;gap:6px;align-items:center;margin-top:8px"><input type="checkbox" data-include disabled' + (t.excluded ? '' : ' checked') + '> 列入排行榜（取消勾選＝不列入優秀學員榜與交易量排行榜，也不計入抽獎）</label>' +
+      '<div class="row-btns"><button class="btn btn-sm btn-ghost" type="button" data-act="unlockReview">✏️ 批改</button><button class="btn btn-sm" type="button" data-act="review" hidden>儲存評分與評語</button></div>' +
       '</div>';
   }
 
@@ -1465,6 +1576,14 @@
     $('pwdEye').addEventListener('click', () => { const i = $('lPwd'); i.type = i.type === 'password' ? 'text' : 'password'; });
     document.querySelectorAll('[data-board]').forEach(b => b.addEventListener('click', () => { currentBoard = b.dataset.board; loadBoard(); }));
     $('reviewBox').addEventListener('click', e => {
+      const unlockBtn = e.target.closest('[data-act="unlockReview"]');
+      if (unlockBtn) {
+        const card = unlockBtn.closest('[data-tid]');
+        card.querySelectorAll('[data-sc], [data-comment], [data-include]').forEach(el => { el.disabled = false; });
+        unlockBtn.hidden = true;
+        card.querySelector('[data-act="review"]').hidden = false;
+        return;
+      }
       const b = e.target.closest('[data-act="review"]');
       if (b) saveReview(b.closest('[data-tid]'));
     });

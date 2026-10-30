@@ -103,6 +103,13 @@
   @media (min-width: 960px) { .ex-pair { grid-template-columns: 1fr 1fr; } }
   .ex-pair .ex-grid { grid-template-columns: 1fr; }
   .ex-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 10px; display: flex; flex-direction: column; gap: 6px; }
+  .act-grid { display: grid; grid-template-columns: 1fr; gap: 14px; }
+  @media (min-width: 640px) { .act-grid { grid-template-columns: 1fr 1fr; } }
+  .act-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+  .act-card img { width: 100%; display: block; max-height: 220px; object-fit: cover; }
+  .act-card .act-body { padding: 14px; }
+  .act-card .act-period { font-size: .85rem; color: var(--muted); margin: 4px 0 8px; }
+  .act-card.ended { opacity: .6; }
   .ex-head { display: flex; align-items: center; gap: 8px; }
   .ex-icon { width: 28px; height: 28px; object-fit: contain; border-radius: 6px; flex-shrink: 0; }
   .ex-name { font-weight: 700; font-size: .92rem; }
@@ -194,6 +201,15 @@
       <a class="btn btn-outline btn-sm" id="sThreads" href="https://www.threads.com/@help_crypto666" target="_blank" rel="noopener noreferrer">Threads</a>
       <a class="btn btn-outline btn-sm" id="sTgP" href="https://t.me/hijfknbv" target="_blank" rel="noopener noreferrer">@hijfknbv</a>
       <a class="btn btn-outline btn-sm" id="sTgG" href="https://t.me/+xyRLxOqigKI5ZWE1" target="_blank" rel="noopener noreferrer">Telegram 群組</a>
+    </div>
+  </section>
+
+  <section class="card" id="activities" hidden>
+    <h2>🎉 活動專區</h2>
+    <div id="activeActList"></div>
+    <div id="endedActWrap" hidden>
+      <h3>已結束</h3>
+      <div id="endedActList"></div>
     </div>
   </section>
 
@@ -643,6 +659,29 @@
     }
   }
 
+  function actCardHtml(a, ended) {
+    const img = a.image ? '<img src="' + esc(a.image) + '" alt="' + esc(a.title) + '" loading="lazy">' : '';
+    const link = (!ended && a.link) ? '<a class="btn btn-sm" href="' + esc(a.link) + '" target="_blank" rel="noopener noreferrer">查看活動</a>' : '';
+    return '<div class="act-card' + (ended ? ' ended' : '') + '">' + img +
+      '<div class="act-body"><h3 style="margin:0">' + esc(a.title) + '</h3>' +
+      '<div class="act-period">' + esc(a.start) + ' ～ ' + esc(a.end) + '</div>' +
+      (a.desc ? '<p style="margin:0 0 10px">' + esc(a.desc) + '</p>' : '') +
+      link + '</div></div>';
+  }
+  function renderActivities(list) {
+    const section = document.getElementById('activities');
+    if (!list.length) { section.hidden = true; return; }
+    section.hidden = false;
+    const active = list.filter(a => !a.ended);
+    const ended = list.filter(a => a.ended);
+    document.getElementById('activeActList').innerHTML = active.length
+      ? '<div class="act-grid">' + active.map(a => actCardHtml(a, false)).join('') + '</div>'
+      : '<p class="muted">目前沒有進行中的活動</p>';
+    const endedWrap = document.getElementById('endedActWrap');
+    endedWrap.hidden = !ended.length;
+    document.getElementById('endedActList').innerHTML = '<div class="act-grid">' + ended.map(a => actCardHtml(a, true)).join('') + '</div>';
+  }
+
   /* ---------- 設定快取與載入 ---------- */
   const CFG_KEY = 'pro_cfg_cache';
   function applyConfig(cfg) {
@@ -652,6 +691,7 @@
     setLink('sTgP', s.tgPersonal);
     setLink('sTgG', s.tgGroup);
     renderExchanges(cfg.exchanges || []);
+    renderActivities(cfg.activities || []);
     document.getElementById('verText').textContent = cfg.version ? '版本 ' + cfg.version : '';
     fillUidForm(cfg.applyExchanges || []);
     fillSubForm(cfg.plans || [], cfg.payments || []);
