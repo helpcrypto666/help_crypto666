@@ -159,6 +159,7 @@
       <button class="tab" type="button" role="tab" data-tab="calc" aria-selected="false">🧮 倉位計算機</button>
       <button id="tabAdmin" class="tab" type="button" role="tab" data-tab="admin" aria-selected="false" hidden>⚙️ 村長管理後台</button>
       <button id="tabActivity" class="tab" type="button" role="tab" data-tab="activity" aria-selected="false" hidden>🎉 活動管理</button>
+      <button id="tabSettings" class="tab" type="button" role="tab" data-tab="settings" aria-selected="false" hidden>🔧 系統設定</button>
       <button id="tabReview" class="tab" type="button" role="tab" data-tab="review" aria-selected="false" hidden>✍️ 批改學員倉位</button>
     </div>
 
@@ -314,6 +315,22 @@
       <div id="actList"></div>
     </div>
 
+    <div id="panelSettings" class="card" hidden>
+      <h2>🔧 系統設定</h2>
+      <p class="muted">以下都是原本要到 Google 試算表「設定後台」分頁改的項目，這裡改完按儲存即可，不用再去試算表找。</p>
+      <div id="settingsBox"><p class="muted">載入中…</p></div>
+      <h3 style="margin-top:20px">收款設定</h3>
+      <div class="grid2">
+        <div><label>收款幣種</label><input id="setPayCur" class="field" value="USDT"></div>
+        <div><label>轉帳網路</label><input id="setPayChain" class="field" value="BEP20 (BNB Chain)"></div>
+      </div>
+      <div style="margin-top:10px"><label>收款錢包地址</label><input id="setPayAddr" class="field"></div>
+      <div class="row-btns" style="margin-top:16px">
+        <button id="setSaveBtn" class="btn" type="button">儲存全部設定</button>
+      </div>
+      <div id="setMsg" class="msg" role="status"></div>
+    </div>
+
     <div id="panelReview" class="card" hidden>
       <h2>✍️ 批改學員倉位</h2>
       <div class="row-btns" style="margin-top:0">
@@ -337,7 +354,7 @@
   const TOKEN_KEY = 'pro_token', CACHE_KEY = 'pro_cache', CUSTOM_KEY = 'pro_strats';
   const DEFAULT_STRATS = ['趨勢順勢', '突破', '回踩', '支撐壓力', '區間震盪', '反轉'];
   const SESSION_ERRORS = ['SESSION_INVALID', 'PENDING_REVIEW', 'PAUSED', 'EXPIRED', 'NOT_READY'];
-  const PANELS = { diary: 'panelDiary', top: 'panelTop', lecture: 'panelLecture', tools: 'panelTools', calc: 'panelCalc', admin: 'panelAdmin', activity: 'panelActivity', review: 'panelReview' };
+  const PANELS = { diary: 'panelDiary', top: 'panelTop', lecture: 'panelLecture', tools: 'panelTools', calc: 'panelCalc', admin: 'panelAdmin', activity: 'panelActivity', settings: 'panelSettings', review: 'panelReview' };
   const STATUS_OPTIONS = ['待審核', '已開通', '已暫停', '已到期'];
   const SCORE_LABELS = ['停損設定', '倉位控制', '復盤完整度', '心得深度'];
   const ERR_TEXT = {
@@ -515,6 +532,7 @@
     $('capBox').hidden = isAdmin;
     $('tabAdmin').hidden = !isAdmin;
     $('tabActivity').hidden = !isAdmin;
+    $('tabSettings').hidden = !isAdmin;
     $('tabReview').hidden = !isAdmin;
     $('lotteryBox').hidden = !isAdmin;
     if (!isAdmin && document.activeElement !== $('capInput')) $('capInput').value = p.capital || '';
@@ -641,6 +659,7 @@
     if (name === 'top') { loadBoard(); if (isAdminUser()) loadLotteryAdmin(); }
     if (name === 'admin') loadAdminMembers();
     if (name === 'activity') loadActivities();
+    if (name === 'settings') loadSettings();
     if (name === 'review') loadReview();
   }
 
@@ -1048,6 +1067,44 @@
       } catch (err) {
         handleErr(err, $('actMsg'));
       }
+    }
+  });
+
+  async function loadSettings() {
+    $('settingsBox').innerHTML = '<p class="muted">載入中…</p>';
+    try {
+      const d = await api('adminGetSettings', {}, token);
+      const s = d.settings || {};
+      const labels = d.labels || [];
+      $('settingsBox').innerHTML = '<div class="grid2">' + labels.map(l =>
+        '<div><label>' + esc(l.label) + '</label><input class="field" data-setkey="' + esc(l.key) + '" value="' + esc(s[l.key] || '') + '"></div>'
+      ).join('') + '</div>';
+      const p = d.payment || {};
+      $('setPayCur').value = p.currency || 'USDT';
+      $('setPayChain').value = p.chain || 'BEP20 (BNB Chain)';
+      $('setPayAddr').value = p.address || '';
+    } catch (err) {
+      $('settingsBox').innerHTML = '';
+      handleErr(err, $('setMsg'));
+    }
+  }
+  $('setSaveBtn').addEventListener('click', async () => {
+    const settings = {};
+    document.querySelectorAll('[data-setkey]').forEach(el => { settings[el.dataset.setkey] = el.value.trim(); });
+    const payment = {
+      currency: $('setPayCur').value.trim(),
+      chain: $('setPayChain').value.trim(),
+      address: $('setPayAddr').value.trim()
+    };
+    const btn = $('setSaveBtn');
+    btn.disabled = true;
+    try {
+      await api('adminSaveSettings', { settings: settings, payment: payment }, token);
+      showMsg($('setMsg'), '✅ 已儲存全部設定', 'ok');
+    } catch (err) {
+      handleErr(err, $('setMsg'));
+    } finally {
+      btn.disabled = false;
     }
   });
 
