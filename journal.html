@@ -160,6 +160,7 @@
       <button id="tabAdmin" class="tab" type="button" role="tab" data-tab="admin" aria-selected="false" hidden>⚙️ 村長管理後台</button>
       <button id="tabActivity" class="tab" type="button" role="tab" data-tab="activity" aria-selected="false" hidden>🎉 活動管理</button>
       <button id="tabSettings" class="tab" type="button" role="tab" data-tab="settings" aria-selected="false" hidden>🔧 系統設定</button>
+      <button id="tabLectureAdmin" class="tab" type="button" role="tab" data-tab="lectureAdmin" aria-selected="false" hidden>📘 講義管理</button>
       <button id="tabReview" class="tab" type="button" role="tab" data-tab="review" aria-selected="false" hidden>✍️ 批改學員倉位</button>
     </div>
 
@@ -319,16 +320,53 @@
       <h2>🔧 系統設定</h2>
       <p class="muted">以下都是原本要到 Google 試算表「設定後台」分頁改的項目，這裡改完按儲存即可，不用再去試算表找。</p>
       <div id="settingsBox"><p class="muted">載入中…</p></div>
-      <h3 style="margin-top:20px">收款設定</h3>
-      <div class="grid2">
-        <div><label>收款幣種</label><input id="setPayCur" class="field" value="USDT"></div>
-        <div><label>轉帳網路</label><input id="setPayChain" class="field" value="BEP20 (BNB Chain)"></div>
-      </div>
-      <div style="margin-top:10px"><label>收款錢包地址</label><input id="setPayAddr" class="field"></div>
       <div class="row-btns" style="margin-top:16px">
-        <button id="setSaveBtn" class="btn" type="button">儲存全部設定</button>
+        <button id="setSaveBtn" class="btn" type="button">儲存以上設定</button>
       </div>
       <div id="setMsg" class="msg" role="status"></div>
+
+      <h3 style="margin-top:28px">收款設定（可新增多筆）</h3>
+      <p class="muted">每一筆是一組收款幣種、網路與地址，學員申請訂閱時可以選擇。</p>
+      <form id="payForm">
+        <input type="hidden" id="payRow">
+        <div class="grid2">
+          <div><label>收款幣種</label><input id="payCur" class="field" value="USDT" required></div>
+          <div><label>轉帳網路</label><input id="payChain" class="field" value="BEP20 (BNB Chain)" required></div>
+        </div>
+        <div style="margin-top:10px"><label>收款錢包地址</label><input id="payAddr" class="field" required></div>
+        <div class="row-btns">
+          <button class="btn btn-sm" type="submit">儲存這一筆</button>
+          <button id="payCancel" class="btn btn-sm btn-ghost" type="button" hidden>取消修改</button>
+        </div>
+        <div id="payMsg" class="msg" role="status"></div>
+      </form>
+      <div id="payList" style="margin-top:12px"></div>
+    </div>
+
+    <div id="panelLectureAdmin" class="card" hidden>
+      <h2>📘 講義管理</h2>
+      <p class="muted">「講義」會出現在學員的「📘 講義」分頁；「網站」會出現在「🧰 好用工具」分頁，依梯隊分類分組。</p>
+      <form id="lecForm">
+        <input type="hidden" id="lecRow">
+        <div class="grid2">
+          <div><label>類型</label><select id="lecType" class="field">
+            <option value="講義">講義</option>
+            <option value="網站">網站</option>
+          </select></div>
+          <div id="lecTierWrap"><label>梯隊分類（僅網站需要）</label><input id="lecTier" class="field" placeholder="例如：🏆 第一梯隊：即時看盤..."></div>
+        </div>
+        <div style="margin-top:10px"><label>標題名稱</label><input id="lecTitle" class="field" maxlength="150" required></div>
+        <div style="margin-top:10px"><label>連結網址（選填）</label><input id="lecUrl" class="field" type="url" placeholder="https://"></div>
+        <div style="margin-top:10px"><label>備註說明（選填）</label><textarea id="lecNote" class="field" rows="2" maxlength="500"></textarea></div>
+        <div class="row-btns">
+          <button class="btn btn-sm" type="submit">儲存這一筆</button>
+          <button id="lecCancel" class="btn btn-sm btn-ghost" type="button" hidden>取消修改</button>
+        </div>
+        <div id="lecMsg" class="msg" role="status"></div>
+      </form>
+      <h3 style="margin-top:20px">目前的講義與網站</h3>
+      <input id="lecSearch" class="field" placeholder="搜尋標題、分類、說明" style="margin-bottom:10px">
+      <div id="lecList"></div>
     </div>
 
     <div id="panelReview" class="card" hidden>
@@ -354,7 +392,7 @@
   const TOKEN_KEY = 'pro_token', CACHE_KEY = 'pro_cache', CUSTOM_KEY = 'pro_strats';
   const DEFAULT_STRATS = ['趨勢順勢', '突破', '回踩', '支撐壓力', '區間震盪', '反轉'];
   const SESSION_ERRORS = ['SESSION_INVALID', 'PENDING_REVIEW', 'PAUSED', 'EXPIRED', 'NOT_READY'];
-  const PANELS = { diary: 'panelDiary', top: 'panelTop', lecture: 'panelLecture', tools: 'panelTools', calc: 'panelCalc', admin: 'panelAdmin', activity: 'panelActivity', settings: 'panelSettings', review: 'panelReview' };
+  const PANELS = { diary: 'panelDiary', top: 'panelTop', lecture: 'panelLecture', tools: 'panelTools', calc: 'panelCalc', admin: 'panelAdmin', activity: 'panelActivity', settings: 'panelSettings', lectureAdmin: 'panelLectureAdmin', review: 'panelReview' };
   const STATUS_OPTIONS = ['待審核', '已開通', '已暫停', '已到期'];
   const SCORE_LABELS = ['停損設定', '倉位控制', '復盤完整度', '心得深度'];
   const ERR_TEXT = {
@@ -533,6 +571,7 @@
     $('tabAdmin').hidden = !isAdmin;
     $('tabActivity').hidden = !isAdmin;
     $('tabSettings').hidden = !isAdmin;
+    $('tabLectureAdmin').hidden = !isAdmin;
     $('tabReview').hidden = !isAdmin;
     $('lotteryBox').hidden = !isAdmin;
     if (!isAdmin && document.activeElement !== $('capInput')) $('capInput').value = p.capital || '';
@@ -660,6 +699,7 @@
     if (name === 'admin') loadAdminMembers();
     if (name === 'activity') loadActivities();
     if (name === 'settings') loadSettings();
+    if (name === 'lectureAdmin') loadLectureAdmin();
     if (name === 'review') loadReview();
   }
 
@@ -1079,32 +1119,178 @@
       $('settingsBox').innerHTML = '<div class="grid2">' + labels.map(l =>
         '<div><label>' + esc(l.label) + '</label><input class="field" data-setkey="' + esc(l.key) + '" value="' + esc(s[l.key] || '') + '"></div>'
       ).join('') + '</div>';
-      const p = d.payment || {};
-      $('setPayCur').value = p.currency || 'USDT';
-      $('setPayChain').value = p.chain || 'BEP20 (BNB Chain)';
-      $('setPayAddr').value = p.address || '';
     } catch (err) {
       $('settingsBox').innerHTML = '';
       handleErr(err, $('setMsg'));
     }
+    loadPayments();
   }
   $('setSaveBtn').addEventListener('click', async () => {
     const settings = {};
     document.querySelectorAll('[data-setkey]').forEach(el => { settings[el.dataset.setkey] = el.value.trim(); });
-    const payment = {
-      currency: $('setPayCur').value.trim(),
-      chain: $('setPayChain').value.trim(),
-      address: $('setPayAddr').value.trim()
-    };
     const btn = $('setSaveBtn');
     btn.disabled = true;
     try {
-      await api('adminSaveSettings', { settings: settings, payment: payment }, token);
+      await api('adminSaveSettings', { settings: settings }, token);
       showMsg($('setMsg'), '✅ 已儲存全部設定', 'ok');
     } catch (err) {
       handleErr(err, $('setMsg'));
     } finally {
       btn.disabled = false;
+    }
+  });
+
+  let paymentList = [];
+  function paymentCard(p) {
+    return '<div class="trade" data-prow="' + p.row + '">' +
+      '<div class="trade-head"><span>' + esc(p.currency) + '｜' + esc(p.chain) + '</span></div>' +
+      '<div class="trade-meta">' + esc(p.address) + '</div>' +
+      '<div class="row-btns"><button class="btn btn-sm btn-ghost" type="button" data-act="editPay">✏️ 修改</button><button class="btn btn-sm btn-ghost" type="button" data-act="delPay" style="color:var(--err);border-color:var(--err)">🗑 刪除</button></div>' +
+      '</div>';
+  }
+  async function loadPayments() {
+    $('payList').innerHTML = '<p class="muted">載入中…</p>';
+    try {
+      const d = await api('adminListPayments', {}, token);
+      paymentList = d.payments || [];
+      $('payList').innerHTML = paymentList.length ? paymentList.map(paymentCard).join('') : '<p class="muted">目前沒有收款設定</p>';
+    } catch (err) {
+      $('payList').innerHTML = '';
+      handleErr(err, $('payMsg'));
+    }
+  }
+  function resetPayForm() {
+    $('payForm').reset();
+    $('payRow').value = '';
+    $('payCancel').hidden = true;
+    $('payCur').value = 'USDT';
+    $('payChain').value = 'BEP20 (BNB Chain)';
+  }
+  $('payForm').addEventListener('submit', async ev => {
+    ev.preventDefault();
+    const msg = $('payMsg');
+    try {
+      await api('adminSavePayment', {
+        row: $('payRow').value || undefined,
+        currency: $('payCur').value.trim(),
+        chain: $('payChain').value.trim(),
+        address: $('payAddr').value.trim()
+      }, token);
+      showMsg(msg, '✅ 已儲存', 'ok');
+      resetPayForm();
+      loadPayments();
+    } catch (err) {
+      handleErr(err, msg);
+    }
+  });
+  $('payCancel').addEventListener('click', resetPayForm);
+  $('payList').addEventListener('click', async ev => {
+    const card = ev.target.closest('[data-prow]');
+    if (!card) return;
+    const row = card.dataset.prow;
+    const p = paymentList.find(x => String(x.row) === row);
+    if (ev.target.closest('[data-act="editPay"]')) {
+      $('payRow').value = p.row;
+      $('payCur').value = p.currency;
+      $('payChain').value = p.chain;
+      $('payAddr').value = p.address;
+      $('payCancel').hidden = false;
+      return;
+    }
+    if (ev.target.closest('[data-act="delPay"]')) {
+      if (!confirm('確定要刪除「' + p.currency + '｜' + p.chain + '」這筆收款設定嗎？')) return;
+      try {
+        await api('adminDeletePayment', { row: p.row }, token);
+        loadPayments();
+      } catch (err) {
+        handleErr(err, $('payMsg'));
+      }
+    }
+  });
+
+  let lectureAdminList = [];
+  function lectureCard(l) {
+    const meta = [l.type, l.tier, l.url].filter(Boolean).join('｜');
+    return '<div class="trade" data-lrow="' + l.row + '">' +
+      '<div class="trade-head"><span>' + esc(l.title) + '</span></div>' +
+      (meta ? '<div class="trade-meta">' + esc(meta) + '</div>' : '') +
+      (l.note ? '<div class="trade-meta">' + esc(l.note) + '</div>' : '') +
+      '<div class="row-btns"><button class="btn btn-sm btn-ghost" type="button" data-act="editLec">✏️ 修改</button><button class="btn btn-sm btn-ghost" type="button" data-act="delLec" style="color:var(--err);border-color:var(--err)">🗑 刪除</button></div>' +
+      '</div>';
+  }
+  function renderLectureAdminList() {
+    const q = $('lecSearch').value.trim().toLowerCase();
+    const list = lectureAdminList.filter(l => !q || [l.type, l.tier, l.title, l.note].join(' ').toLowerCase().indexOf(q) >= 0);
+    $('lecList').innerHTML = list.length ? list.map(lectureCard).join('') : (q ? '' : '<p class="muted">目前沒有講義或網站</p>');
+  }
+  async function loadLectureAdmin() {
+    $('lecList').innerHTML = '<p class="muted">載入中…</p>';
+    try {
+      const d = await api('adminListLectures', {}, token);
+      lectureAdminList = d.items || [];
+      renderLectureAdminList();
+    } catch (err) {
+      $('lecList').innerHTML = '';
+      handleErr(err, $('lecMsg'));
+    }
+  }
+  function toggleLecTier() {
+    $('lecTierWrap').hidden = $('lecType').value !== '網站';
+  }
+  $('lecType').addEventListener('change', toggleLecTier);
+  toggleLecTier();
+  function resetLecForm() {
+    $('lecForm').reset();
+    $('lecRow').value = '';
+    $('lecCancel').hidden = true;
+    toggleLecTier();
+  }
+  $('lecForm').addEventListener('submit', async ev => {
+    ev.preventDefault();
+    const msg = $('lecMsg');
+    try {
+      await api('adminSaveLecture', {
+        row: $('lecRow').value || undefined,
+        type: $('lecType').value,
+        tier: $('lecTier').value.trim(),
+        title: $('lecTitle').value.trim(),
+        url: $('lecUrl').value.trim(),
+        note: $('lecNote').value.trim()
+      }, token);
+      showMsg(msg, '✅ 已儲存', 'ok');
+      resetLecForm();
+      loadLectureAdmin();
+    } catch (err) {
+      handleErr(err, msg);
+    }
+  });
+  $('lecCancel').addEventListener('click', resetLecForm);
+  $('lecSearch').addEventListener('input', renderLectureAdminList);
+  $('lecList').addEventListener('click', async ev => {
+    const card = ev.target.closest('[data-lrow]');
+    if (!card) return;
+    const row = card.dataset.lrow;
+    const l = lectureAdminList.find(x => String(x.row) === row);
+    if (ev.target.closest('[data-act="editLec"]')) {
+      $('lecRow').value = l.row;
+      $('lecType').value = l.type === '網站' ? '網站' : '講義';
+      $('lecTier').value = l.tier;
+      $('lecTitle').value = l.title;
+      $('lecUrl').value = l.url;
+      $('lecNote').value = l.note;
+      $('lecCancel').hidden = false;
+      toggleLecTier();
+      window.scrollTo({ top: $('lecForm').offsetTop - 80, behavior: 'smooth' });
+      return;
+    }
+    if (ev.target.closest('[data-act="delLec"]')) {
+      if (!confirm('確定要刪除「' + l.title + '」嗎？')) return;
+      try {
+        await api('adminDeleteLecture', { row: l.row }, token);
+        loadLectureAdmin();
+      } catch (err) {
+        handleErr(err, $('lecMsg'));
+      }
     }
   });
 
