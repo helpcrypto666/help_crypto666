@@ -1573,7 +1573,6 @@
     (t ? t.strategies : []).forEach(s => {
       if (DEFAULT_STRATS.indexOf(s) < 0 && customStrats.indexOf(s) < 0) customStrats.push(s);
     });
-    saveCustom();
     renderStrats();
     $('entryLegs').innerHTML = '';
     $('exitLegs').innerHTML = '';
@@ -1755,25 +1754,45 @@
     } catch (err) { handleErr(err); }
   }
 
-  /* ---------- 策略標籤 ---------- */
-  function loadCustom() {
-    try { customStrats = JSON.parse(lsGet(CUSTOM_KEY) || '[]') || []; } catch (e) { customStrats = []; }
+  /* ---------- 策略標籤（存在伺服器，依帳號區分） ---------- */
+  async function loadCustom() {
+    try {
+      const d = await api('listCustomStrategies', {}, token);
+      customStrats = (d.items || []).map(x => x.name);
+    } catch (e) { customStrats = []; }
   }
-  function saveCustom() { lsSet(CUSTOM_KEY, JSON.stringify(customStrats)); }
   function renderStrats() {
     const all = DEFAULT_STRATS.concat(customStrats.filter(s => DEFAULT_STRATS.indexOf(s) < 0));
-    $('stratBox').innerHTML = all.map(s =>
-      '<label class="chip"><input type="checkbox" value="' + esc(s) + '"' + (stratSel.has(s) ? ' checked' : '') + '>' + esc(s) + '</label>'
-    ).join('');
+    $('stratBox').innerHTML = all.map(s => {
+      const delBtn = DEFAULT_STRATS.indexOf(s) < 0
+        ? '<button type="button" class="strat-del" data-strat="' + esc(s) + '" title="刪除這個策略" style="margin-left:4px;border:none;background:none;color:var(--err);cursor:pointer">✕</button>'
+        : '';
+      return '<label class="chip"><input type="checkbox" value="' + esc(s) + '"' + (stratSel.has(s) ? ' checked' : '') + '>' + esc(s) + '</label>' + delBtn;
+    }).join('');
   }
-  function addCustomStrat() {
+  async function addCustomStrat() {
     const v = $('customStrat').value.trim().replace(/、/g, ',').slice(0, 30);
     if (!v) return;
-    if (DEFAULT_STRATS.indexOf(v) < 0 && customStrats.indexOf(v) < 0) { customStrats.push(v); saveCustom(); }
     stratSel.add(v);
     $('customStrat').value = '';
-    renderStrats();
+    if (DEFAULT_STRATS.indexOf(v) < 0 && customStrats.indexOf(v) < 0) {
+      customStrats.push(v);
+      renderStrats();
+      try { await api('addCustomStrategy', { name: v }, token); } catch (e) {}
+    } else {
+      renderStrats();
+    }
   }
+  $('stratBox').addEventListener('click', async ev => {
+    const btn = ev.target.closest('.strat-del');
+    if (!btn) return;
+    const name = btn.dataset.strat;
+    if (!confirm('確定要刪除「' + name + '」這個策略嗎？')) return;
+    customStrats = customStrats.filter(s => s !== name);
+    stratSel.delete(name);
+    renderStrats();
+    try { await api('deleteCustomStrategy', { name: name }, token); } catch (e) {}
+  });
 
 
 
@@ -1849,13 +1868,13 @@
     $('rvSearch').addEventListener('input', renderReview);
   }
 
-  function init() {
+  async function init() {
     bindEvents();
-    loadCustom();
-    renderStrats();
     toggleMode();
     token = lsGet(TOKEN_KEY) || '';
     if (!token) { showLogin(); return; }
+    await loadCustom();
+    renderStrats();
     try { state = JSON.parse(lsGet(CACHE_KEY) || 'null'); } catch (e) { state = null; }
     showMain();
     syncNow();
